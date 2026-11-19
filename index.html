@@ -14,7 +14,7 @@
 <style>:root{
   --bg:#0a0a0a; --bg2:#0e1014; --card:#111318; --card2:#161921; --line:#232733; --line2:#2e3342;
   --text:#ece7da; --mute:#8d8a80; --dim:#5d5b55;
-  --gold:#d4ae5a; --gold2:#f1d48c; --gold3:#9c7a2f; --goldbg:rgba(212,174,90,.10);
+  --gold:#cfa032; --gold2:#e6c066; --gold3:#8c6a1c; --goldbg:rgba(207,160,50,.10);
   --green:#3fbf7f; --red:#e0565b; --blue:#5aa6e0;
   --serif:'Cinzel','Cormorant Garamond',Georgia,serif; --serif2:'Cormorant Garamond',Georgia,serif;
   --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -40,7 +40,7 @@ main{flex:1;min-width:0;max-width:1100px;margin:0 auto;padding:16px 16px 24px}
 .pagehead h1{font-size:24px}
 .eyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
-.card.gold{border-color:rgba(212,174,90,.45);background:linear-gradient(180deg,#14130f,#101115)}
+.card.gold{border-color:rgba(207,160,50,.45);background:linear-gradient(180deg,#14130f,#101115)}
 .card h2{font-size:15px;margin-bottom:10px}
 .card h3{font-size:13px}
 .grid{display:grid;gap:14px}
@@ -71,7 +71,7 @@ label.f{display:block;font-size:12px;color:var(--mute);margin:10px 0 5px}
 .tabs button{background:none;border:none;color:var(--mute);padding:10px 12px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-size:14px}
 .tabs button.on{color:var(--gold);border-bottom-color:var(--gold)}
 .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;background:var(--card2);border:1px solid var(--line2);color:var(--mute)}
-.pill.g{color:var(--gold);border-color:rgba(212,174,90,.4);background:var(--goldbg)}
+.pill.g{color:var(--gold);border-color:rgba(207,160,50,.4);background:var(--goldbg)}
 .bar{height:6px;background:#1c1f27;border-radius:99px;overflow:hidden}
 .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold3),var(--gold2));border-radius:99px}
 .empty{color:var(--mute);text-align:center;padding:22px 10px;font-size:14px}
@@ -109,7 +109,7 @@ label.f{display:block;font-size:12px;color:var(--mute);margin:10px 0 5px}
 .hero .date{color:var(--mute);font-size:13px;margin-top:4px;letter-spacing:.06em}
 .piecewrap{width:150px;height:150px;margin:14px auto 6px;position:relative}
 .piecewrap svg{width:100%;height:100%}
-.piecewrap.glow::before{content:'';position:absolute;inset:10%;border-radius:50%;filter:blur(28px);opacity:.45;background:var(--glow,#d4ae5a)}
+.piecewrap.glow::before{content:'';position:absolute;inset:10%;border-radius:50%;filter:blur(28px);opacity:.45;background:var(--glow,#cfa032)}
 .rankname{font-family:var(--serif);font-size:18px;letter-spacing:.06em}
 .streakline{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:14px;flex-wrap:wrap}
 .streakline b{font-family:var(--serif2);font-size:20px}
@@ -140,7 +140,7 @@ label.f{display:block;font-size:12px;color:var(--mute);margin:10px 0 5px}
 .tl{position:relative;margin-left:52px;border-left:1px solid var(--line)}
 .tl .hr{position:absolute;left:-52px;width:44px;text-align:right;font-size:11px;color:var(--dim);transform:translateY(-7px)}
 .tl .hl{position:absolute;left:0;right:0;border-top:1px dashed #1b1e26}
-.tl .ev{position:absolute;left:8px;right:4px;border-radius:9px;background:linear-gradient(180deg,rgba(212,174,90,.18),rgba(212,174,90,.08));border:1px solid rgba(212,174,90,.45);padding:5px 9px;font-size:13px;overflow:hidden;cursor:pointer;display:flex;gap:8px;align-items:flex-start}
+.tl .ev{position:absolute;left:8px;right:4px;border-radius:9px;background:linear-gradient(180deg,rgba(207,160,50,.18),rgba(207,160,50,.08));border:1px solid rgba(207,160,50,.45);padding:5px 9px;font-size:13px;overflow:hidden;cursor:pointer;display:flex;gap:8px;align-items:flex-start}
 .tl .ev.done{opacity:.5;text-decoration:line-through}
 .tl .now{position:absolute;left:-4px;right:0;border-top:2px solid var(--red);z-index:3}
 .tl .now::before{content:'';position:absolute;left:-4px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--red)}
@@ -198,7 +198,7 @@ label.f{display:block;font-size:12px;color:var(--mute);margin:10px 0 5px}
 /* heatmap */
 .heat{display:grid;grid-auto-flow:column;grid-auto-columns:13px;justify-content:start;grid-template-rows:repeat(7,1fr);gap:3px;overflow-x:auto;padding-bottom:4px}
 .heat i{width:13px;height:13px;border-radius:3px;background:#15181f;display:block}
-.heat i.l1{background:#3b3220}.heat i.l2{background:#6b5527}.heat i.l3{background:#a8843a}.heat i.l4{background:#f1d48c}
+.heat i.l1{background:#3a2f15}.heat i.l2{background:#6a5019}.heat i.l3{background:#a37a22}.heat i.l4{background:#e6c066}
 .heat i.f{visibility:hidden}
 
 /* focus */
@@ -230,8 +230,39 @@ body.gated{padding-bottom:0}
 input[type=email],input[type=password]{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;outline:none;font-size:16px;text-align:center}
 input[type=email]:focus,input[type=password]:focus{border-color:var(--gold3)}
 body.gated .nav{display:none}
+/* v2 home (screenshot style) */
+.hhead{display:flex;align-items:center;gap:16px;margin:14px 2px 22px}
+.hhead img{width:92px;flex-shrink:0}
+.hdate{font-size:12px;letter-spacing:.2em;color:var(--gold);font-weight:600}
+.hgreet{font-family:var(--serif2);font-size:32px;line-height:1.05;margin-top:6px;font-weight:500}
+.hname{font-family:var(--serif);font-size:27px;color:var(--gold);letter-spacing:.02em;line-height:1.15;font-weight:600}
+@media(min-width:900px){.hhead img{width:110px}.hgreet{font-size:40px}.hname{font-size:34px}}
+.rankcard{display:flex;align-items:center;gap:18px;border-color:rgba(207,160,50,.35);background:#100f0c;cursor:pointer;padding:16px 20px}
+.rankcard .rp{width:58px;height:58px;flex-shrink:0}
+.rankcard .rp svg{width:100%;height:100%}
+.rankcard .rn{font-family:var(--serif2);font-size:24px;font-weight:600;line-height:1.1}
+.rankcard .rs{color:#b9b4a8;font-size:14.5px;margin-top:3px}
+.tiles{gap:12px;margin-bottom:14px}
+.tile{margin:0;padding:20px 18px;min-height:150px;background:#0f0f10}
+.tile .tbig{font-family:var(--serif2);font-size:42px;font-weight:600;line-height:1}
+.tile .tk{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);font-weight:600;margin-top:16px}
+.tile .tsub{color:#b9b4a8;font-size:14px;margin-top:5px;line-height:1.35}
+.orders{padding:20px}
+.ogh{display:flex;gap:12px;font-size:12px;letter-spacing:.22em;font-weight:600;color:var(--gold);padding:16px 0 8px;border-bottom:1px solid var(--line)}
+/* war room */
+.brief{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;cursor:pointer;min-width:0}
+.brief b{font-family:var(--serif2);font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.weeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px}
+.wk-cell{border:1px solid var(--line2);border-radius:9px;padding:7px 4px;text-align:center;cursor:pointer;background:var(--bg2);font-size:12px}
+.wk-cell span{display:block;font-weight:600}.wk-cell i{font-style:normal;font-size:10.5px;color:var(--mute)}
+.wk-cell.cur{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.wk-cell.done{background:var(--goldbg);border-color:var(--gold3)}.wk-cell.done span{color:var(--gold)}
+.wk-cell.miss{border-color:rgba(224,86,91,.5)}
+ol.code{text-align:left;max-width:520px;margin:14px auto;padding-left:22px;font-family:var(--serif2);font-size:19px;line-height:1.45}
+ol.code li{margin:6px 0}
+ol.code li::marker{color:var(--gold);font-family:var(--serif)}
 
-.card[data-go] svg,[data-go]>span>svg{width:22px;height:22px}
+[data-go]>span>svg{width:22px;height:22px}
 main{padding-top:max(16px, env(safe-area-inset-top))}
 .side{padding-top:max(22px, env(safe-area-inset-top))}
 html,body{overscroll-behavior-y:none}
@@ -282,12 +313,15 @@ const ICON = {
   left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M15 5l-7 7 7 7"/></svg>',
   right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M9 5l7 7-7 7"/></svg>',
   repeat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="vertical-align:-1px"><path d="M4 11V9a3 3 0 0 1 3-3h12l-3-3M20 13v2a3 3 0 0 1-3 3H5l3 3"/></svg>',
+  today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg>',
+  trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>',
+  sword: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>',
   clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
 };
 
 /* ========== store (synced via Claude db, local fallback) ========== */
-const COLS = ['tasks', 'days', 'goals', 'prayers', 'books', 'accounts', 'trades', 'tjournal', 'holdings', 'watch', 'reviews', 'misc'];
+const COLS = ['tasks', 'days', 'goals', 'prayers', 'books', 'accounts', 'trades', 'tjournal', 'holdings', 'watch', 'reviews', 'misc', 'campaigns', 'enemies', 'aar', 'countdowns'];
 const S = {}; COLS.forEach(c => S[c] = {});
 const SYNC = { mode: 'connecting', loaded: new Set(), timedOut: false };
 let BASE = null;
@@ -345,7 +379,7 @@ async function initStore() {
 /* ========== ranks / chess pieces ========== */
 const METALS = [
   { key: 'silver', name: 'Silver', a: '#ffffff', b: '#c9ced6', c: '#7d848f', glow: '#cfd6e0' },
-  { key: 'gold', name: 'Gold', a: '#fff1bf', b: '#e2b85a', c: '#8f6a22', glow: '#e9b949' },
+  { key: 'gold', name: 'Gold', a: '#fbe7a6', b: '#d4a438', c: '#7e5c16', glow: '#d9a43a' },
   { key: 'emerald', name: 'Emerald', a: '#c8ffe4', b: '#2fbf7c', c: '#0b5e3a', glow: '#2fd38a' },
   { key: 'diamond', name: 'Diamond', a: '#ffffff', b: '#b9ecff', c: '#5aa9d6', glow: '#9fe3ff' },
 ];
@@ -453,10 +487,10 @@ const timeGroup = time => { if (!time) return 'Anytime'; const h = +time.split('
 
 /* ========== router / render ========== */
 const NAV = [
-  { id: 'home', label: 'Home', icon: 'home' }, { id: 'tasks', label: 'Tasks', icon: 'tasks' }, { id: 'schedule', label: 'Schedule', icon: 'sched' },
-  { id: 'trading', label: 'Trading', icon: 'trade' }, { id: 'goals', label: 'Goals', icon: 'goal' }, { id: 'faith', label: 'Faith', icon: 'faith' },
-  { id: 'reading', label: 'Reading', icon: 'book' }, { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' },
-  { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
+  { id: 'home', label: 'Today', icon: 'today' }, { id: 'schedule', label: 'Schedule', icon: 'sched' }, { id: 'trading', label: 'Trading', icon: 'trend' },
+  { id: 'goals', label: 'Goals', icon: 'goal' }, { id: 'warroom', label: 'War Room', icon: 'sword' }, { id: 'tasks', label: 'All Tasks', icon: 'tasks' },
+  { id: 'faith', label: 'Faith', icon: 'faith' }, { id: 'reading', label: 'Reading', icon: 'book' },
+  { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' }, { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
   { id: 'settings', label: 'Settings & Data', icon: 'gear' },
 ];
 const VIEWS = {};
@@ -471,14 +505,14 @@ function render(force) {
   pendingRender = false;
   if (typeof gate === 'function' && gate()) return;
   document.body.classList.remove('gated');
-  const mobileMain = ['home', 'tasks', 'schedule', 'trading'];
+  const mobileMain = ['home', 'schedule', 'trading', 'goals'];
   const navHTML = (arr, side) => arr.map(n => `<button data-go="${n.id}" class="${UI.view === n.id || (!side && n.id === 'more' && !mobileMain.includes(UI.view)) ? 'on' : ''}">${ICON[n.icon]}<span>${n.label}</span></button>`).join('');
   $('#side').innerHTML = `<div class="brand"><img src="${EAGLE}" alt=""><div class="t">EMPEROR'S MIND</div></div>`
-    + navHTML(NAV.slice(0, 4), true) + '<div class="sec">LIFE</div>' + navHTML(NAV.slice(4, 7), true) + '<div class="sec">DISCIPLINE</div>' + navHTML(NAV.slice(7), true);
+    + navHTML(NAV.slice(0, 6), true) + '<div class="sec">LIFE</div>' + navHTML(NAV.slice(6, 8), true) + '<div class="sec">DISCIPLINE</div>' + navHTML(NAV.slice(8, 12), true) + '<div class="sec">&nbsp;</div>' + navHTML(NAV.slice(12), true);
   $('#nav').innerHTML = navHTML([...NAV.slice(0, 4), { id: 'more', label: 'More', icon: 'more' }], false);
   const syncTxt = typeof syncLabel === 'function' ? syncLabel() : SYNC.mode === 'cloud' ? (SYNC.timedOut ? '<span class="dot warn"></span>Sync slow' : SYNC.loaded.size < COLS.length ? '<span class="dot warn"></span>Syncing…' : '<span class="dot on"></span>Synced')
     : SYNC.mode === 'local' ? '<span class="dot warn"></span>This device only' : SYNC.mode === 'error' ? '<span class="dot" style="background:var(--red)"></span>Sync error' : '<span class="dot"></span>Connecting…';
-  const top = `<div class="topbar"><img src="${EAGLE}" alt=""><span class="t">EMPEROR'S MIND</span><span class="sync">${syncTxt}</span></div>`;
+  const top = UI.view === 'home' ? '' : `<div class="topbar"><img src="${EAGLE}" alt=""><span class="t">EMPEROR'S MIND</span><span class="sync">${syncTxt}</span></div>`;
   let banner = '';
   if (SYNC.mode === 'local') banner = '<div class="banner">Not connected to sync — changes are saved on this device only. Open the app from your Claude link while signed in to sync between iPhone and Mac.</div>';
   if (SYNC.timedOut) banner = '<div class="banner">Can\'t reach your synced data yet — what you see may be out of date.</div>';
@@ -553,59 +587,6 @@ function checkRankUp() {
 }
 
 /* ========== HOME ========== */
-function greeting() { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening'; }
-function ringSVG(r, size = 84, label = '') {
-  const R = 36, C = 2 * Math.PI * R;
-  return `<svg class="ring" viewBox="0 0 84 84" style="width:${size}px;height:${size}px"><circle cx="42" cy="42" r="${R}" fill="none" stroke="#1c1f27" stroke-width="7"/>
-  <circle cx="42" cy="42" r="${R}" fill="none" stroke="url(#rg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - Math.min(1, r))}" transform="rotate(-90 42 42)"/>
-  <defs><linearGradient id="rg"><stop offset="0" stop-color="#9c7a2f"/><stop offset="1" stop-color="#f1d48c"/></linearGradient></defs>
-  <text x="42" y="47" text-anchor="middle" fill="#ece7da" font-size="17" font-family="Cormorant Garamond,serif" font-weight="600">${label}</text></svg>`;
-}
-VIEWS.home = () => {
-  const t = today(), si = streakInfo(), idx = pieceIndex(si.record);
-  const m = idx >= 0 ? METALS[Math.floor(idx / 6)] : METALS[0];
-  const next = Math.min(23, idx + 1), nextDay = pieceDay(next);
-  const prevDay = idx < 0 ? 0 : pieceDay(idx);
-  const prog = idx >= 23 ? 1 : (si.record - prevDay) / (nextDay - prevDay);
-  const { rep, once } = tasksForDate(t);
-  const items = [...rep, ...once];
-  const doneN = items.filter(x => isDoneOn(x, t)).length;
-  const upcoming = items.filter(x => !isDoneOn(x, t)).sort((a, b) => (a.time || '99').localeCompare(b.time || '99')).slice(0, 5);
-  const tr = tradesFiltered('all').filter(x => tradeDate(x) === t);
-  const trW = tradesFiltered('all').filter(x => tradeDate(x) >= weekStart(t));
-  const focusToday = (S.days[t] && S.days[t].focus) || 0;
-  const v = verseOfDay();
-  const piece = idx >= 0 ? pieceSVG(idx) : `<div style="opacity:.25">${pieceSVG(0)}</div>`;
-  return `
-  <div class="card gold hero">
-    <div class="greet">${greeting()}, <b>Emperor Blanco</b></div>
-    <div class="date">${fmtDate(t)}</div>
-    <div class="piecewrap glow" style="--glow:${m.glow}" data-go="trophies">${piece}</div>
-    <div class="rankname">${pieceName(idx)}</div>
-    <div class="streakline">
-      <span>🔥 <b>${si.cur}</b> <span class="mute">day streak</span></span>
-      <span>🏆 <b>${si.record}</b> <span class="mute">record</span></span>
-    </div>
-    ${idx < 23 ? `<div style="max-width:320px;margin:12px auto 0"><div class="bar"><i style="width:${Math.max(2, prog * 100)}%"></i></div>
-      <div class="tiny mute" style="margin-top:6px">${idx < 0 ? 'Complete your first task today to earn the Silver Pawn' : (nextDay - si.record) + ' days to ' + pieceName(next) + ' (beat your record)'}</div></div>` : '<div class="tiny goldt" style="margin-top:8px">The highest rank. Long live the Emperor.</div>'}
-    ${!si.todayActive ? '<div class="small" style="margin-top:12px;color:#e6c27a">Today isn\'t counted yet — complete one task to keep the streak.</div>' : ''}
-  </div>
-  <div class="grid g2">
-    <div class="card">
-      <div class="row"><div><div class="eyebrow">Today</div><h2 style="margin:4px 0 0">${doneN}/${items.length} tasks done</h2></div><span class="sp"></span>${ringSVG(items.length ? doneN / items.length : 0, 70, items.length ? Math.round(doneN / items.length * 100) + '%' : '–')}</div>
-      <div class="list" style="margin-top:6px">${upcoming.map(x => `<div class="mini-task"><button class="chk" data-act="tick" data-id="${x.id}">${ICON.check}</button><span style="flex:1">${esc(x.title)}</span><span class="tiny mute">${x.time || ''}</span></div>`).join('') || '<div class="empty">All done for today. Well played.</div>'}</div>
-      <button class="btn sm ghost" data-go="tasks" style="margin-top:8px">Open task list →</button>
-    </div>
-    <div>
-      <div class="card"><div class="eyebrow">Verse of the day</div><div class="verse" style="margin-top:8px">“${esc(v.t)}”</div><div class="small goldt" style="margin-top:6px">${esc(v.r)}</div></div>
-      <div class="grid g2 keep">
-        <div class="card stat" data-go="trading" style="cursor:pointer"><div class="k">P&L today</div><div class="v ${cls(sum(tr.map(pnlOf)))}">${tr.length ? money(sum(tr.map(pnlOf)), true) : '–'}</div><div class="tiny mute">Week: <span class="${cls(sum(trW.map(pnlOf)))}">${money(sum(trW.map(pnlOf)), true)}</span></div></div>
-        <div class="card stat" data-go="focus" style="cursor:pointer"><div class="k">Focus today</div><div class="v">${minsToHM(focusToday)}</div><div class="tiny mute">Deep work</div></div>
-      </div>
-    </div>
-  </div>
-  <div class="card"><div class="row"><h2 style="margin:0">Discipline — last 20 weeks</h2><span class="sp"></span><button class="btn sm ghost" data-go="heatmap">Full year →</button></div><div style="margin-top:10px">${heatGrid(addDays(t, -20 * 7 + 1), t)}</div></div>`;
-};
 ACT.tick = d => { const t = S.tasks[d.id]; if (t) toggleTask(t, d.date || today()); };
 
 /* ========== TASKS ========== */
@@ -666,7 +647,7 @@ function taskModal(t) {
    <label class="f">Type</label><div class="seg" id="tm-kind"><button data-v="rep">Repeating</button><button data-v="once">One-time</button></div>
    <div class="grid g2 keep" style="gap:10px"><div><label class="f">Time (optional)</label><input type="time" name="time" value="${esc(t.time || '')}"></div>
    <div><label class="f" id="tm-datel">Start date</label><input type="date" name="date" value="${esc(t.kind === 'once' ? (t.date || '') : (t.start || today()))}"></div></div>
-   <label class="f">Duration: <b id="tm-durv">${minsToHM(t.dur || 0)}</b></label><input type="range" name="dur" min="0" max="240" step="5" value="${t.dur || 0}" style="width:100%;accent-color:#d4ae5a">
+   <label class="f">Duration: <b id="tm-durv">${minsToHM(t.dur || 0)}</b></label><input type="range" name="dur" min="0" max="240" step="5" value="${t.dur || 0}" style="width:100%;accent-color:#cfa032">
    <div id="tm-rep"><label class="f">Repeat</label><div class="seg" id="tm-rtype"><button data-v="daily">Every day</button><button data-v="weekdays">Certain days</button><button data-v="interval">Every X days</button><button data-v="monthly">Monthly</button></div>
      <div id="tm-days" style="margin-top:10px"><div class="days7">${[1, 2, 3, 4, 5, 6, 0].map(i => `<button type="button" data-d="${i}">${DOW[i]}</button>`).join('')}</div></div>
      <div id="tm-int" style="margin-top:10px"><div class="row"><span class="mute small">Every</span><input type="number" name="every" min="1" value="${r.every || 2}" style="width:80px"><span class="mute small">days</span></div></div>
@@ -881,7 +862,7 @@ function tradeModal(t, presetDate) {
     const read = () => ({ ...t, acc: fv(m, 'acc'), sym: fv(m, 'sym').toUpperCase(), side: st.side, openAt: fv(m, 'openAt'), closeAt: fv(m, 'closeAt'), entry: fv(m, 'entry'), exit: fv(m, 'exit'), qty: fv(m, 'qty'), mult: fv(m, 'mult') || '1', stop: fv(m, 'stop'), target: fv(m, 'target'), fees: fv(m, 'fees'), pnlOverride: fv(m, 'pnlOverride'), setup: fv(m, 'setup'), emotion: fv(m, 'emotion'), tags: fv(m, 'tags').split(',').map(s => s.trim()).filter(Boolean), mistakes: fv(m, 'mistakes').split(',').map(s => s.trim()).filter(Boolean), rating: st.rating, notes: fv(m, 'notes'), img: st.img });
     const sync = () => {
       m.querySelectorAll('#tr-side button').forEach(b => b.classList.toggle('on', b.dataset.v === st.side));
-      m.querySelectorAll('#tr-rate span').forEach(s => s.style.color = +s.dataset.v <= st.rating ? '#d4ae5a' : '#2e3342');
+      m.querySelectorAll('#tr-rate span').forEach(s => s.style.color = +s.dataset.v <= st.rating ? '#cfa032' : '#2e3342');
       m.querySelector('#tr-img').innerHTML = st.img ? `<img src="${st.img}" style="max-width:100%;border-radius:10px;border:1px solid var(--line)">` : '';
       const x = read(), p = pnlOf(x), r = rOf(x), rr = plannedRR(x), h = holdMs(x);
       m.querySelector('#tr-calc').innerHTML = `<div class="row wrap" style="gap:18px;font-size:13px"><span>P&L <b class="${cls(p)}">${money(p, true)}</b></span><span>R-multiple <b class="${cls(r)}">${r == null ? '–' : r.toFixed(2) + 'R'}</b></span><span>Planned R:R <b>${rr == null ? '–' : '1:' + rr.toFixed(2)}</b></span><span>Risk <b>${money(riskOf(x))}</b></span><span>Hold <b>${durTxt(h)}</b></span></div>`;
@@ -978,7 +959,7 @@ ACT.editRules = () => {
 function tPortfolio() {
   const h = all('holdings').sort((a, b) => hv(b) - hv(a));
   const tv = sum(h.map(hv)), tc = sum(h.map(x => (num(x.qty) || 0) * (num(x.cost) || 0))), tp = tv - tc;
-  const colors = ['#d4ae5a', '#5aa6e0', '#3fbf7f', '#c77dff', '#e0565b', '#e6a23c', '#4fd1c5', '#a0aec0', '#f687b3', '#9ae6b4'];
+  const colors = ['#cfa032', '#5aa6e0', '#3fbf7f', '#c77dff', '#e0565b', '#e6a23c', '#4fd1c5', '#a0aec0', '#f687b3', '#9ae6b4'];
   return `<div class="grid g3 keep">${statCard('Portfolio value', money(tv), h.length + ' positions')}${statCard('Unrealized P&L', money(tp, true), tc ? pct(tp / tc, 2) : '', cls(tp))}${statCard('Cost basis', money(tc))}</div>
   ${h.length ? `<div class="card"><h2>Allocation</h2><div style="display:flex;height:14px;border-radius:7px;overflow:hidden">${h.map((x, i) => `<div style="width:${tv ? hv(x) / tv * 100 : 0}%;background:${colors[i % colors.length]}" title="${esc(x.sym)}"></div>`).join('')}</div>
    <div class="row wrap small" style="margin-top:8px;gap:12px">${h.map((x, i) => `<span><span class="dot" style="background:${colors[i % colors.length]}"></span> ${esc(x.sym)} ${tv ? pct(hv(x) / tv, 0) : ''}</span>`).join('')}</div></div>` : ''}
@@ -1237,7 +1218,7 @@ ACT.editBook = d => {
    <label class="f">Rating</label><div class="row" id="bk-r" style="font-size:24px;gap:4px;cursor:pointer">${[1, 2, 3, 4, 5].map(i => `<span data-v="${i}">★</span>`).join('')}</div>
    <label class="f">Key lessons</label><textarea name="lessons" style="min-height:120px" placeholder="What did this book teach you?">${esc(b.lessons || '')}</textarea>
    <div class="actions">${d.id ? '<button class="btn danger" id="bk-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="bk-save">Save</button></div>`, m => {
-    const sync = () => { m.querySelectorAll('#bk-s button').forEach(x => x.classList.toggle('on', x.dataset.v === st.status)); m.querySelectorAll('#bk-r span').forEach(s => s.style.color = +s.dataset.v <= st.rating ? '#d4ae5a' : '#2e3342'); };
+    const sync = () => { m.querySelectorAll('#bk-s button').forEach(x => x.classList.toggle('on', x.dataset.v === st.status)); m.querySelectorAll('#bk-r span').forEach(s => s.style.color = +s.dataset.v <= st.rating ? '#cfa032' : '#2e3342'); };
     m.querySelector('#bk-s').onclick = e => { const x = e.target.closest('button'); if (x) { e.preventDefault(); st.status = x.dataset.v; if (st.status === 'finished') { const f = m.querySelector('[name=finished]'); if (!f.value) f.value = today(); const p = m.querySelector('[name=pages]').value; if (p) m.querySelector('[name=current]').value = p; } sync(); } };
     m.querySelector('#bk-r').onclick = e => { const s = e.target.closest('span'); if (s) { st.rating = +s.dataset.v === st.rating ? 0 : +s.dataset.v; sync(); } };
     m.querySelector('#bk-save').onclick = () => { const title = fv(m, 'title'); if (!title) return; put('books', b.id || uid(), { ...b, title, author: fv(m, 'author'), category: fv(m, 'category'), status: st.status, current: fv(m, 'current'), pages: fv(m, 'pages'), started: fv(m, 'started'), finished: fv(m, 'finished'), rating: st.rating, lessons: fv(m, 'lessons'), updated: Date.now() }); closeModal(); };
@@ -1273,7 +1254,7 @@ VIEWS.focus = () => {
   return `<div class="pagehead"><div><div class="eyebrow">Focus Timer</div><h1>Deep Work</h1></div></div>
   <div class="grid g2"><div class="card gold" style="text-align:center">
     <input type="text" data-chg="fLabel" value="${esc(F.label)}" placeholder="What are you working on?" style="text-align:center;max-width:340px;margin:0 auto 6px" ${running ? 'disabled' : ''}>
-    <div class="timer"><svg viewBox="0 0 240 240" style="width:100%;height:100%"><circle cx="120" cy="120" r="108" fill="none" stroke="#1c1f27" stroke-width="9"/><circle id="fring" data-c="${C}" cx="120" cy="120" r="108" fill="none" stroke="url(#rg2)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (r / (F.dur * 6e4))}" transform="rotate(-90 120 120)"/><defs><linearGradient id="rg2"><stop offset="0" stop-color="#9c7a2f"/><stop offset="1" stop-color="#f1d48c"/></linearGradient></defs></svg>
+    <div class="timer"><svg viewBox="0 0 240 240" style="width:100%;height:100%"><circle cx="120" cy="120" r="108" fill="none" stroke="#1c1f27" stroke-width="9"/><circle id="fring" data-c="${C}" cx="120" cy="120" r="108" fill="none" stroke="url(#rg2)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (r / (F.dur * 6e4))}" transform="rotate(-90 120 120)"/><defs><linearGradient id="rg2"><stop offset="0" stop-color="#8c6a1c"/><stop offset="1" stop-color="#e6c066"/></linearGradient></defs></svg>
      <div class="tt"><div class="big" id="ftime">${pad(Math.floor(r / 6e4))}:${pad(Math.floor(r / 1000) % 60)}</div><div class="tiny mute">${running ? 'Stay locked in' : paused ? 'Paused' : F.dur + ' min session'}</div></div></div>
     ${!running && !paused ? `<div class="seg" style="margin-bottom:12px">${[25, 50, 90].map(m => `<button class="${F.dur === m ? 'on' : ''}" data-act="fDur" data-m="${m}">${m} min</button>`).join('')}<button class="${![25, 50, 90].includes(F.dur) ? 'on' : ''}" data-act="fCustom">Custom</button></div>` : ''}
     <div class="row" style="justify-content:center">${running ? '<button class="btn" data-act="fPause">Pause</button>' : `<button class="btn pri" data-act="fStart">${paused ? 'Resume' : 'Start focus'}</button>`}${running || paused ? '<button class="btn ghost" data-act="fReset">Reset</button>' : ''}${running || paused ? '<button class="btn ghost" data-act="fDone">Finish now</button>' : ''}</div>
@@ -1339,6 +1320,223 @@ ACT.importRun = async () => {
   const data = j && j.data ? j.data : j; if (!data || typeof data !== 'object') { msg.textContent = 'Nothing to import.'; return; }
   msg.textContent = 'Importing…';
   try { const n = await bulkImport(data); ta.value = ''; msg.textContent = ''; toast('Imported ' + n + ' items 👑'); render(true); } catch (e) { console.error(e); msg.textContent = 'Import failed: ' + (e.message || e); }
+};
+
+/* ========== TODAY (home) ========== */
+function greeting() { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening'; }
+function ringSVG(r, size = 84, label = '', sub = '') {
+  const R = 36, C = 2 * Math.PI * R;
+  return `<svg class="ring" viewBox="0 0 84 84" style="width:${size}px;height:${size}px"><circle cx="42" cy="42" r="${R}" fill="none" stroke="#1d1d1f" stroke-width="6"/>
+  <circle cx="42" cy="42" r="${R}" fill="none" stroke="url(#rg)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - Math.min(1, r))}" transform="rotate(-90 42 42)"/>
+  <defs><linearGradient id="rg"><stop offset="0" stop-color="#8c6a1c"/><stop offset="1" stop-color="#e6c066"/></linearGradient></defs>
+  <text x="42" y="${sub ? 44 : 48}" text-anchor="middle" fill="#ece7da" font-size="${sub ? 17 : 16}" font-family="Cormorant Garamond,Georgia,serif" font-weight="600">${label}</text>${sub ? `<text x="42" y="58" text-anchor="middle" fill="#8d8a80" font-size="8.5" font-family="Inter,sans-serif" letter-spacing=".5">${sub}</text>` : ''}</svg>`;
+}
+const FLAME = on => `<svg viewBox="0 0 24 24" width="22" height="22" style="vertical-align:middle"><path d="M12 2.5c.6 3.3 4.8 5.6 4.8 10.6A4.8 4.8 0 0 1 12 18a4.8 4.8 0 0 1-4.8-4.9c0-2.3 1.2-3.7 2.3-4.9.3 1.4 1 2.4 2 2.7-.4-2.9.1-5.6.5-8.4z" fill="${on ? '#e0912f' : '#4a4640'}"/></svg>`;
+VIEWS.home = () => {
+  const t = today(), si = streakInfo(), idx = pieceIndex(si.record);
+  const next = Math.min(23, idx + 1), nextDay = pieceDay(next);
+  const { rep, once } = tasksForDate(t);
+  const items = [...rep, ...once];
+  const doneN = items.filter(x => isDoneOn(x, t)).length, left = items.length - doneN;
+  const focusToday = (S.days[t] && S.days[t].focus) || 0;
+  const groups = { Morning: [], Afternoon: [], Evening: [], Anytime: [] };
+  rep.slice().sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99') || (a.title || '').localeCompare(b.title || '')).forEach(x => groups[timeGroup(x.time)].push(x));
+  const v = verseOfDay();
+  const tr = tradesFiltered('all').filter(x => tradeDate(x) === t), trW = tradesFiltered('all').filter(x => tradeDate(x) >= weekStart(t));
+  const cd = all('countdowns').filter(c => c.date >= t).sort((a, b) => a.date.localeCompare(b.date))[0];
+  const camp = activeCampaign();
+  const tile = (big, k, sub, extra = '') => `<div class="card tile">${extra}<div class="tbig">${big}</div><div class="tk">${k}</div><div class="tsub">${sub}</div></div>`;
+  return `
+  <div class="hhead">
+    <img src="${EAGLE}" alt="">
+    <div><div class="hdate">${fmtDate(t, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase()}</div>
+    <div class="hgreet">${greeting()},</div><div class="hname">Emperor Blanco</div></div>
+  </div>
+  <div class="card rankcard" data-go="trophies">
+    <div class="rp">${idx >= 0 ? pieceSVG(idx) : '<div style="opacity:.28;filter:grayscale(1)">' + pieceSVG(0) + '</div>'}</div>
+    <div style="flex:1;min-width:0"><div class="rn">${pieceName(idx)}</div>
+    <div class="rs">${idx >= 23 ? 'The highest rank. Long live the Emperor.' : pieceName(next) + ' at ' + nextDay + ' day' + (nextDay === 1 ? '' : 's')}</div>
+    ${idx < 23 ? `<div class="bar" style="margin-top:9px"><i style="width:${Math.max(2, Math.min(100, (si.record - (idx < 0 ? 0 : pieceDay(idx))) / (nextDay - (idx < 0 ? 0 : pieceDay(idx))) * 100))}%"></i></div>` : ''}</div>
+  </div>
+  <div class="grid g2 keep tiles">
+    <div class="card tile" style="display:flex;flex-direction:column">${ringSVG(items.length ? doneN / items.length : 0, 92, doneN + '/' + items.length, 'today')}<div class="tk" style="margin-top:12px">Progress</div><div class="tsub">${items.length ? (left ? left + ' left today' : 'All done 👑') : 'No tasks yet'}</div></div>
+    ${tile(si.cur + ' ' + FLAME(si.todayActive), 'Day streak', si.todayActive ? 'Today is counted' : 'Complete one task to keep it')}
+    ${tile(si.record, 'Record', idx >= 23 ? 'Max rank reached' : Math.max(0, nextDay - si.record) + ' day' + (nextDay - si.record === 1 ? '' : 's') + ' to next piece')}
+    ${tile(minsToHM(focusToday).toUpperCase(), 'Focus today', focusToday ? 'Deep work logged' : 'Start a session in Focus', '').replace('class="card tile"', 'class="card tile" data-go="focus" style="cursor:pointer"')}
+  </div>
+  <div class="card orders">
+    <div class="row"><h2 class="serif" style="font-size:25px;font-family:var(--serif2);letter-spacing:0;margin:0;font-weight:600">Today's orders</h2><span class="sp"></span><button class="btn pri sm" data-act="newTask">${ICON.plus} Task</button></div>
+    ${once.length ? `<div class="ogh"><span>GENERAL</span><span class="mute">${once.filter(x => isDoneOn(x, t)).length}/${once.length}</span></div><div class="list">${once.map(x => taskRow(x, t)).join('')}</div>` : ''}
+    ${Object.entries(groups).filter(([, a]) => a.length).map(([g, a]) => `<div class="ogh"><span>${g.toUpperCase()}</span><span class="mute">${a.filter(x => isDoneOn(x, t)).length}/${a.length}</span></div><div class="list">${a.map(x => taskRow(x, t)).join('')}</div>`).join('')}
+    ${!items.length ? '<div class="empty">Set your daily orders — tap <b>+ Task</b> to add Daily GM, Gym, Pray…</div>' : ''}
+  </div>
+  ${camp || cd ? `<div class="card" data-go="warroom" style="cursor:pointer"><div class="row"><div class="eyebrow">War Room</div><span class="sp"></span><span class="small mute">Open →</span></div>
+    ${camp ? `<div style="margin-top:8px"><b>${esc(camp.title)}</b> <span class="small mute">· week ${campWeek(camp)} of ${campWeeks(camp)}</span><div class="bar" style="margin-top:6px"><i style="width:${campProgress(camp) * 100}%"></i></div></div>` : ''}
+    ${cd ? `<div class="small" style="margin-top:8px">⏳ <b>${esc(cd.title)}</b> in <b class="goldt">${diffDays(t, cd.date)}</b> days</div>` : ''}</div>` : ''}
+  <div class="card"><div class="eyebrow">Verse of the day</div><div class="verse" style="margin-top:8px">“${esc(v.t)}”</div><div class="small goldt" style="margin-top:6px">${esc(v.r)}</div></div>
+  ${tr.length || trW.length ? `<div class="card stat" data-go="trading" style="cursor:pointer"><div class="k">P&L today</div><div class="v ${cls(sum(tr.map(pnlOf)))}">${tr.length ? money(sum(tr.map(pnlOf)), true) : '–'}</div><div class="tiny mute">This week: <span class="${cls(sum(trW.map(pnlOf)))}">${money(sum(trW.map(pnlOf)), true)}</span></div></div>` : ''}
+  <div class="card"><div class="row"><h2 style="margin:0">Discipline — last 20 weeks</h2><span class="sp"></span><button class="btn sm ghost" data-go="heatmap">Full year →</button></div><div style="margin-top:10px">${heatGrid(addDays(t, -20 * 7 + 1), t)}</div></div>`;
+};
+
+/* ========== WAR ROOM ========== */
+UI.wrTab = 'campaign';
+const activeCampaign = () => all('campaigns').filter(c => c.status !== 'done').sort((a, b) => (b.created || 0) - (a.created || 0))[0];
+const campWeeks = c => Math.max(1, Math.ceil((diffDays(c.start, c.end) + 1) / 7));
+const campWeek = c => Math.min(campWeeks(c), Math.max(1, Math.floor(diffDays(c.start, today()) / 7) + 1));
+const campProgress = c => { const b = c.battles || []; return b.length ? b.filter(x => x.done).length / b.length : 0; };
+function enemyStats(e) {
+  const rel = (e.relapses || []).map(r => r.date).sort();
+  const pts = [e.start || today(), ...rel];
+  let best = 0; for (let i = 1; i < pts.length; i++) best = Math.max(best, diffDays(pts[i - 1], pts[i]));
+  const cur = Math.max(0, diffDays(rel.length ? rel[rel.length - 1] : (e.start || today()), today()));
+  return { cur, best: Math.max(best, cur), n: rel.length };
+}
+const code = () => misc('code');
+function codeStreak() { const r = code().read || {}; let d = r[today()] ? today() : addDays(today(), -1), n = 0; while (r[d] && n < 3000) { n++; d = addDays(d, -1); } return n; }
+VIEWS.warroom = () => {
+  const t = today(), camp = activeCampaign(), en = all('enemies').filter(e => !e.archived);
+  const cds = all('countdowns').filter(c => c.date >= t).sort((a, b) => a.date.localeCompare(b.date));
+  const readToday = !!(code().read || {})[t], aarToday = S.aar[t] && (S.aar[t].happened || S.aar[t].change);
+  const tabs = [['campaign', 'Campaign'], ['enemies', 'Enemies'], ['rules', 'Rules'], ['aar', 'After Action'], ['countdowns', 'D-Day']];
+  const body = { campaign: wrCampaign, enemies: wrEnemies, rules: wrRules, aar: wrAAR, countdowns: wrCountdowns }[UI.wrTab]();
+  return `<div class="pagehead"><div><div class="eyebrow">Command Center</div><h1>War Room</h1></div></div>
+  <div class="card gold"><div class="eyebrow" style="margin-bottom:10px">Briefing · ${fmtDate(t, { weekday: 'long', day: 'numeric', month: 'short' })}</div>
+   <div class="grid g2 keep" style="gap:10px">
+    <div class="brief" data-act="wrTab" data-k="campaign"><span class="mute tiny">CAMPAIGN</span><b>${camp ? esc(camp.title) : '—'}</b><span class="tiny mute">${camp ? 'Week ' + campWeek(camp) + '/' + campWeeks(camp) + ' · ' + Math.round(campProgress(camp) * 100) + '%' : 'No active campaign'}</span></div>
+    <div class="brief" data-act="wrTab" data-k="enemies"><span class="mute tiny">ENEMIES</span><b>${en.length ? en.map(e => enemyStats(e).cur).reduce((a, b) => Math.min(a, b)) + ' days' : '—'}</b><span class="tiny mute">${en.length ? 'weakest front · ' + en.length + ' tracked' : 'None tracked'}</span></div>
+    <div class="brief" data-act="wrTab" data-k="rules"><span class="mute tiny">CODE</span><b>${readToday ? '✓ Read today' : 'Not read yet'}</b><span class="tiny mute">${codeStreak()} day streak</span></div>
+    <div class="brief" data-act="wrTab" data-k="countdowns"><span class="mute tiny">NEXT D-DAY</span><b>${cds[0] ? diffDays(t, cds[0].date) + ' days' : '—'}</b><span class="tiny mute">${cds[0] ? esc(cds[0].title) : 'No countdowns'}</span></div>
+   </div>
+   ${!aarToday && new Date().getHours() >= 17 ? '<button class="btn sm" data-act="wrTab" data-k="aar" style="margin-top:12px">📝 File today\'s After Action Report</button>' : ''}</div>
+  <div class="tabs">${tabs.map(([k, l]) => `<button class="${UI.wrTab === k ? 'on' : ''}" data-act="wrTab" data-k="${k}">${l}</button>`).join('')}</div>${body}`;
+};
+ACT.wrTab = d => { UI.wrTab = d.k; render(); };
+
+/* campaign */
+function wrCampaign() {
+  const c = activeCampaign(), past = all('campaigns').filter(x => x.status === 'done').sort((a, b) => (b.end || '').localeCompare(a.end || ''));
+  if (!c) return `<div class="card empty">No active campaign.<br><span class="small">A campaign is one big mission for ~90 days, broken into weekly battles.</span><br><br><button class="btn pri" data-act="editCampaign">Start a campaign</button></div>${pastCamps(past)}`;
+  const W = campWeeks(c), cw = campWeek(c), b = c.battles || [];
+  const daysLeft = Math.max(0, diffDays(today(), c.end)), elapsed = Math.min(1, Math.max(0, diffDays(c.start, today()) / Math.max(1, diffDays(c.start, c.end))));
+  let weeks = '';
+  for (let w = 1; w <= W; w++) {
+    const wb = b.filter(x => +x.week === w), done = wb.length && wb.every(x => x.done);
+    weeks += `<div class="wk-cell ${w === cw ? 'cur' : ''} ${done ? 'done' : ''} ${w < cw && wb.length && !done ? 'miss' : ''}" data-act="campWeek" data-w="${w}"><span>W${w}</span><i>${wb.length ? wb.filter(x => x.done).length + '/' + wb.length : ''}</i></div>`;
+  }
+  const sel = UI.campWeek || cw, sb = b.filter(x => +x.week === sel);
+  return `<div class="card gold"><div class="row" style="align-items:flex-start"><div style="flex:1"><div class="eyebrow">Active campaign</div><h2 style="font-size:20px;margin:6px 0 4px">${esc(c.title)}</h2>${c.objective ? `<div class="small" style="color:#c9c4b6">${esc(c.objective)}</div>` : ''}</div><button class="iconbtn" data-act="editCampaign" data-id="${c.id}">${ICON.edit}</button></div>
+    <div class="grid g3 keep" style="margin-top:12px;gap:8px">${statCard('Battles won', b.filter(x => x.done).length + '/' + b.length)}${statCard('Week', cw + '/' + W)}${statCard('Days left', daysLeft)}</div>
+    <div class="small mute" style="margin-top:4px">Mission progress</div><div class="bar" style="margin-top:6px;height:8px"><i style="width:${campProgress(c) * 100}%"></i></div>
+    <div class="tiny mute" style="margin-top:6px">Time elapsed ${Math.round(elapsed * 100)}% · ${fmtDate(c.start, { day: 'numeric', month: 'short' })} → ${fmtDate(c.end, { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+    ${c.why ? `<div class="verse" style="font-size:16px;margin-top:12px">“${esc(c.why)}”</div>` : ''}</div>
+  <div class="card"><h2>Battle map</h2><div class="weeks">${weeks}</div></div>
+  <div class="card"><div class="row"><h2 style="margin:0">Week ${sel} battles</h2><span class="sp"></span><span class="tiny mute">${fmtDate(addDays(c.start, (sel - 1) * 7), { day: 'numeric', month: 'short' })} – ${fmtDate(addDays(c.start, sel * 7 - 1), { day: 'numeric', month: 'short' })}</span></div>
+    <div class="list" style="margin-top:6px">${sb.map(x => `<div class="task"><button class="chk ${x.done ? 'on' : ''}" data-act="battleTick" data-b="${x.id}">${ICON.check}</button><div class="body" style="padding-top:4px"><div class="name" style="${x.done ? 'text-decoration:line-through;color:var(--mute)' : ''}">${esc(x.title)}</div></div><button class="iconbtn" data-act="battleDel" data-b="${x.id}">${ICON.x}</button></div>`).join('') || '<div class="empty small">No battles planned for this week.</div>'}</div>
+    <form data-form="battle" class="row" style="margin-top:10px"><input type="text" name="b" placeholder="Add a battle for week ${sel}…"><button class="btn pri" type="submit">${ICON.plus}</button></form></div>
+  <div class="row" style="margin-bottom:14px"><span class="sp"></span><button class="btn sm" data-act="endCampaign">🏁 End campaign</button></div>${pastCamps(past)}`;
+}
+const pastCamps = past => past.length ? `<div class="card"><h2>Past campaigns</h2><div class="list">${past.map(c => `<div class="row" style="padding:9px 0"><span style="flex:1"><b>${esc(c.title)}</b><div class="tiny mute">${fmtDate(c.start, { month: 'short', year: 'numeric' })} – ${fmtDate(c.end, { month: 'short', year: 'numeric' })}</div></span><span class="pill g">${Math.round(campProgress(c) * 100)}%</span></div>`).join('')}</div></div>` : '';
+ACT.campWeek = d => { UI.campWeek = +d.w; render(); };
+ACT.form_battle = f => { const c = activeCampaign(), v = f.b.value.trim(); if (!c || !v) return; const w = UI.campWeek || campWeek(c); put('campaigns', c.id, { ...c, battles: [...(c.battles || []), { id: uid(), week: w, title: v, done: false }] }); f.b.value = ''; render(true); };
+ACT.battleTick = d => { const c = activeCampaign(); if (!c) return; put('campaigns', c.id, { ...c, battles: (c.battles || []).map(x => x.id === d.b ? { ...x, done: !x.done, doneAt: !x.done ? today() : null } : x) }); };
+ACT.battleDel = d => { const c = activeCampaign(); if (!c) return; put('campaigns', c.id, { ...c, battles: (c.battles || []).filter(x => x.id !== d.b) }); };
+ACT.endCampaign = () => { const c = activeCampaign(); if (c) confirmBox('End “' + c.title + '” and move it to past campaigns?', () => { put('campaigns', c.id, { ...c, status: 'done', end: c.end < today() ? c.end : today() }); UI.campWeek = null; }, 'End campaign'); };
+ACT.editCampaign = d => {
+  const c = d.id ? S.campaigns[d.id] : { start: today(), end: addDays(today(), 89), battles: [] };
+  openModal(mh(d.id ? 'Edit campaign' : 'New campaign') + `<label class="f">Mission</label><input type="text" name="title" value="${esc(c.title || '')}" placeholder="Get funded and pass 2 evals">
+   <label class="f">Objective — what does victory look like?</label><textarea name="objective" style="min-height:60px">${esc(c.objective || '')}</textarea>
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Start</label><input type="date" name="start" value="${esc(c.start)}"></div><div><label class="f">End</label><input type="date" name="end" value="${esc(c.end)}"></div></div>
+   <label class="f">Why I fight</label><input type="text" name="why" value="${esc(c.why || '')}" placeholder="For my family's future">
+   <div class="actions">${d.id ? '<button class="btn danger" id="c-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="c-s">${d.id ? 'Save' : 'Start campaign'}</button></div>`, m => {
+    m.querySelector('#c-s').onclick = () => { const title = fv(m, 'title'); if (!title) return; const s = fv(m, 'start') || today(), e = fv(m, 'end') || addDays(s, 89); put('campaigns', c.id || uid(), { ...c, title, objective: fv(m, 'objective'), start: s, end: e < s ? s : e, why: fv(m, 'why'), status: 'active', created: c.created || Date.now() }); UI.campWeek = null; closeModal(); };
+    const dl = m.querySelector('#c-del'); if (dl) dl.onclick = () => confirmBox('Delete this campaign for good?', () => del('campaigns', c.id));
+  });
+};
+
+/* enemies */
+function wrEnemies() {
+  const en = all('enemies').filter(e => !e.archived).sort((a, b) => (a.created || 0) - (b.created || 0));
+  const ms = [7, 30, 90, 180, 365];
+  return `<div class="row" style="margin-bottom:12px"><span class="small mute">The habits you're at war with. Every clean day is a victory.</span><span class="sp"></span><button class="btn sm pri" data-act="editEnemy">${ICON.plus} Enemy</button></div>
+  ${en.length ? `<div class="grid g2">${en.map(e => { const s = enemyStats(e), nm = ms.find(x => x > s.cur);
+    return `<div class="card"><div class="row"><b style="font-size:16px;flex:1">${esc(e.name)}</b><button class="iconbtn" data-act="editEnemy" data-id="${e.id}">${ICON.edit}</button></div>
+     <div class="row" style="align-items:flex-end;margin-top:6px"><div class="serif" style="font-size:44px;font-weight:600;line-height:1;color:var(--gold)">${s.cur}</div><div class="small mute" style="padding-bottom:6px">days clean</div><span class="sp"></span><div class="tiny mute" style="text-align:right">Best ${s.best}<br>${s.n} relapse${s.n === 1 ? '' : 's'}</div></div>
+     <div class="row" style="gap:6px;margin-top:10px">${ms.map(x => `<span class="pill ${s.cur >= x ? 'g' : ''}">${x}d</span>`).join('')}</div>
+     ${nm ? `<div class="bar" style="margin-top:10px"><i style="width:${s.cur / nm * 100}%"></i></div><div class="tiny mute" style="margin-top:4px">${nm - s.cur} days to the ${nm}-day badge</div>` : '<div class="tiny goldt" style="margin-top:8px">One full year conquered. 👑</div>'}
+     ${e.why ? `<div class="small" style="margin-top:8px;color:#c9c4b6">${esc(e.why)}</div>` : ''}
+     <button class="btn sm ghost" data-act="relapse" data-id="${e.id}" style="margin-top:10px">I slipped — reset</button></div>`; }).join('')}</div>` : '<div class="card empty">No enemies tracked yet. Name the habits you\'re defeating — scrolling, sugar, porn, weed, sleeping in…</div>'}`;
+}
+ACT.editEnemy = d => {
+  const e = d.id ? S.enemies[d.id] : { start: today(), relapses: [] };
+  openModal(mh(d.id ? 'Edit enemy' : 'New enemy') + `<label class="f">Enemy</label><input type="text" name="name" value="${esc(e.name || '')}" placeholder="Doom scrolling">
+   <label class="f">Clean since</label><input type="date" name="start" value="${esc(e.start || today())}">
+   <label class="f">Why I'm fighting it</label><textarea name="why" style="min-height:60px">${esc(e.why || '')}</textarea>
+   ${(e.relapses || []).length ? `<label class="f">Relapse log</label><div class="list small">${e.relapses.slice().reverse().map(r => `<div style="padding:6px 0"><b>${fmtDate(r.date, { day: 'numeric', month: 'short', year: 'numeric' })}</b> <span class="mute">${esc(r.note || '')}</span></div>`).join('')}</div>` : ''}
+   <div class="actions">${d.id ? '<button class="btn danger" id="e-del">Remove</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="e-s">Save</button></div>`, m => {
+    m.querySelector('#e-s').onclick = () => { const name = fv(m, 'name'); if (!name) return; put('enemies', e.id || uid(), { ...e, name, start: fv(m, 'start') || today(), why: fv(m, 'why'), created: e.created || Date.now() }); closeModal(); };
+    const dl = m.querySelector('#e-del'); if (dl) dl.onclick = () => confirmBox('Remove “' + e.name + '” from your enemies?', () => put('enemies', e.id, { ...e, archived: true }), 'Remove');
+  });
+};
+ACT.relapse = d => {
+  const e = S.enemies[d.id]; if (!e) return;
+  openModal(mh('Reset ' + esc(e.name) + '?') + `<p class="small mute">Honesty is strength. Your best streak stays on record.</p><label class="f">What happened? (optional)</label><input type="text" id="rn" placeholder="Trigger, situation…"><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="r-s">Reset counter</button></div>`,
+    m => m.querySelector('#r-s').onclick = () => { put('enemies', e.id, { ...e, relapses: [...(e.relapses || []), { date: today(), note: m.querySelector('#rn').value.trim() }] }); closeModal(); toast('Counter reset. Back to war.'); });
+};
+
+/* rules of engagement */
+function wrRules() {
+  const c = code(), rules = c.rules || [], read = !!(c.read || {})[today()];
+  return `<div class="card gold" style="text-align:center;padding:22px 18px"><div class="eyebrow">My code</div>
+   ${rules.length ? `<ol class="code">${rules.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : '<div class="mute" style="margin:14px 0">Write the rules you live by. Read them every day.</div>'}
+   <div class="row" style="justify-content:center;margin-top:8px">${rules.length ? `<button class="btn ${read ? '' : 'pri'}" data-act="codeRead">${read ? '✓ Read today' : 'I have read my code'}</button>` : ''}<button class="btn ghost" data-act="editCode">${rules.length ? 'Edit' : 'Write my code'}</button></div>
+   <div class="tiny mute" style="margin-top:10px">${codeStreak()} day reading streak</div></div>`;
+}
+ACT.codeRead = () => { const c = code(), r = { ...(c.read || {}) }; if (r[today()]) delete r[today()]; else r[today()] = 1; put('misc', 'code', { ...c, read: r }); };
+ACT.editCode = () => {
+  const c = code();
+  openModal(mh('Rules of Engagement') + `<p class="small mute">One rule per line.</p><textarea id="cd" style="min-height:220px" placeholder="I don't negotiate with my feelings.\nWin the morning, win the day.\nNo zero days.">${esc((c.rules || []).join('\n'))}</textarea><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="cd-s">Save</button></div>`,
+    m => m.querySelector('#cd-s').onclick = () => { put('misc', 'code', { ...c, rules: m.querySelector('#cd').value.split('\n').map(s => s.trim()).filter(Boolean) }); closeModal(); });
+};
+
+/* after action report */
+function wrAAR() {
+  const k = UI.aarDate || today(), a = S.aar[k] || {};
+  const past = all('aar').filter(x => x.id !== k && (x.happened || x.change)).sort((x, y) => y.id.localeCompare(x.id)).slice(0, 10);
+  const { rep, once } = tasksForDate(k), items = [...rep, ...once], dn = items.filter(x => isDoneOn(x, k)).length;
+  const f = (n, l, ph) => `<label class="f">${l}</label><textarea data-chg="aarText" data-f="${n}" data-d="${k}" placeholder="${ph}" style="min-height:64px">${esc(a[n] || '')}</textarea>`;
+  return `<div class="row" style="margin-bottom:12px"><button class="iconbtn" data-act="aarNav" data-d="-1">${ICON.left}</button><b class="serif" style="font-size:18px">${fmtDate(k, { weekday: 'short', day: 'numeric', month: 'long' })}</b><button class="iconbtn" data-act="aarNav" data-d="1">${ICON.right}</button>${k !== today() ? '<button class="btn sm" data-act="aarNav" data-d="0">Today</button>' : ''}<span class="sp"></span><span class="small mute">Orders ${dn}/${items.length}</span></div>
+  <div class="card"><h2>After Action Report</h2>
+   ${f('planned', '1 · What was the plan?', 'What did I intend to accomplish today?')}
+   ${f('happened', '2 · What actually happened?', 'Facts only.')}
+   ${f('why', '3 · Why was there a difference?', 'What went right, what went wrong — and why.')}
+   ${f('change', '4 · What will I do differently?', 'One concrete adjustment for tomorrow.')}
+   <label class="f">Score the day</label><div class="seg">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `<button class="${a.score === i ? 'on' : ''}" data-act="aarScore" data-d="${k}" data-v="${i}">${i}</button>`).join('')}</div>
+   <div class="tiny mute" style="margin-top:8px">Saves automatically.</div></div>
+  ${past.length ? `<div class="card"><h2>Past reports</h2><div class="list">${past.map(p => `<div class="row" style="padding:9px 0;cursor:pointer" data-act="aarOpen" data-d="${p.id}"><span style="flex:1;min-width:0"><b>${fmtDate(p.id, { weekday: 'short', day: 'numeric', month: 'short' })}</b><div class="tiny mute" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.change || p.happened || '')}</div></span>${p.score ? `<span class="pill g">${p.score}/10</span>` : ''}</div>`).join('')}</div></div>` : ''}`;
+}
+ACT.aarNav = d => { UI.aarDate = d.d === '0' ? today() : addDays(UI.aarDate || today(), +d.d); render(); };
+ACT.aarOpen = d => { UI.aarDate = d.d; render(); window.scrollTo(0, 0); };
+ACT.aarText = (d, el) => { const a = S.aar[d.d] || {}; if ((a[d.f] || '') === el.value) return; put('aar', d.d, { ...a, [d.f]: el.value }); toast('Report saved'); };
+ACT.aarScore = d => { const a = S.aar[d.d] || {}; put('aar', d.d, { ...a, score: +d.v }); };
+
+/* countdowns */
+function wrCountdowns() {
+  const t = today(), cs = all('countdowns').sort((a, b) => a.date.localeCompare(b.date));
+  const up = cs.filter(c => c.date >= t), past = cs.filter(c => c.date < t).reverse();
+  return `<div class="row" style="margin-bottom:12px"><span class="small mute">Big dates you're preparing for.</span><span class="sp"></span><button class="btn sm pri" data-act="editCd">${ICON.plus} D-Day</button></div>
+  ${up.length ? `<div class="grid g2">${up.map(c => { const n = diffDays(t, c.date); return `<div class="card" style="cursor:pointer" data-act="editCd" data-id="${c.id}"><div class="eyebrow">${n === 0 ? 'Today' : 'D-' + n}</div>
+    <div class="row" style="align-items:flex-end;margin-top:6px"><div class="serif" style="font-size:46px;font-weight:600;line-height:1">${n}</div><div class="small mute" style="padding-bottom:6px">day${n === 1 ? '' : 's'}</div></div>
+    <b style="display:block;margin-top:6px">${esc(c.title)}</b><div class="tiny mute">${fmtDate(c.date, { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}</div>${c.note ? `<div class="small" style="margin-top:6px;color:#c9c4b6">${esc(c.note)}</div>` : ''}</div>`; }).join('')}</div>` : '<div class="card empty">No countdowns. Add an eval deadline, a competition, a launch…</div>'}
+  ${past.length ? `<div class="card"><h2 class="mute">Passed</h2><div class="list">${past.map(c => `<div class="row small" style="padding:8px 0;cursor:pointer" data-act="editCd" data-id="${c.id}"><span style="flex:1">${esc(c.title)}</span><span class="mute">${fmtDate(c.date, { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>`).join('')}</div></div>` : ''}`;
+}
+ACT.editCd = d => {
+  const c = d.id ? S.countdowns[d.id] : { date: addDays(today(), 30) };
+  openModal(mh(d.id ? 'Edit D-Day' : 'New D-Day') + `<label class="f">What</label><input type="text" name="title" value="${esc(c.title || '')}" placeholder="Eval ends">
+   <label class="f">Date</label><input type="date" name="date" value="${esc(c.date)}"><label class="f">Note</label><input type="text" name="note" value="${esc(c.note || '')}">
+   <div class="actions">${d.id ? '<button class="btn danger" id="cd-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="cdx-s">Save</button></div>`, m => {
+    m.querySelector('#cdx-s').onclick = () => { const title = fv(m, 'title'), date = fv(m, 'date'); if (!title || !date) return; put('countdowns', c.id || uid(), { ...c, title, date, note: fv(m, 'note') }); closeModal(); };
+    const dl = m.querySelector('#cd-del'); if (dl) dl.onclick = () => confirmBox('Delete “' + c.title + '”?', () => del('countdowns', c.id));
+  });
 };
 
 /* ========== Supabase sync (standalone app build) — overrides the Claude-db store ========== */
