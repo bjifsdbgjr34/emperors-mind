@@ -496,7 +496,7 @@ const NAV = [
   { id: 'home', label: 'Today', icon: 'today' }, { id: 'schedule', label: 'Schedule', icon: 'sched' }, { id: 'trading', label: 'Trading', icon: 'trend' },
   { id: 'goals', label: 'Goals', icon: 'goal' }, { id: 'warroom', label: 'War Room', icon: 'sword' }, { id: 'tasks', label: 'All Tasks', icon: 'tasks' },
   { id: 'faith', label: 'Faith', icon: 'faith' }, { id: 'reading', label: 'Reading', icon: 'book' },
-  { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' }, { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
+  { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' }, { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'monthly', label: 'Monthly Report', icon: 'review' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
   { id: 'settings', label: 'Settings & Data', icon: 'gear' },
 ];
 const VIEWS = {};
@@ -514,7 +514,7 @@ function render(force) {
   const mobileMain = ['home', 'schedule', 'trading', 'goals'];
   const navHTML = (arr, side) => arr.map(n => `<button data-go="${n.id}" class="${UI.view === n.id || (!side && n.id === 'more' && !mobileMain.includes(UI.view)) ? 'on' : ''}">${ICON[n.icon]}<span>${n.label}</span></button>`).join('');
   $('#side').innerHTML = `<div class="brand"><img src="${EAGLE}" alt=""><div class="t">EMPEROR'S MIND</div></div>`
-    + navHTML(NAV.slice(0, 6), true) + '<div class="sec">LIFE</div>' + navHTML(NAV.slice(6, 8), true) + '<div class="sec">DISCIPLINE</div>' + navHTML(NAV.slice(8, 12), true) + '<div class="sec">&nbsp;</div>' + navHTML(NAV.slice(12), true);
+    + navHTML(NAV.slice(0, 6), true) + '<div class="sec">LIFE</div>' + navHTML(NAV.slice(6, 8), true) + '<div class="sec">DISCIPLINE</div>' + navHTML(NAV.slice(8, 13), true) + '<div class="sec">&nbsp;</div>' + navHTML(NAV.slice(13), true);
   $('#nav').innerHTML = navHTML([...NAV.slice(0, 4), { id: 'more', label: 'More', icon: 'more' }], false);
   const syncTxt = typeof syncLabel === 'function' ? syncLabel() : SYNC.mode === 'cloud' ? (SYNC.timedOut ? '<span class="dot warn"></span>Sync slow' : SYNC.loaded.size < COLS.length ? '<span class="dot warn"></span>Syncing…' : '<span class="dot on"></span>Synced')
     : SYNC.mode === 'local' ? '<span class="dot warn"></span>This device only' : SYNC.mode === 'error' ? '<span class="dot" style="background:var(--red)"></span>Sync error' : '<span class="dot"></span>Connecting…';
@@ -772,8 +772,8 @@ function accSelect() {
 }
 ACT.setAcc = (d, el) => { UI.tAcc = el.value; el.blur(); render(); };
 VIEWS.trading = () => {
-  const tabs = [['dash', 'Dashboard'], ['trades', 'Trades'], ['cal', 'Calendar'], ['journal', 'Journal & Rules'], ['portfolio', 'Portfolio'], ['watch', 'Watchlist'], ['accounts', 'Accounts']];
-  const body = { dash: tDash, trades: tTrades, cal: tCal, journal: tJournal, portfolio: tPortfolio, watch: tWatch, accounts: tAccounts }[UI.tTab]();
+  const tabs = [['dash', 'Dashboard'], ['trades', 'Trades'], ['cal', 'Calendar'], ['journal', 'Journal & Rules'], ['portfolio', 'Portfolio'], ['watch', 'Watchlist'], ['news', 'News'], ['accounts', 'Accounts']];
+  const body = { dash: tDash, trades: tTrades, cal: tCal, journal: tJournal, portfolio: tPortfolio, watch: tWatch, news: tNews, accounts: tAccounts }[UI.tTab]();
   return `<div class="pagehead"><div><div class="eyebrow">Trading Desk</div><h1>The Vault</h1></div><div class="row">${['dash', 'trades', 'cal'].includes(UI.tTab) ? accSelect() : ''}<button class="btn pri sm" data-act="newTrade">${ICON.plus} Trade</button></div></div>
   <div class="tabs">${tabs.map(([k, l]) => `<button class="${UI.tTab === k ? 'on' : ''}" data-act="tTab" data-k="${k}">${l}</button>`).join('')}</div>${body}`;
 };
@@ -810,7 +810,7 @@ function tDash() {
   const tr = tradesFiltered(UI.tAcc), s = computeStats(tr);
   if (!tr.length) return `<div class="card empty">No trades yet.<br><br><button class="btn pri" data-act="newTrade">Log your first trade</button>${!all('accounts').length ? '<br><br><span class="small">Tip: add your accounts first in the <b>Accounts</b> tab (prop firm, personal, demo…).</span>' : ''}</div>`;
   const ruleScore = rulesAdherence(30);
-  return `<div class="grid g4 keep">
+  return redFoldersToday() + `<div class="grid g4 keep">
     ${statCard('Net P&L', money(s.net, true), s.n + ' trades · ' + s.days + ' days', cls(s.net))}
     ${statCard('Win rate', pct(s.winRate, 1), s.wins + 'W / ' + s.losses + 'L')}
     ${statCard('Profit factor', s.pf == null ? '–' : s.pf === Infinity ? '∞' : s.pf.toFixed(2), 'gross win ÷ gross loss')}
@@ -963,36 +963,40 @@ ACT.editRules = () => {
 
 /* portfolio */
 function tPortfolio() {
+  refreshQuotes();
   const h = all('holdings').sort((a, b) => hv(b) - hv(a));
   const tv = sum(h.map(hv)), tc = sum(h.map(x => (num(x.qty) || 0) * (num(x.cost) || 0))), tp = tv - tc;
   const colors = ['#cfa032', '#5aa6e0', '#3fbf7f', '#c77dff', '#e0565b', '#e6a23c', '#4fd1c5', '#a0aec0', '#f687b3', '#9ae6b4'];
-  return `<div class="grid g3 keep">${statCard('Portfolio value', money(tv), h.length + ' positions')}${statCard('Unrealized P&L', money(tp, true), tc ? pct(tp / tc, 2) : '', cls(tp))}${statCard('Cost basis', money(tc))}</div>
+  const dayChg = sum(h.map(x => { const q = liveQ(x); return q && q.prev ? (q.price - q.prev) * (num(x.qty) || 0) : 0; }));
+  return liveBar() + `<div class="grid g3 keep">${statCard('Portfolio value', money(tv), h.length + ' positions')}${statCard('Unrealized P&L', money(tp, true), tc ? pct(tp / tc, 2) : '', cls(tp))}${statCard('Today', UI.quotesAt ? money(dayChg, true) : '–', 'day change', cls(dayChg))}</div>
   ${h.length ? `<div class="card"><h2>Allocation</h2><div style="display:flex;height:14px;border-radius:7px;overflow:hidden">${h.map((x, i) => `<div style="width:${tv ? hv(x) / tv * 100 : 0}%;background:${colors[i % colors.length]}" title="${esc(x.sym)}"></div>`).join('')}</div>
    <div class="row wrap small" style="margin-top:8px;gap:12px">${h.map((x, i) => `<span><span class="dot" style="background:${colors[i % colors.length]}"></span> ${esc(x.sym)} ${tv ? pct(hv(x) / tv, 0) : ''}</span>`).join('')}</div></div>` : ''}
   <div class="card" style="padding:6px 10px"><div class="row" style="padding:8px 6px"><h2 style="margin:0">Holdings</h2><span class="sp"></span><button class="btn sm pri" data-act="editHolding">${ICON.plus} Add</button></div>
   ${h.length ? `<div class="scrollx"><table class="tbl"><tr><th>Asset</th><th class="r">Qty</th><th class="r">Avg cost</th><th class="r">Price</th><th class="r">Value</th><th class="r">P&L</th></tr>
-   ${h.map(x => { const c = (num(x.qty) || 0) * (num(x.cost) || 0), p = hv(x) - c; return `<tr class="click" data-act="editHolding" data-id="${x.id}"><td><b>${esc(x.sym)}</b><div class="tiny mute">${esc(x.type || '')}${x.priceAt ? ' · price ' + fmtDate(x.priceAt, { day: 'numeric', month: 'short' }) : ''}</div></td><td class="r">${esc(x.qty)}</td><td class="r">${money(num(x.cost))}</td><td class="r">${money(num(x.price))}</td><td class="r"><b>${money(hv(x))}</b></td><td class="r ${cls(p)}">${money(p, true)}<div class="tiny">${c ? pct(p / c, 1) : ''}</div></td></tr>`; }).join('')}</table></div>` : '<div class="empty small">Add your stocks, ETFs, crypto… Prices are entered by hand — tap a holding to update its price.</div>'}</div>`;
+   ${h.map(x => { const c = (num(x.qty) || 0) * (num(x.cost) || 0), p = hv(x) - c; return `<tr class="click" data-act="editHolding" data-id="${x.id}"><td><b>${esc(x.sym)}</b><div class="tiny mute">${esc(x.type || '')}${x.priceAt ? ' · price ' + fmtDate(x.priceAt, { day: 'numeric', month: 'short' }) : ''}</div></td><td class="r">${esc(x.qty)}</td><td class="r">${money(num(x.cost))}</td><td class="r">${money(livePrice(x) ?? num(x.price))}${liveQ(x) && liveQ(x).prev ? `<div class="tiny ${cls(liveQ(x).price - liveQ(x).prev)}">${pct((liveQ(x).price - liveQ(x).prev) / liveQ(x).prev, 2)}</div>` : ''}</td><td class="r"><b>${money(hv(x))}</b></td><td class="r ${cls(p)}">${money(p, true)}<div class="tiny">${c ? pct(p / c, 1) : ''}</div></td></tr>`; }).join('')}</table></div>` : '<div class="empty small">Add your stocks, ETFs, crypto… Prices are entered by hand — tap a holding to update its price.</div>'}</div>`;
 }
-const hv = x => (num(x.qty) || 0) * (num(x.price) ?? num(x.cost) ?? 0);
+const hv = x => (num(x.qty) || 0) * ((typeof livePrice === 'function' ? livePrice(x) : null) ?? num(x.price) ?? num(x.cost) ?? 0);
 ACT.editHolding = d => {
   const x = d.id ? S.holdings[d.id] : { type: 'Stock' };
   openModal(mh(d.id ? 'Edit holding' : 'Add holding') + `<div class="grid g2 keep" style="gap:10px">
    <div><label class="f">Symbol</label><input type="text" name="sym" value="${esc(x.sym || '')}" placeholder="AAPL, BTC…"></div><div><label class="f">Type</label><select name="type">${['Stock', 'ETF', 'Crypto', 'Forex', 'Commodity', 'Bond', 'Other'].map(o => `<option ${x.type === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
    <div><label class="f">Quantity</label><input type="number" step="any" name="qty" value="${esc(x.qty || '')}"></div><div><label class="f">Average cost</label><input type="number" step="any" name="cost" value="${esc(x.cost || '')}"></div>
-   <div><label class="f">Current price</label><input type="number" step="any" name="price" value="${esc(x.price || '')}"></div></div>
+   <div><label class="f">Manual price (fallback)</label><input type="number" step="any" name="price" value="${esc(x.price || '')}"></div>
+   <div><label class="f">Live data symbol (optional)</label><input type="text" name="dsym" value="${esc(x.dsym || '')}" placeholder="auto · e.g. BTC-USD, NQ=F"></div></div>
    <label class="f">Notes / thesis</label><textarea name="notes">${esc(x.notes || '')}</textarea>
    <div class="actions">${d.id ? '<button class="btn danger" id="h-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="h-s">Save</button></div>`, m => {
-    m.querySelector('#h-s').onclick = () => { const sym = fv(m, 'sym').toUpperCase(); if (!sym) return; const price = fv(m, 'price'); put('holdings', x.id || uid(), { ...x, sym, type: fv(m, 'type'), qty: fv(m, 'qty'), cost: fv(m, 'cost'), price, priceAt: price !== (x.price || '') ? today() : (x.priceAt || today()), notes: fv(m, 'notes') }); closeModal(); };
+    m.querySelector('#h-s').onclick = () => { const sym = fv(m, 'sym').toUpperCase(); if (!sym) return; const price = fv(m, 'price'); put('holdings', x.id || uid(), { ...x, sym, type: fv(m, 'type'), qty: fv(m, 'qty'), cost: fv(m, 'cost'), price, dsym: fv(m, 'dsym'), priceAt: price !== (x.price || '') ? today() : (x.priceAt || today()), notes: fv(m, 'notes') }); closeModal(); UI.quotesAt = 0; refreshQuotes(true); };
     const dl = m.querySelector('#h-del'); if (dl) dl.onclick = () => confirmBox('Remove ' + x.sym + '?', () => del('holdings', x.id));
   });
 };
 
 /* watchlist */
 function tWatch() {
+  refreshQuotes();
   const w = all('watch').sort((a, b) => (a.sym || '').localeCompare(b.sym || ''));
-  return `<div class="row" style="margin-bottom:12px"><span class="mute small">${w.length} on watch</span><span class="sp"></span><button class="btn sm pri" data-act="editWatch">${ICON.plus} Add ticker</button></div>
-  ${w.length ? `<div class="grid g3">${w.map(x => { const p = num(x.price), tg = num(x.target), dist = p && tg ? (tg - p) / p : null; return `<div class="card" style="cursor:pointer" data-act="editWatch" data-id="${x.id}">
-   <div class="row"><b style="font-size:17px">${esc(x.sym)}</b>${x.bias ? `<span class="pill ${x.bias === 'Bullish' ? 'g' : ''}">${esc(x.bias)}</span>` : ''}<span class="sp"></span><span>${p != null ? money(p) : ''}</span></div>
+  return liveBar() + `<div class="row" style="margin-bottom:12px"><span class="mute small">${w.length} on watch</span><span class="sp"></span><button class="btn sm pri" data-act="editWatch">${ICON.plus} Add ticker</button></div>
+  ${w.length ? `<div class="grid g3">${w.map(x => { const q = liveQ(x), p = q ? q.price : num(x.price), tg = num(x.target), dist = p && tg ? (tg - p) / p : null; return `<div class="card" style="cursor:pointer" data-act="editWatch" data-id="${x.id}">
+   <div class="row"><b style="font-size:17px">${esc(x.sym)}</b>${x.bias ? `<span class="pill ${x.bias === 'Bullish' ? 'g' : ''}">${esc(x.bias)}</span>` : ''}<span class="sp"></span><span style="text-align:right">${p != null ? money(p) : ''}${q && q.prev ? `<div class="tiny ${cls(q.price - q.prev)}">${q.price - q.prev >= 0 ? '+' : ''}${pct((q.price - q.prev) / q.prev, 2)}</div>` : ''}</span></div>${q && q.name ? `<div class="tiny mute">${esc(q.name)}</div>` : ''}
    ${tg != null ? `<div class="small mute" style="margin-top:4px">Target ${money(tg)} ${dist != null ? `<span class="${cls(dist)}">(${dist > 0 ? '+' : ''}${pct(dist, 1)})</span>` : ''}</div>` : ''}
    ${x.why ? `<div class="small" style="margin-top:8px;color:#c9c4b6">${esc(x.why)}</div>` : ''}<div class="tiny dim" style="margin-top:8px">Added ${x.added ? fmtDate(x.added, { day: 'numeric', month: 'short' }) : ''}</div></div>`; }).join('')}</div>` : '<div class="card empty">Your watchlist is empty. Add tickers with the reason you\'re watching them and your target price.</div>'}`;
 }
@@ -1000,10 +1004,10 @@ ACT.editWatch = d => {
   const x = d.id ? S.watch[d.id] : { added: today() };
   openModal(mh(d.id ? 'Edit ticker' : 'Add to watchlist') + `<div class="grid g2 keep" style="gap:10px"><div><label class="f">Symbol</label><input type="text" name="sym" value="${esc(x.sym || '')}"></div>
    <div><label class="f">Bias</label><select name="bias">${['', 'Bullish', 'Bearish', 'Neutral'].map(o => `<option ${x.bias === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
-   <div><label class="f">Current price</label><input type="number" step="any" name="price" value="${esc(x.price || '')}"></div><div><label class="f">Target / alert price</label><input type="number" step="any" name="target" value="${esc(x.target || '')}"></div></div>
+   <div><label class="f">Live data symbol (optional)</label><input type="text" name="dsym" value="${esc(x.dsym || '')}" placeholder="auto · e.g. NQ=F, EURUSD=X"></div><div><label class="f">Target / alert price</label><input type="number" step="any" name="target" value="${esc(x.target || '')}"></div></div>
    <label class="f">Why are you watching it?</label><textarea name="why">${esc(x.why || '')}</textarea>
    <div class="actions">${d.id ? '<button class="btn danger" id="w-del">Remove</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="w-s">Save</button></div>`, m => {
-    m.querySelector('#w-s').onclick = () => { const sym = fv(m, 'sym').toUpperCase(); if (!sym) return; put('watch', x.id || uid(), { ...x, sym, bias: fv(m, 'bias'), price: fv(m, 'price'), target: fv(m, 'target'), why: fv(m, 'why') }); closeModal(); };
+    m.querySelector('#w-s').onclick = () => { const sym = fv(m, 'sym').toUpperCase(); if (!sym) return; put('watch', x.id || uid(), { ...x, sym, bias: fv(m, 'bias'), dsym: fv(m, 'dsym'), target: fv(m, 'target'), why: fv(m, 'why') }); closeModal(); UI.quotesAt = 0; refreshQuotes(true); };
     const dl = m.querySelector('#w-del'); if (dl) dl.onclick = () => confirmBox('Remove ' + x.sym + ' from watchlist?', () => del('watch', x.id), 'Remove');
   });
 };
@@ -1287,7 +1291,7 @@ VIEWS.review = () => {
   const bkDone = all('books').filter(b => b.status === 'finished' && b.finished >= ws && b.finished <= we);
   const ch = [];
   for (let d = ws; d <= we; d = addDays(d, 1)) { const r = dayRatio(d); ch.push(`<div style="flex:1;text-align:center"><div style="height:70px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;height:${r.r * 100}%;min-height:2px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--gold2),var(--gold3))"></div></div><div class="tiny mute">${DOW[dow(d)]}</div></div>`); }
-  const past = all('reviews').filter(x => x.id !== ws).sort((a, b) => b.id.localeCompare(a.id)).slice(0, 8);
+  const past = all('reviews').filter(x => x.id !== ws && !x.id.startsWith('M-')).sort((a, b) => b.id.localeCompare(a.id)).slice(0, 8);
   return `<div class="pagehead"><div><div class="eyebrow">Weekly Review</div><h1>${fmtDate(ws, { day: 'numeric', month: 'short' })} – ${fmtDate(we, { day: 'numeric', month: 'short' })}</h1></div><div class="row"><button class="iconbtn" data-act="revW" data-d="-7">${ICON.left}</button>${ws !== weekStart(today()) ? '<button class="btn sm" data-act="revW" data-d="0">This week</button>' : ''}<button class="iconbtn" data-act="revW" data-d="7">${ICON.right}</button></div></div>
   <div class="grid g4 keep">${statCard('Tasks done', done + '/' + due, due ? pct(done / due, 0) + ' completion' : '')}${statCard('Active days', active + '/7', perfect + ' perfect days')}${statCard('Focus', minsToHM(focus))}${statCard('Trading P&L', tr.length ? money(s.net, true) : '–', tr.length ? s.n + ' trades · WR ' + pct(s.winRate, 0) : 'no trades', cls(s.net))}</div>
   <div class="grid g2"><div class="card"><h2>Daily completion</h2><div style="display:flex;gap:4px">${ch.join('')}</div></div>
@@ -1413,6 +1417,7 @@ VIEWS.warroom = () => {
     <div class="brief" data-act="wrTab" data-k="rules"><span class="mute tiny">CODE</span><b>${readToday ? '✓ Read today' : 'Not read yet'}</b><span class="tiny mute">${codeStreak()} day streak</span></div>
     <div class="brief" data-act="wrTab" data-k="countdowns"><span class="mute tiny">NEXT D-DAY</span><b>${cds[0] ? diffDays(t, cds[0].date) + ' days' : '—'}</b><span class="tiny mute">${cds[0] ? esc(cds[0].title) : 'No countdowns'}</span></div>
    </div>
+   ${HAS_LIVE() ? (refreshCalendar(), newsFiltered(t).filter(e => e.impact === 'High').length ? `<div class="small" style="margin-top:12px">📰 <b>Red folders today:</b> ${newsFiltered(t).filter(e => e.impact === 'High').map(e => evTime(e.d) + ' ' + esc(e.country) + ' ' + esc(e.title)).join(' · ')}</div>` : '') : ''}
    ${!aarToday && new Date().getHours() >= 17 ? '<button class="btn sm" data-act="wrTab" data-k="aar" style="margin-top:12px">📝 File today\'s After Action Report</button>' : ''}</div>
   <div class="tabs">${tabs.map(([k, l]) => `<button class="${UI.wrTab === k ? 'on' : ''}" data-act="wrTab" data-k="${k}">${l}</button>`).join('')}</div>${body}`;
 };
@@ -1545,9 +1550,118 @@ ACT.editCd = d => {
   });
 };
 
+/* ========== LIVE DATA (quotes + economic calendar) — only in the standalone app ========== */
+const HAS_LIVE = () => typeof FN_URL !== 'undefined';
+async function fnCall(body) { const r = await fetch(FN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+UI.quotes = {}; UI.quotesAt = 0; UI.quotesBusy = false;
+const dataSym = x => (x.dsym || '').trim().toUpperCase() || ((x.type === 'Crypto' && !String(x.sym).includes('-')) ? x.sym + '-USD' : x.sym);
+async function refreshQuotes(force) {
+  if (!HAS_LIVE() || UI.quotesBusy) return;
+  if (!force && Date.now() - UI.quotesAt < 120e3) return;
+  const syms = [...new Set([...all('holdings'), ...all('watch')].map(dataSym).filter(Boolean))];
+  if (!syms.length) return;
+  UI.quotesBusy = true; scheduleRender();
+  try { const j = await fnCall({ action: 'quotes', symbols: syms }); UI.quotes = { ...UI.quotes, ...(j.quotes || {}) }; UI.quotesAt = Date.now(); }
+  catch (e) { console.warn(e); toast('Could not load live prices'); }
+  UI.quotesBusy = false; scheduleRender();
+}
+const liveQ = x => UI.quotes[dataSym(x)];
+const livePrice = x => { const q = liveQ(x); return q ? q.price : null; };
+function liveBar() {
+  if (!HAS_LIVE()) return '<div class="tiny mute" style="margin-bottom:10px">Live prices work in the installed app.</div>';
+  return `<div class="row tiny mute" style="margin-bottom:10px"><span class="dot ${UI.quotesAt ? 'on' : ''}"></span>${UI.quotesBusy ? 'Loading live prices…' : UI.quotesAt ? 'Live prices · updated ' + new Date(UI.quotesAt).toTimeString().slice(0, 5) : 'Live prices'}<span class="sp"></span><button class="btn sm ghost" data-act="qRefresh">↻ Refresh</button></div>`;
+}
+ACT.qRefresh = () => refreshQuotes(true);
+
+UI.cal = null; UI.calAt = 0; UI.calBusy = false;
+async function refreshCalendar(force) {
+  if (!HAS_LIVE() || UI.calBusy) return;
+  if (!force && UI.cal && Date.now() - UI.calAt < 30 * 60e3) return;
+  if (!UI.cal) { try { const c = JSON.parse(localStorage.getItem('em-cal') || 'null'); if (c && Date.now() - c.t < 6 * 3600e3) { UI.cal = c.ev; UI.calAt = c.t; scheduleRender(); if (!force) return; } } catch (e) { } }
+  UI.calBusy = true;
+  try { const j = await fnCall({ action: 'calendar' }); UI.cal = j.events || []; UI.calAt = Date.now(); try { localStorage.setItem('em-cal', JSON.stringify({ t: UI.calAt, ev: UI.cal })); } catch (e) { } }
+  catch (e) { console.warn(e); }
+  UI.calBusy = false; scheduleRender();
+}
+const newsPrefs = () => ({ impact: 'High', cur: ['USD'], ...(tSettings().news || {}) });
+function newsFiltered(dayOnly) {
+  const p = newsPrefs(), lv = { High: 3, Medium: 2, Low: 1, Holiday: 0 }, min = p.impact === 'High' ? 3 : p.impact === 'Medium' ? 2 : 1;
+  return (UI.cal || []).filter(e => (lv[e.impact] || 0) >= min && (!p.cur.length || p.cur.includes(e.country))).map(e => ({ ...e, d: new Date(e.date) }))
+    .filter(e => !dayOnly || ymd(e.d) === dayOnly).sort((a, b) => a.d - b.d);
+}
+const evTime = d => pad(d.getHours()) + ':' + pad(d.getMinutes());
+const impactDot = i => `<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${i === 'High' ? '#e0565b' : i === 'Medium' ? '#e6a23c' : '#e6d36a'}"></span>`;
+function redFoldersToday() {
+  if (!HAS_LIVE()) return '';
+  refreshCalendar();
+  const ev = newsFiltered(today()).filter(e => e.impact === 'High');
+  if (!ev.length) return '';
+  return `<div class="card" style="border-color:rgba(224,86,91,.45);padding:12px 16px"><div class="row wrap" style="gap:8px"><b class="small" style="color:#e98a8d">📰 Red folders today</b>${ev.map(e => `<span class="pill" style="border-color:rgba(224,86,91,.4)">${evTime(e.d)} · ${esc(e.country)} ${esc(e.title)}</span>`).join('')}</div></div>`;
+}
+function tNews() {
+  if (!HAS_LIVE()) return '<div class="card empty">The economic calendar works in the installed app.</div>';
+  refreshCalendar();
+  const p = newsPrefs(), ev = newsFiltered(), now = new Date();
+  const days = {}; ev.forEach(e => (days[ymd(e.d)] = days[ymd(e.d)] || []).push(e));
+  const curs = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD', 'CNY'];
+  return `<div class="card" style="padding:12px 16px"><div class="row wrap" style="gap:10px"><div class="seg">${['High', 'Medium', 'All'].map(k => `<button class="${p.impact === k ? 'on' : ''}" data-act="newsImp" data-k="${k}">${k === 'High' ? 'High only' : k === 'Medium' ? 'High + Medium' : 'All'}</button>`).join('')}</div>
+   <div class="row wrap" style="gap:4px">${curs.map(c => `<button class="btn sm ${p.cur.includes(c) ? 'pri' : 'ghost'}" style="padding:4px 8px" data-act="newsCur" data-c="${c}">${c}</button>`).join('')}</div></div>
+   <div class="tiny mute" style="margin-top:8px">This week · times in your timezone · source: ForexFactory${UI.calAt ? ' · updated ' + new Date(UI.calAt).toTimeString().slice(0, 5) : ''}</div></div>
+  ${!UI.cal ? '<div class="card empty">Loading calendar…</div>' : !ev.length ? '<div class="card empty">No events match your filter this week.</div>' : Object.entries(days).map(([d, a]) => `<div class="card" style="padding:10px 14px"><div class="eyebrow" style="padding:4px 0 6px">${d === today() ? 'Today · ' : ''}${fmtDate(d, { weekday: 'long', day: 'numeric', month: 'short' })}</div>
+   <div class="list">${a.map(e => `<div class="row small" style="padding:8px 0;${e.d < now ? 'opacity:.45' : ''}"><span style="width:44px" class="mute">${evTime(e.d)}</span>${impactDot(e.impact)}<b style="width:34px">${esc(e.country)}</b><span style="flex:1;min-width:0">${esc(e.title)}</span><span class="tiny mute" style="text-align:right">${e.forecast ? 'F ' + esc(e.forecast) : ''}${e.previous ? '<br>P ' + esc(e.previous) : ''}</span></div>`).join('')}</div></div>`).join('')}`;
+}
+ACT.newsImp = d => { const t = tSettings(); put('misc', 'trading', { ...t, news: { ...newsPrefs(), impact: d.k } }); };
+ACT.newsCur = d => { const t = tSettings(), p = newsPrefs(); const c = p.cur.includes(d.c) ? p.cur.filter(x => x !== d.c) : [...p.cur, d.c]; put('misc', 'trading', { ...t, news: { ...p, cur: c } }); };
+
+/* ========== MONTHLY REPORT ========== */
+VIEWS.monthly = () => {
+  const now = today(), m = UI.month || now.slice(0, 7), [y, mo] = m.split('-').map(Number);
+  const first = m + '-01', dim = new Date(y, mo, 0).getDate(), last = m + '-' + pad(dim), end = last < now ? last : now;
+  const rid = 'M-' + m, rv = S.reviews[rid] || {};
+  let due = 0, done = 0, active = 0, perfect = 0, focus = 0, run = 0, bestRun = 0; const daysArr = [];
+  for (let d = first; d <= last; d = addDays(d, 1)) {
+    const r = d <= end ? dayRatio(d) : { due: 0, done: 0, r: 0 }; daysArr.push([d, r]);
+    if (d > end) continue;
+    due += r.due; done += r.done; if (r.done) { active++; run++; bestRun = Math.max(bestRun, run); } else run = 0;
+    if (r.due && r.r >= 1) perfect++; focus += (S.days[d] && S.days[d].focus) || 0;
+  }
+  const tr = all('trades').filter(t => tradeDate(t).startsWith(m)), s = computeStats(tr);
+  const byDayPnl = {}; tr.forEach(t => { const d = tradeDate(t); byDayPnl[d] = (byDayPnl[d] || 0) + pnlOf(t); });
+  const scored = daysArr.filter(([d, r]) => d <= end && r.due).map(([d, r]) => ({ d, r: r.r, p: byDayPnl[d] || 0, a: (S.aar[d] || {}).score || 0 }));
+  const best = scored.slice().sort((a, b) => b.r - a.r || b.a - a.a || b.p - a.p)[0], worst = scored.slice().sort((a, b) => a.r - b.r || a.a - b.a || a.p - b.p)[0];
+  const pDays = Object.entries(byDayPnl).sort((a, b) => b[1] - a[1]);
+  const aars = all('aar').filter(a => a.id.startsWith(m) && a.score), aarAvg = aars.length ? avg(aars.map(a => a.score)) : null;
+  const books = all('books').filter(b => b.status === 'finished' && (b.finished || '').startsWith(m));
+  const ms = []; all('goals').forEach(g => (g.milestones || []).forEach(x => { if (x.done && (x.doneAt || '').startsWith(m)) ms.push(g.title + ' — ' + x.title); }));
+  const battles = []; all('campaigns').forEach(c => (c.battles || []).forEach(b => { if (b.done && (b.doneAt || '').startsWith(m)) battles.push(b.title); }));
+  const reps = all('tasks').filter(t => t.kind !== 'once').map(t => { let dd = 0, dn = 0; for (let d = first; d <= end; d = addDays(d, 1)) if (isDue(t, d)) { dd++; if (isDoneOn(t, d)) dn++; } return { t, dd, dn }; }).filter(x => x.dd).sort((a, b) => b.dn / b.dd - a.dn / a.dd);
+  const bars = daysArr.map(([d, r]) => `<div title="${d} ${Math.round(r.r * 100)}%" style="flex:1;display:flex;align-items:flex-end;height:80px"><div style="width:100%;height:${d <= end ? Math.max(3, r.r * 100) : 0}%;border-radius:3px 3px 1px 1px;background:${r.r >= 1 ? 'var(--gold)' : r.done ? 'var(--gold3)' : '#2a2a2c'}"></div></div>`).join('');
+  const isCur = m === now.slice(0, 7);
+  return `<div class="pagehead"><div><div class="eyebrow">Monthly Report</div><h1>${MONTHS[mo - 1]} ${y}</h1></div><div class="row"><button class="iconbtn" data-act="monNav" data-d="-1">${ICON.left}</button>${!isCur ? '<button class="btn sm" data-act="monNav" data-d="0">This month</button>' : ''}<button class="iconbtn" data-act="monNav" data-d="1">${ICON.right}</button></div></div>
+  ${isCur ? '<div class="tiny mute" style="margin:-6px 0 12px">Month in progress — numbers so far.</div>' : ''}
+  <div class="grid g4 keep">${statCard('Completion', due ? pct(done / due, 0) : '–', done + '/' + due + ' tasks')}${statCard('Perfect days', perfect, active + ' active days')}${statCard('Best streak', bestRun + ' 🔥', 'in this month')}${statCard('Focus', minsToHM(focus), aarAvg ? 'AAR avg ' + aarAvg.toFixed(1) + '/10' : 'deep work')}</div>
+  <div class="card"><h2>Daily completion</h2><div style="display:flex;gap:2px;align-items:flex-end">${bars}</div><div class="row tiny mute" style="margin-top:4px"><span>1</span><span class="sp"></span><span>${dim}</span></div></div>
+  <div class="grid g2">
+   <div class="card"><h2>Best & worst day</h2>${best ? `<div class="row" style="padding:6px 0"><span class="pill g">Best</span><b>${fmtDate(best.d, { weekday: 'short', day: 'numeric', month: 'short' })}</b><span class="sp"></span><span class="small">${Math.round(best.r * 100)}%${best.p ? ' · <span class="' + cls(best.p) + '">' + money(best.p, true) + '</span>' : ''}</span></div>` : '<div class="empty small">No data yet.</div>'}
+    ${worst && worst !== best ? `<div class="row" style="padding:6px 0"><span class="pill" style="color:#e98a8d">Worst</span><b>${fmtDate(worst.d, { weekday: 'short', day: 'numeric', month: 'short' })}</b><span class="sp"></span><span class="small">${Math.round(worst.r * 100)}%${worst.p ? ' · <span class="' + cls(worst.p) + '">' + money(worst.p, true) + '</span>' : ''}</span></div>` : ''}
+    ${pDays.length ? `<div class="tiny mute" style="margin-top:8px">Best trading day <span class="pos">${fmtDate(pDays[0][0], { day: 'numeric', month: 'short' })} ${money(pDays[0][1], true)}</span> · worst <span class="${cls(pDays[pDays.length - 1][1])}">${fmtDate(pDays[pDays.length - 1][0], { day: 'numeric', month: 'short' })} ${money(pDays[pDays.length - 1][1], true)}</span></div>` : ''}</div>
+   <div class="card"><h2>Trading</h2>${tr.length ? `<div class="grid g2 keep" style="gap:8px">${statCard('Net P&L', money(s.net, true), s.n + ' trades', cls(s.net))}${statCard('Win rate', pct(s.winRate, 0), 'PF ' + (s.pf == null ? '–' : s.pf === Infinity ? '∞' : s.pf.toFixed(2)))}</div>` : '<div class="empty small">No trades this month.</div>'}</div></div>
+  <div class="grid g2">
+   <div class="card"><h2>Task scorecard</h2><div class="list">${reps.slice(0, 12).map(x => `<div class="row small" style="padding:7px 0"><span style="flex:1;min-width:0">${esc(x.t.title)}</span><span class="mute">${x.dn}/${x.dd}</span><span style="width:46px;text-align:right" class="${x.dn / x.dd >= .8 ? 'goldt' : x.dn / x.dd < .5 ? 'neg' : ''}">${Math.round(x.dn / x.dd * 100)}%</span></div>`).join('') || '<div class="empty small">No repeating tasks.</div>'}</div></div>
+   <div class="card"><h2>Victories</h2><div class="small">${ms.map(x => '<div style="padding:3px 0">◎ ' + esc(x) + '</div>').join('')}${battles.map(x => '<div style="padding:3px 0">⚔️ ' + esc(x) + '</div>').join('')}${books.map(b => '<div style="padding:3px 0">📖 Finished ' + esc(b.title) + '</div>').join('')}${!ms.length && !battles.length && !books.length ? '<span class="mute">No milestones, battles or books completed this month.</span>' : ''}
+    ${all('enemies').filter(e => !e.archived).map(e => '<div style="padding:3px 0">🛡 ' + esc(e.name) + ': <b>' + enemyStats(e).cur + '</b> days clean</div>').join('')}</div></div></div>
+  <div class="card gold"><h2>Reflection</h2>
+   <label class="f">Biggest wins this month</label><textarea data-chg="revText" data-f="wins" data-w="${rid}">${esc(rv.wins || '')}</textarea>
+   <label class="f">What held me back</label><textarea data-chg="revText" data-f="lessons" data-w="${rid}">${esc(rv.lessons || '')}</textarea>
+   <label class="f">Focus for next month</label><textarea data-chg="revText" data-f="next" data-w="${rid}">${esc(rv.next || '')}</textarea>
+   <label class="f">Rate this month</label><div class="seg">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `<button class="${rv.rating === i ? 'on' : ''}" data-act="revRate" data-w="${rid}" data-v="${i}">${i}</button>`).join('')}</div></div>`;
+};
+ACT.monNav = d => { if (d.d === '0') UI.month = today().slice(0, 7); else { let [y, m] = (UI.month || today().slice(0, 7)).split('-').map(Number); m += +d.d; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; } UI.month = y + '-' + pad(m); } render(); };
+
 /* ========== Supabase sync (standalone app build) — overrides the Claude-db store ========== */
 const SB_URL = 'https://npmlicuclezcptclwysv.supabase.co';
 const SB_KEY = 'sb_publishable_UxONMwXf1HQWvS1js6GF1g_z5ERc14Y';
+const FN_URL = SB_URL + '/functions/v1/hq';
 const SB = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
 let SESSION = null, AUTH_READY = false, CHANNEL = null;
 const QKEY = 'em-queue', CKEY = 'em-cache-';
@@ -1629,6 +1743,7 @@ function syncLabel() { return SYNC.offline ? '<span class="dot warn"></span>Offl
 /* login gate */
 UI.authMode = 'in';
 function gate() {
+  if (SESSION && LOCKED && lockCfg()) return lockScreen();
   if (SESSION) return false;
   document.body.classList.add('gated');
   $('#side').innerHTML = ''; $('#nav').innerHTML = '';
@@ -1639,12 +1754,11 @@ function gate() {
     <h1>Emperor's Mind</h1>
     <p class="mute small">${signup ? 'Create your account. You only do this once.' : 'Sign in to enter your headquarters.'}</p>
     <form data-form="auth" class="login-form">
-      <input type="email" name="email" placeholder="you@domain.com" autocomplete="email" required>
+      <input type="email" name="email" placeholder="you@domain.com" autocomplete="username" required>
       <input type="password" name="pw" placeholder="Password${signup ? ' (min. 6 characters)' : ''}" autocomplete="${signup ? 'new-password' : 'current-password'}" required minlength="6">
       <button class="btn pri" type="submit" style="width:100%;letter-spacing:.25em">${signup ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
       <div class="small" id="authmsg" style="min-height:20px;margin-top:6px"></div>
     </form>
-    <button class="btn ghost sm" data-act="authToggle">${signup ? 'I already have an account → Sign in' : 'First time here? Create account'}</button>
     ${!signup ? '<button class="btn ghost sm" data-act="authReset" style="margin-top:4px">Forgot password?</button>' : ''}
   </div>`;
   return true;
@@ -1676,8 +1790,9 @@ SB.auth.onAuthStateChange((ev) => {
 });
 
 function accountCard() {
+  setTimeout(pushRefresh, 0);
   return `<div class="card gold"><div class="row"><div><div class="eyebrow">Account</div><div style="margin-top:4px">${esc(SESSION ? SESSION.user.email : '')}</div><div class="tiny mute" style="margin-top:2px">${syncLabel()}</div></div><span class="sp"></span><button class="btn sm" data-act="signOut">Sign out</button></div></div>
-  <div class="card"><h2>Install on your devices</h2><div class="small mute"><b style="color:var(--text)">iPhone:</b> open this page in Safari → Share → <i>Add to Home Screen</i>.<br><b style="color:var(--text)">Mac:</b> Safari → File → <i>Add to Dock</i> (or Chrome → ⋮ → <i>Cast, save and share → Install page as app</i>).<br>Sign in once on each device — everything syncs automatically.</div></div>`;
+  <div class="card"><h2>Install on your devices</h2><div class="small mute"><b style="color:var(--text)">iPhone:</b> open this page in Safari → Share → <i>Add to Home Screen</i>.<br><b style="color:var(--text)">Mac:</b> Safari → File → <i>Add to Dock</i> (or Chrome → ⋮ → <i>Cast, save and share → Install page as app</i>).<br>Sign in once on each device — everything syncs automatically.</div></div>` + securityCard() + notifyCard();
 }
 ACT.signOut = () => confirmBox('Sign out on this device?', async () => { await SB.auth.signOut(); }, 'Sign out');
 
@@ -1687,6 +1802,100 @@ async function bulkImport(data) {
   for (let i = 0; i < rows.length; i += 300) { const { error } = await SB.from('docs').upsert(rows.slice(i, i + 300)); if (error) throw error; }
   await loadAll(); return rows.length;
 }
+
+/* ========== Face ID / Touch ID lock (WebAuthn, on this device) ========== */
+const LOCK_KEY = 'em-lock';
+function lockCfg() { try { return JSON.parse(localStorage.getItem(LOCK_KEY) || 'null'); } catch (e) { return null; } }
+let LOCKED = !!lockCfg(), hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) hiddenAt = Date.now();
+  else if (lockCfg() && hiddenAt && Date.now() - hiddenAt > 120000) { LOCKED = true; render(true); }
+});
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
+const bioName = () => /Mac/.test(navigator.platform) && !('ontouchend' in document) ? 'Touch ID' : 'Face ID';
+function lockScreen() {
+  document.body.classList.add('gated'); $('#side').innerHTML = ''; $('#nav').innerHTML = '';
+  $('#main').innerHTML = `<div class="login"><img src="${EAGLE}" alt=""><div class="eyebrow" style="letter-spacing:.35em">Locked</div><h1>Emperor's Mind</h1>
+    <p class="mute small">Welcome back, Emperor Blanco.</p>
+    <div class="login-form"><button class="btn pri" data-act="unlock" style="width:100%">UNLOCK WITH ${bioName().toUpperCase()}</button><div class="small" id="lockmsg" style="min-height:20px"></div></div>
+    <button class="btn ghost sm" data-act="lockPw">Use email and password instead</button></div>`;
+  return true;
+}
+ACT.unlock = async () => {
+  const cfg = lockCfg(), msg = $('#lockmsg'); if (!cfg) { LOCKED = false; render(true); return; }
+  try {
+    const cred = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: unb64u(cfg.id) }], userVerification: 'required', timeout: 60000, rpId: location.hostname } });
+    if (cred) { LOCKED = false; render(true); }
+  } catch (e) { if (msg) { msg.className = 'small neg'; msg.textContent = 'Not unlocked. Try again.'; } }
+};
+ACT.lockPw = () => confirmBox('Sign out and sign in with your email and password?', async () => { LOCKED = false; await SB.auth.signOut(); }, 'Sign out');
+function securityCard() {
+  const on = !!lockCfg();
+  return `<div class="card"><div class="row"><div style="flex:1"><h2 style="margin:0">${bioName()} lock</h2><div class="small mute" style="margin-top:4px">Ask for ${bioName()} every time you open the app on this device. You stay signed in — no typing.</div></div><button class="sw ${on ? 'on' : ''}" data-act="lockToggle" aria-label="Toggle ${bioName()} lock"></button></div></div>`;
+}
+ACT.lockToggle = async () => {
+  if (lockCfg()) { localStorage.removeItem(LOCK_KEY); toast(bioName() + ' lock off'); render(true); return; }
+  try {
+    if (!window.PublicKeyCredential || !(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) { toast(bioName() + ' is not available here'); return; }
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: "Emperor's Mind", id: location.hostname },
+      user: { id: crypto.getRandomValues(new Uint8Array(16)), name: (SESSION && SESSION.user.email) || 'emperor', displayName: 'Emperor Blanco' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000, attestation: 'none' } });
+    localStorage.setItem(LOCK_KEY, JSON.stringify({ id: b64u(cred.rawId) })); toast(bioName() + ' lock on 👑'); render(true);
+  } catch (e) { console.warn(e); toast('Could not set up ' + bioName()); }
+};
+
+/* ========== Push notifications ========== */
+UI.push = 'checking';
+async function pushRefresh() {
+  let st = 'unsupported';
+  try {
+    if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+      if (Notification.permission === 'denied') st = 'denied';
+      else { const reg = await navigator.serviceWorker.ready; st = (await reg.pushManager.getSubscription()) ? 'on' : 'off'; }
+    }
+  } catch (e) { }
+  if (st !== UI.push) { UI.push = st; if (UI.view === 'settings') scheduleRender(); }
+}
+const notifyCfg = () => ({ morning: '07:00', streak: '21:00', aar: '21:30', weekly: true, weeklyTime: '18:00', monthly: true, ...misc('notify') });
+function notifyCard() {
+  const c = notifyCfg(), ios = /iPhone|iPad|iPod/.test(navigator.userAgent), standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const status = UI.push === 'on' ? '<span class="dot on"></span> On for this device' : UI.push === 'denied' ? '<span class="dot" style="background:var(--red)"></span> Blocked — allow notifications for this app in your device settings' : UI.push === 'unsupported' ? (ios && !standalone ? 'Add the app to your Home Screen first, then open it from there.' : 'Not supported in this browser.') : UI.push === 'checking' ? 'Checking…' : 'Off on this device';
+  const tm = (k, l) => `<div class="row" style="padding:7px 0"><span style="flex:1">${l}</span><input type="time" value="${esc(c[k] || '')}" data-chg="notifyTime" data-k="${k}" style="width:120px"><button class="iconbtn" data-act="notifyClear" data-k="${k}" title="Turn off">${ICON.x}</button></div>`;
+  return `<div class="card"><div class="row"><div style="flex:1"><h2 style="margin:0">Notifications</h2><div class="small mute" style="margin-top:4px">${status}</div></div>
+   ${UI.push === 'on' ? '<button class="btn sm" data-act="pushTest">Send test</button><button class="btn sm ghost" data-act="pushOff">Turn off</button>' : UI.push === 'off' ? '<button class="btn sm pri" data-act="pushOn">Turn on</button>' : ''}</div>
+   <div class="list" style="margin-top:10px">${tm('morning', '☀️ Morning briefing')}${tm('streak', '🔥 Streak in danger (only if nothing done)')}${tm('aar', '📝 After Action Report (only if not filed)')}
+    <div class="row" style="padding:7px 0"><span style="flex:1">📊 Weekly review — Sundays</span><input type="time" value="${esc(c.weekly ? c.weeklyTime : '')}" data-chg="notifyTime" data-k="weeklyTime" style="width:120px"><button class="sw ${c.weekly ? 'on' : ''}" data-act="notifyFlag" data-k="weekly"></button></div>
+    <div class="row" style="padding:7px 0"><span style="flex:1">🗓 Monthly report — 1st of the month, 09:00</span><button class="sw ${c.monthly ? 'on' : ''}" data-act="notifyFlag" data-k="monthly"></button></div></div>
+   <div class="tiny mute" style="margin-top:6px">Times are Swiss time. Turn notifications on separately on each device.</div></div>`;
+}
+ACT.notifyTime = (d, el) => { const c = notifyCfg(); if (d.k === 'weeklyTime') c.weekly = !!el.value; put('misc', 'notify', { ...c, [d.k]: el.value }); };
+ACT.notifyClear = d => put('misc', 'notify', { ...notifyCfg(), [d.k]: '' });
+ACT.notifyFlag = d => { const c = notifyCfg(); put('misc', 'notify', { ...c, [d.k]: !c[d.k] }); };
+ACT.pushOn = async () => {
+  try {
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') { toast('Notifications not allowed'); pushRefresh(); return; }
+    const { key } = await fnCall({ action: 'vapid' });
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: unb64u(key) });
+    const j = sub.toJSON();
+    const { error } = await SB.from('push_subs').upsert({ endpoint: j.endpoint, user_id: SESSION.user.id, sub: j });
+    if (error) throw error;
+    if (!S.misc.notify) put('misc', 'notify', notifyCfg());
+    toast('Notifications on 👑'); await pushRefresh(); render(true);
+  } catch (e) { console.warn(e); toast('Could not turn on notifications'); }
+};
+ACT.pushOff = async () => {
+  try { const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub) { await SB.from('push_subs').delete().eq('endpoint', sub.endpoint); await sub.unsubscribe(); } } catch (e) { }
+  await pushRefresh(); render(true);
+};
+ACT.pushTest = async () => {
+  try { const r = await fetch(FN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + SESSION.access_token }, body: JSON.stringify({ action: 'test' }) }); const j = await r.json(); toast(j.sent ? 'Test sent — check your notifications' : 'No device subscribed yet'); }
+  catch (e) { toast('Test failed'); }
+};
 
 /* ========== boot ========== */
 (function boot() {
