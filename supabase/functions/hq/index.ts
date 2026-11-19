@@ -95,7 +95,7 @@ async function notifyAll() {
     if (st.morning) due.push({ key: "morning", time: hm(st.morning as string), build: async () => {
       const s = await streakOf(uid, z.day);
       if (redToday === null) { try { const ev = await calendar(); redToday = ev.filter((e: { impact: string; country: string; date: string }) => e.impact === "High" && e.country === "USD" && zurich(new Date(e.date)).day === z.day).length; } catch (_) { redToday = 0; } }
-      return { title: "Good morning, Emperor Blanco", body: `Day ${s.cur} 🔥 — win the morning.${redToday ? ` ${redToday} red-folder event${redToday > 1 ? "s" : ""} today.` : ""}`, url: "#home" };
+      return { title: "Good morning, Emperor Blanco", body: `Day ${s.cur} 🔥 — win the morning.${redToday ? ` ${redToday} red-folder event${redToday > 1 ? "s" : ""} today.` : ""} Tap to begin your briefing.`, url: "#morning" };
     } });
     if (st.streak) due.push({ key: "streak", time: hm(st.streak as string), build: async () => {
       const s = await streakOf(uid, z.day); if (s.todayActive) return null;
@@ -103,7 +103,7 @@ async function notifyAll() {
     } });
     if (st.aar) due.push({ key: "aar", time: hm(st.aar as string), build: async () => {
       const a = await doc(uid, "aar", z.day); if (a && (a.happened || a.change)) return null;
-      return { title: "After Action Report", body: "Debrief the day: plan, reality, why, and what changes tomorrow.", url: "#warroom" };
+      return { title: "Close the day 🔒", body: "Night shutdown: debrief, then plan tomorrow's attack.", url: "#shutdown" };
     } });
     if (st.weekly && z.wd === "Sun") due.push({ key: "weekly", time: hm((st.weeklyTime as string) || "18:00"), build: async () => ({ title: "Weekly review", body: "Sunday debrief — review the week and set next week's focus.", url: "#review" }) });
     if (st.monthly && z.dom === 1) due.push({ key: "monthly", time: 9 * 60, build: async () => ({ title: "Your monthly report is ready", body: "See how last month went — and plan the next one.", url: "#monthly" }) });

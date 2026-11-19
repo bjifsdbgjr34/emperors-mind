@@ -267,6 +267,23 @@ body.gated main{max-width:none}
 .login-form input:focus{border-color:var(--gold)}
 .login-form .btn.pri{border-radius:0;padding:15px;font-weight:500;letter-spacing:.35em;box-shadow:0 8px 28px rgba(207,160,50,.18)}
 .login .btn.ghost{border-radius:0}
+/* rituals, lock, insights, command */
+body.ritual .side,body.ritual .nav{display:none}
+body.ritual{padding-bottom:0}
+.ritual-wrap{max-width:620px;margin:0 auto;min-height:88vh;display:flex;flex-direction:column;padding-top:8px}
+.ritual-step{flex:1}
+.rdots{display:flex;gap:6px}.rdots i{width:22px;height:4px;border-radius:2px;background:#26262a}.rdots i.past{background:var(--gold3)}.rdots i.on{background:var(--gold)}
+.ritualcta{display:flex;align-items:center;gap:14px;width:100%;cursor:pointer;color:var(--text);border-color:rgba(207,160,50,.5);background:linear-gradient(90deg,rgba(207,160,50,.12),transparent)}
+.mission{display:flex;flex-direction:column;gap:4px;border-color:rgba(207,160,50,.35)}.mission .tiny{color:var(--gold);letter-spacing:.18em;font-weight:600}.mission b{font-family:var(--serif2);font-size:20px}
+.hhead{position:relative}.hcmd{position:absolute;right:-6px;top:-6px;color:var(--gold)}
+.lockban{border-color:rgba(224,86,91,.55);background:linear-gradient(90deg,rgba(224,86,91,.12),transparent)}
+.lockbtn{border-color:rgba(224,86,91,.5)}
+.insight .ico{font-size:18px}.insight.dim{opacity:.6}
+.cmdbtn{display:flex;align-items:center;gap:10px;margin-bottom:10px;border:1px solid var(--line2)!important;border-radius:10px;color:var(--mute)}
+.cmdbtn kbd{margin-left:auto;font-size:10.5px;color:var(--dim);font-family:var(--sans)}
+.topbar .iconbtn svg{width:20px;height:20px}
+.hcmd svg,.cmdbtn svg{width:20px;height:20px}
+#modal .row>span>svg{width:22px;height:22px}
 
 [data-go]>span>svg{width:22px;height:22px}
 main{padding-top:max(16px, env(safe-area-inset-top))}
@@ -496,7 +513,7 @@ const NAV = [
   { id: 'home', label: 'Today', icon: 'today' }, { id: 'schedule', label: 'Schedule', icon: 'sched' }, { id: 'trading', label: 'Trading', icon: 'trend' },
   { id: 'goals', label: 'Goals', icon: 'goal' }, { id: 'warroom', label: 'War Room', icon: 'sword' }, { id: 'tasks', label: 'All Tasks', icon: 'tasks' },
   { id: 'faith', label: 'Faith', icon: 'faith' }, { id: 'reading', label: 'Reading', icon: 'book' },
-  { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' }, { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'monthly', label: 'Monthly Report', icon: 'review' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
+  { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' }, { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'monthly', label: 'Monthly Report', icon: 'review' }, { id: 'insights', label: 'Insights', icon: 'trend' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
   { id: 'settings', label: 'Settings & Data', icon: 'gear' },
 ];
 const VIEWS = {};
@@ -513,12 +530,15 @@ function render(force) {
   document.body.classList.remove('gated');
   const mobileMain = ['home', 'schedule', 'trading', 'goals'];
   const navHTML = (arr, side) => arr.map(n => `<button data-go="${n.id}" class="${UI.view === n.id || (!side && n.id === 'more' && !mobileMain.includes(UI.view)) ? 'on' : ''}">${ICON[n.icon]}<span>${n.label}</span></button>`).join('');
-  $('#side').innerHTML = `<div class="brand"><img src="${EAGLE}" alt=""><div class="t">EMPEROR'S MIND</div></div>`
-    + navHTML(NAV.slice(0, 6), true) + '<div class="sec">LIFE</div>' + navHTML(NAV.slice(6, 8), true) + '<div class="sec">DISCIPLINE</div>' + navHTML(NAV.slice(8, 13), true) + '<div class="sec">&nbsp;</div>' + navHTML(NAV.slice(13), true);
+  const byId = ids => ids.map(i => NAV.find(n => n.id === i)).filter(Boolean);
+  $('#side').innerHTML = `<div class="brand"><img src="${EAGLE}" alt=""><div class="t">EMPEROR'S MIND</div></div><button data-act="cmd" class="cmdbtn">${ICON.sword}<span>Command</span><kbd>⌘K</kbd></button>`
+    + navHTML(byId(['home', 'schedule', 'trading', 'goals', 'warroom', 'tasks']), true) + '<div class="sec">LIFE</div>' + navHTML(byId(['faith', 'reading']), true)
+    + '<div class="sec">DISCIPLINE</div>' + navHTML(byId(['heatmap', 'focus', 'review', 'monthly', 'insights', 'trophies']), true) + '<div class="sec">&nbsp;</div>' + navHTML(byId(['settings']), true);
   $('#nav').innerHTML = navHTML([...NAV.slice(0, 4), { id: 'more', label: 'More', icon: 'more' }], false);
   const syncTxt = typeof syncLabel === 'function' ? syncLabel() : SYNC.mode === 'cloud' ? (SYNC.timedOut ? '<span class="dot warn"></span>Sync slow' : SYNC.loaded.size < COLS.length ? '<span class="dot warn"></span>Syncing…' : '<span class="dot on"></span>Synced')
     : SYNC.mode === 'local' ? '<span class="dot warn"></span>This device only' : SYNC.mode === 'error' ? '<span class="dot" style="background:var(--red)"></span>Sync error' : '<span class="dot"></span>Connecting…';
-  const top = UI.view === 'home' ? '' : `<div class="topbar"><img src="${EAGLE}" alt=""><span class="t">EMPEROR'S MIND</span><span class="sync">${syncTxt}</span></div>`;
+  const ritual = ['morning', 'shutdown'].includes(UI.view); document.body.classList.toggle('ritual', ritual);
+  const top = UI.view === 'home' || ritual ? '' : `<div class="topbar"><img src="${EAGLE}" alt=""><span class="t">EMPEROR'S MIND</span><span class="sync">${syncTxt}</span><button class="iconbtn" data-act="cmd" aria-label="Command" style="color:var(--gold)">${ICON.sword}</button></div>`;
   let banner = '';
   if (SYNC.mode === 'local') banner = '<div class="banner">Not connected to sync — changes are saved on this device only. Open the app from your Claude link while signed in to sync between iPhone and Mac.</div>';
   if (SYNC.timedOut) banner = '<div class="banner">Can\'t reach your synced data yet — what you see may be out of date.</div>';
@@ -774,7 +794,7 @@ ACT.setAcc = (d, el) => { UI.tAcc = el.value; el.blur(); render(); };
 VIEWS.trading = () => {
   const tabs = [['dash', 'Dashboard'], ['trades', 'Trades'], ['cal', 'Calendar'], ['journal', 'Journal & Rules'], ['portfolio', 'Portfolio'], ['watch', 'Watchlist'], ['news', 'News'], ['accounts', 'Accounts']];
   const body = { dash: tDash, trades: tTrades, cal: tCal, journal: tJournal, portfolio: tPortfolio, watch: tWatch, news: tNews, accounts: tAccounts }[UI.tTab]();
-  return `<div class="pagehead"><div><div class="eyebrow">Trading Desk</div><h1>The Vault</h1></div><div class="row">${['dash', 'trades', 'cal'].includes(UI.tTab) ? accSelect() : ''}<button class="btn pri sm" data-act="newTrade">${ICON.plus} Trade</button></div></div>
+  return `<div class="pagehead"><div><div class="eyebrow">Trading Desk</div><h1>The Vault</h1></div><div class="row">${['dash', 'trades', 'cal'].includes(UI.tTab) ? accSelect() : ''}${tradingLocked() ? '' : '<button class="btn sm lockbtn" data-act="tradeLock">🔒 Lock</button>'}<button class="btn pri sm" data-act="newTrade">${ICON.plus} Trade</button></div></div>${lockBanner()}
   <div class="tabs">${tabs.map(([k, l]) => `<button class="${UI.tTab === k ? 'on' : ''}" data-act="tTab" data-k="${k}">${l}</button>`).join('')}</div>${body}`;
 };
 ACT.tTab = d => { UI.tTab = d.k; render(); };
@@ -888,7 +908,7 @@ function tradeModal(t, presetDate) {
     sync();
   });
 }
-ACT.newTrade = d => tradeModal(null, d.date);
+ACT.newTrade = d => { if (tradingLocked()) { toast('Trading is locked 🔒 — ' + lockLeft() + ' left'); return; } tradeModal(null, d.date); };
 ACT.editTrade = d => { const t = S.trades[d.id]; if (t) tradeModal(t); };
 
 /* calendar */
@@ -1316,6 +1336,7 @@ VIEWS.settings = () => {
   const acct = typeof accountCard === 'function' ? accountCard() : '';
   return `<div class="pagehead"><div><div class="eyebrow">Settings</div><h1>Settings & Data</h1></div></div>
   ${acct}
+  ${lockSetupCard()}
   <div class="card"><h2>Export your data</h2><p class="small mute">Copies everything (tasks, streak history, trades, goals, journal…) as one block of text. Use it to move to the new app or as a backup.</p>
    <div class="row wrap"><button class="btn pri" data-act="exportCopy">Copy all data</button>${typeof SB !== 'undefined' ? '<button class="btn" data-act="exportFile">Download backup file</button>' : ''}</div>
    <div class="tiny mute" style="margin-top:8px">${counts.map(([c, n]) => c + ': ' + n).join(' · ') || 'No data yet.'}</div></div>
@@ -1358,10 +1379,13 @@ VIEWS.home = () => {
   const tile = (big, k, sub, extra = '') => `<div class="card tile">${extra}<div class="tbig">${big}</div><div class="tk">${k}</div><div class="tsub">${sub}</div></div>`;
   return `
   <div class="hhead">
+    <button class="iconbtn hcmd" data-act="cmd" aria-label="Command">${ICON.sword}</button>
     <img src="${EAGLE}" alt="">
     <div><div class="hdate">${fmtDate(t, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase()}</div>
     <div class="hgreet">${greeting()},</div><div class="hname">Emperor Blanco</div></div>
   </div>
+  ${(() => { const dd = S.days[t] || {}, h = new Date().getHours(); const am = !dd.ritualAM && h >= 4 && h < 14, pm = !dd.closed && h >= 17; return am || pm ? `<button class="card ritualcta" data-go="${am ? 'morning' : 'shutdown'}"><span style="font-size:22px">${am ? '⚔️' : '🔒'}</span><span style="flex:1;text-align:left"><b>${am ? 'Begin the day' : 'Close the day'}</b><span class="tiny mute" style="display:block">${am ? 'Morning briefing · 2 minutes' : 'Night shutdown · debrief and plan tomorrow'}</span></span><span class="goldt">→</span></button>` : ''; })()}
+  ${(S.days[t] || {}).mission ? `<div class="card mission"><span class="tiny">🎯 TODAY'S MISSION</span><b>${esc(S.days[t].mission)}</b></div>` : ''}
   <div class="card rankcard" data-go="trophies">
     <div class="rp">${idx >= 0 ? pieceSVG(idx) : '<div style="opacity:.28;filter:grayscale(1)">' + pieceSVG(0) + '</div>'}</div>
     <div style="flex:1;min-width:0"><div class="rn">${pieceName(idx)}</div>
@@ -1383,7 +1407,8 @@ VIEWS.home = () => {
   ${camp || cd ? `<div class="card" data-go="warroom" style="cursor:pointer"><div class="row"><div class="eyebrow">War Room</div><span class="sp"></span><span class="small mute">Open →</span></div>
     ${camp ? `<div style="margin-top:8px"><b>${esc(camp.title)}</b> <span class="small mute">· week ${campWeek(camp)} of ${campWeeks(camp)}</span><div class="bar" style="margin-top:6px"><i style="width:${campProgress(camp) * 100}%"></i></div></div>` : ''}
     ${cd ? `<div class="small" style="margin-top:8px">⏳ <b>${esc(cd.title)}</b> in <b class="goldt">${diffDays(t, cd.date)}</b> days</div>` : ''}</div>` : ''}
-  <div class="card"><div class="eyebrow">Verse of the day</div><div class="verse" style="margin-top:8px">“${esc(v.t)}”</div><div class="small goldt" style="margin-top:6px">${esc(v.r)}</div></div>
+  <div class="card"><div class="eyebrow">Verse of the day</div><div class="verse" style="margin-top:8px">“${esc(v.t)}”</div><div class="small goldt" style="margin-top:6px">${esc(v.r)}</div>
+    <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px"><div class="eyebrow" style="color:var(--mute)">Quote of the day</div><div class="verse" style="margin-top:6px;font-size:17px">“${esc(quoteOfDay().t)}”</div><div class="small mute" style="margin-top:4px">— ${esc(quoteOfDay().r)}</div></div></div>
   ${tr.length || trW.length ? `<div class="card stat" data-go="trading" style="cursor:pointer"><div class="k">P&L today</div><div class="v ${cls(sum(tr.map(pnlOf)))}">${tr.length ? money(sum(tr.map(pnlOf)), true) : '–'}</div><div class="tiny mute">This week: <span class="${cls(sum(trW.map(pnlOf)))}">${money(sum(trW.map(pnlOf)), true)}</span></div></div>` : ''}
   <div class="card"><div class="row"><h2 style="margin:0">Discipline — last 20 weeks</h2><span class="sp"></span><button class="btn sm ghost" data-go="heatmap">Full year →</button></div><div style="margin-top:10px">${heatGrid(addDays(t, -20 * 7 + 1), t)}</div></div>`;
 };
@@ -1657,6 +1682,262 @@ VIEWS.monthly = () => {
    <label class="f">Rate this month</label><div class="seg">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `<button class="${rv.rating === i ? 'on' : ''}" data-act="revRate" data-w="${rid}" data-v="${i}">${i}</button>`).join('')}</div></div>`;
 };
 ACT.monNav = d => { if (d.d === '0') UI.month = today().slice(0, 7); else { let [y, m] = (UI.month || today().slice(0, 7)).split('-').map(Number); m += +d.d; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; } UI.month = y + '-' + pad(m); } render(); };
+
+/* ========== QUOTES (public-domain sources) ========== */
+const QUOTES = [
+  ['Very little is needed to make a happy life.', 'Marcus Aurelius'],
+  ['If it is not right, do not do it; if it is not true, do not say it.', 'Marcus Aurelius'],
+  ['The best way of avenging thyself is not to become like the wrong doer.', 'Marcus Aurelius'],
+  ['How much more grievous are the consequences of anger than the causes of it.', 'Marcus Aurelius'],
+  ['Waste no more time arguing what a good man should be. Be one.', 'Marcus Aurelius'],
+  ['Do every act of thy life as if it were the last.', 'Marcus Aurelius'],
+  ['The soul becomes dyed with the colour of its thoughts.', 'Marcus Aurelius'],
+  ['While we are postponing, life speeds by.', 'Seneca'],
+  ['We suffer more often in imagination than in reality.', 'Seneca'],
+  ['Difficulties strengthen the mind, as labour does the body.', 'Seneca'],
+  ['He who is brave is free.', 'Seneca'],
+  ['No man was ever wise by chance.', 'Seneca'],
+  ['First say to yourself what you would be; and then do what you have to do.', 'Epictetus'],
+  ['No man is free who is not master of himself.', 'Epictetus'],
+  ['Make the best use of what is in your power, and take the rest as it happens.', 'Epictetus'],
+  ['Wealth consists not in having great possessions, but in having few wants.', 'Epictetus'],
+  ['Victorious warriors win first and then go to war, while defeated warriors go to war first and then seek to win.', 'Sun Tzu'],
+  ['Opportunities multiply as they are seized.', 'Sun Tzu'],
+  ['Let your plans be dark and impenetrable as night, and when you move, fall like a thunderbolt.', 'Sun Tzu'],
+  ['Experience is the teacher of all things.', 'Julius Caesar'],
+  ['Victory belongs to the most persevering.', 'Napoleon Bonaparte'],
+  ['Discipline is the soul of an army.', 'George Washington'],
+  ['Well done is better than well said.', 'Benjamin Franklin'],
+];
+function quoteOfDay(date = today()) { const i = Math.floor(parseD(date).getTime() / 864e5 + 0.5); const q = QUOTES[((i * 7) % QUOTES.length + QUOTES.length) % QUOTES.length]; return { t: q[0], r: q[1] }; }
+
+/* ========== RITUALS: Morning briefing & Night shutdown ========== */
+UI.rStep = 0;
+const dayDoc = d => S.days[d] || { done: {} };
+function setDay(d, patch) { put('days', d, { ...dayDoc(d), ...patch }); }
+function ritualShell(kind, steps, step) {
+  const dots = steps.map((_, i) => `<i class="${i === step ? 'on' : i < step ? 'past' : ''}"></i>`).join('');
+  return `<div class="ritual-wrap"><div class="row" style="margin-bottom:8px"><div class="rdots">${dots}</div><span class="sp"></span><button class="iconbtn" data-act="ritualExit" aria-label="Close">${ICON.x}</button></div>
+   <div class="ritual-step">${steps[step]()}</div>
+   <div class="row" style="margin-top:22px">${step > 0 ? '<button class="btn ghost" data-act="ritualStep" data-d="-1">← Back</button>' : ''}<span class="sp"></span>
+   ${step < steps.length - 1 ? `<button class="btn pri" data-act="ritualStep" data-d="1" data-k="${kind}">${kind === 'morning' && step === 1 && !(code().read || {})[today()] && (code().rules || []).length ? 'I have read my code →' : 'Next →'}</button>` : `<button class="btn pri" data-act="ritualDone" data-k="${kind}">${kind === 'morning' ? 'GO TO WAR ⚔️' : 'CLOSE THE DAY 🔒'}</button>`}</div></div>`;
+}
+ACT.ritualExit = () => { UI.rStep = 0; go('home'); };
+ACT.ritualStep = d => {
+  if (d.k === 'morning' && UI.rStep === 1 && +d.d > 0) { const c = code(); if ((c.rules || []).length && !(c.read || {})[today()]) put('misc', 'code', { ...c, read: { ...(c.read || {}), [today()]: 1 } }); }
+  const mi = $('#r-mission'); if (mi) saveMission(mi);
+  UI.rStep = Math.max(0, UI.rStep + +d.d); render(true); window.scrollTo(0, 0);
+};
+function saveMission(el) { const d = el.dataset.d, v = el.value.trim(); if ((dayDoc(d).mission || '') !== v) setDay(d, { mission: v }); }
+ACT.missionSave = (d, el) => saveMission(el);
+ACT.ritualDone = d => {
+  const mi = $('#r-mission'); if (mi) saveMission(mi);
+  if (d.k === 'morning') { setDay(today(), { ritualAM: Date.now() }); toast('Go to war, Emperor ⚔️'); }
+  else { setDay(today(), { closed: Date.now() }); toast('Day closed. Rest well, Emperor 🔒'); }
+  UI.rStep = 0; go('home');
+};
+VIEWS.morning = () => {
+  const t = today(), v = verseOfDay(), q = quoteOfDay(), si = streakInfo(), c = code();
+  const en = all('enemies').filter(e => !e.archived), camp = activeCampaign(), cds = all('countdowns').filter(x => x.date >= t).sort((a, b) => a.date.localeCompare(b.date));
+  const { rep, once } = tasksForDate(t), items = [...rep, ...once].sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  const steps = [
+    () => `<div style="text-align:center"><img src="${EAGLE}" style="width:120px" alt=""><div class="hdate" style="margin-top:10px">${fmtDate(t, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase()}</div>
+      <div class="hgreet" style="margin-top:6px">${greeting()},</div><div class="hname">Emperor Blanco</div>
+      <div class="small mute" style="margin-top:8px">Day ${si.cur} 🔥 · ${pieceName(pieceIndex(si.record))}</div>
+      <div class="verse" style="margin-top:22px">“${esc(v.t)}”</div><div class="small goldt" style="margin-top:6px">${esc(v.r)}</div>
+      <div class="verse" style="margin-top:18px;font-size:17px;color:#cfc9bb">“${esc(q.t)}”</div><div class="small mute" style="margin-top:6px">— ${esc(q.r)}</div></div>`,
+    () => `<div class="eyebrow">Rules of engagement</div><h1 style="margin:8px 0 4px">Your code</h1>${(c.rules || []).length ? `<ol class="code" style="margin-left:0">${c.rules.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : '<p class="mute">You haven\'t written your code yet — add it in the War Room → Rules.</p>'}`,
+    () => `<div class="eyebrow">The fronts</div><h1 style="margin:8px 0 12px">Status report</h1>
+      ${camp ? `<div class="card"><div class="tiny mute">CAMPAIGN · WEEK ${campWeek(camp)}/${campWeeks(camp)}</div><b style="font-size:17px">${esc(camp.title)}</b><div class="bar" style="margin-top:8px"><i style="width:${campProgress(camp) * 100}%"></i></div>
+        ${(camp.battles || []).filter(b => +b.week === campWeek(camp)).map(b => `<div class="small" style="margin-top:6px">${b.done ? '✓' : '○'} ${esc(b.title)}</div>`).join('')}</div>` : ''}
+      ${en.length ? `<div class="card"><div class="tiny mute" style="margin-bottom:6px">ENEMIES</div>${en.map(e => `<div class="row" style="padding:4px 0"><span style="flex:1">${esc(e.name)}</span><b class="goldt">${enemyStats(e).cur}</b><span class="tiny mute">days clean</span></div>`).join('')}</div>` : ''}
+      ${cds[0] ? `<div class="card"><div class="tiny mute">NEXT D-DAY</div><b>${esc(cds[0].title)}</b> in <b class="goldt">${diffDays(t, cds[0].date)}</b> days</div>` : ''}
+      ${!camp && !en.length && !cds[0] ? '<p class="mute">No campaign, enemies or countdowns set yet. Set them up in the War Room.</p>' : ''}`,
+    () => `<div class="eyebrow">Today's orders</div><h1 style="margin:8px 0 12px">${items.length} order${items.length === 1 ? '' : 's'} today</h1>
+      ${HAS_LIVE() ? (refreshCalendar(), newsFiltered(t).filter(e => e.impact === 'High').length ? `<div class="card" style="border-color:rgba(224,86,91,.45)"><b class="small" style="color:#e98a8d">📰 Red folders</b>${newsFiltered(t).filter(e => e.impact === 'High').map(e => `<div class="small" style="margin-top:4px">${evTime(e.d)} · ${esc(e.country)} ${esc(e.title)}</div>`).join('')}</div>` : '') : ''}
+      <div class="card"><div class="list">${items.map(x => `<div class="row small" style="padding:8px 0"><span style="width:46px" class="mute">${x.time || '—'}</span><span style="flex:1">${esc(x.title)}</span>${isDoneOn(x, t) ? '<span class="goldt">✓</span>' : ''}</div>`).join('') || '<div class="empty small">No orders set for today.</div>'}</div></div>`,
+    () => `<div class="eyebrow">Focus</div><h1 style="margin:8px 0 6px">Today's #1 mission</h1><p class="small mute">If you only win one battle today, which one?</p>
+      <input type="text" id="r-mission" data-d="${t}" data-chg="missionSave" value="${esc(dayDoc(t).mission || '')}" placeholder="Pass phase 1 of the eval" style="font-size:18px;padding:14px">`,
+  ];
+  return ritualShell('morning', steps, Math.min(UI.rStep, steps.length - 1));
+};
+VIEWS.shutdown = () => {
+  const t = today(), tm = addDays(t, 1), a = S.aar[t] || {}, si = streakInfo();
+  const { rep, once } = tasksForDate(t), items = [...rep, ...once], dn = items.filter(x => isDoneOn(x, t)).length;
+  const tr = all('trades').filter(x => tradeDate(x) === t), focus = dayDoc(t).focus || 0;
+  const tmr = tasksForDate(tm); const tItems = [...tmr.rep, ...tmr.once.filter(x => x.date === tm || !x.date)].sort((x, y) => (x.time || '99').localeCompare(y.time || '99'));
+  const f = (n, l, ph) => `<label class="f">${l}</label><textarea data-chg="aarText" data-f="${n}" data-d="${t}" placeholder="${ph}" style="min-height:60px">${esc(a[n] || '')}</textarea>`;
+  const steps = [
+    () => `<div class="eyebrow">Night shutdown</div><h1 style="margin:8px 0 12px">Today's results</h1>
+      <div class="grid g2 keep" style="gap:10px">${statCard('Orders', dn + '/' + items.length)}${statCard('Streak', si.cur + ' 🔥', si.todayActive ? 'counted' : 'not counted yet!')}${statCard('Focus', minsToHM(focus))}${statCard('P&L', tr.length ? money(sum(tr.map(pnlOf)), true) : '–', tr.length + ' trades', cls(sum(tr.map(pnlOf))))}</div>
+      ${dayDoc(t).mission ? `<div class="card"><div class="tiny mute">TODAY'S MISSION</div><b>${esc(dayDoc(t).mission)}</b></div>` : ''}
+      ${items.filter(x => !isDoneOn(x, t)).length ? `<div class="card"><div class="tiny mute" style="margin-bottom:4px">STILL OPEN — tick what you did</div><div class="list">${items.filter(x => !isDoneOn(x, t)).map(x => taskRow(x, t)).join('')}</div></div>` : '<div class="card goldt">Every order completed. 👑</div>'}`,
+    () => `<div class="eyebrow">Debrief</div><h1 style="margin:8px 0 4px">After Action Report</h1>
+      ${f('planned', '1 · What was the plan?', 'What did I intend to accomplish?')}${f('happened', '2 · What actually happened?', 'Facts only.')}${f('why', '3 · Why the difference?', 'What went right, what went wrong — and why.')}${f('change', '4 · What changes tomorrow?', 'One concrete adjustment.')}
+      <label class="f">Score the day</label><div class="seg">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `<button class="${a.score === i ? 'on' : ''}" data-act="aarScore" data-d="${t}" data-v="${i}">${i}</button>`).join('')}</div>`,
+    () => `<div class="eyebrow">Tomorrow · ${fmtDate(tm, { weekday: 'long', day: 'numeric', month: 'short' })}</div><h1 style="margin:8px 0 12px">Plan the attack</h1>
+      <label class="f">Tomorrow's #1 mission</label><input type="text" id="r-mission" data-d="${tm}" data-chg="missionSave" value="${esc(dayDoc(tm).mission || '')}" placeholder="What wins tomorrow?">
+      <div class="card" style="margin-top:14px"><div class="tiny mute" style="margin-bottom:4px">TOMORROW'S ORDERS</div><div class="list">${tItems.map(x => `<div class="row small" style="padding:7px 0"><span style="width:46px" class="mute">${x.time || '—'}</span><span style="flex:1">${esc(x.title)}</span></div>`).join('') || '<div class="empty small">Nothing planned yet.</div>'}</div>
+      <form data-form="tmrTask" class="row" style="margin-top:10px"><input type="text" name="q" placeholder="Add an order for tomorrow… e.g. Call broker at 10:00"><button class="btn pri" type="submit">${ICON.plus}</button></form></div>`,
+  ];
+  return ritualShell('shutdown', steps, Math.min(UI.rStep, steps.length - 1));
+};
+ACT.form_tmrTask = f => {
+  let q = f.q.value.trim(); if (!q) return; let time = '';
+  const tm = q.match(/\b(?:at|@|um)\s*(\d{1,2})(?:[:.h](\d{2}))?\b/i) || q.match(/\b(\d{1,2})[:.](\d{2})\b/);
+  if (tm && +tm[1] < 24) { time = pad(+tm[1]) + ':' + pad(tm[2] ? +tm[2] : 0); q = q.replace(tm[0], ' ').replace(/\s+/g, ' ').trim(); }
+  put('tasks', uid(), { title: q[0].toUpperCase() + q.slice(1), kind: 'once', time, dur: 0, date: addDays(today(), 1), repeat: { type: 'daily' }, created: Date.now() });
+  f.q.value = ''; render(true);
+};
+
+/* ========== TRADING LOCK ========== */
+const LOCK_HOURS = 4;
+const tlock = () => misc('tlock');
+const tradingLocked = () => (tlock().until || 0) > Date.now();
+function lockLeft() { const ms = Math.max(0, (tlock().until || 0) - Date.now()); const h = Math.floor(ms / 36e5), m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1000) % 60; return h + ':' + pad(m) + ':' + pad(s); }
+function lockBanner() {
+  if (!tradingLocked()) return '';
+  return `<div class="card lockban"><div class="row"><div style="font-size:26px">🔒</div><div style="flex:1"><b style="letter-spacing:.18em">TRADING LOCKED</b><div class="small mute">Until ${new Date(tlock().until).toTimeString().slice(0, 5)} · no new trades. Walk away, Emperor.</div></div><div class="serif" id="lockleft" style="font-size:26px;font-weight:600">${lockLeft()}</div></div>
+   <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="runLockShortcut">Run Opal block again</button><span class="sp"></span><button class="btn sm ghost" data-act="lockBreak" style="color:var(--mute)">Emergency unlock</button></div></div>`;
+}
+setInterval(() => { const el = $('#lockleft'); if (el) { if (!tradingLocked()) render(); else el.textContent = lockLeft(); } }, 1000);
+ACT.tradeLock = () => {
+  const until = new Date(Date.now() + LOCK_HOURS * 36e5);
+  openModal(mh('Lock trading for ' + LOCK_HOURS + ' hours?') + `<p class="mute small">Until <b style="color:var(--text)">${until.toTimeString().slice(0, 5)}</b>. Logging new trades is locked in the app, and your <b style="color:var(--text)">“Trading Lock”</b> shortcut runs to block TradingView and Topstep with Opal.</p>
+    <p class="tiny mute">First time? Set up the shortcut once: Settings & Data → Trading Lock setup.</p>
+    <div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="tl-go">🔒 Lock now</button></div>`, m => m.querySelector('#tl-go').onclick = () => {
+    const t = tlock(); put('misc', 'tlock', { ...t, until: until.getTime(), started: Date.now(), history: [...(t.history || []), { at: Date.now(), hours: LOCK_HOURS }].slice(-200) });
+    closeModal(); setTimeout(() => ACT.runLockShortcut(), 350);
+  });
+};
+ACT.runLockShortcut = () => { try { location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent('Trading Lock'); } catch (e) { toast('Could not open Shortcuts'); } };
+ACT.lockBreak = () => openModal(mh('Emergency unlock') + `<p class="small mute">You locked this for a reason. To unlock the app part early, type <b style="color:var(--text)">I break my word</b>. (Opal's block keeps running.)</p><input type="text" id="lb" autocomplete="off"><div class="actions"><button class="btn" data-act="close">Stay locked</button><button class="btn danger" id="lb-go">Unlock</button></div>`,
+  m => m.querySelector('#lb-go').onclick = () => { if (m.querySelector('#lb').value.trim().toLowerCase() !== 'i break my word') { toast('Stay locked 💪'); return; } const t = tlock(); put('misc', 'tlock', { ...t, until: 0, broken: (t.broken || 0) + 1 }); closeModal(); });
+function lockSetupCard() {
+  return `<div class="card"><h2>Trading Lock setup (one time)</h2><ol class="small" style="padding-left:18px;line-height:1.6;color:#c9c4b6;margin:0">
+    <li>Install <b>Opal</b> from the App Store and give it Screen Time access.</li>
+    <li>In Opal, create a session that blocks the <b>TradingView</b> app and the websites <b>tradingview.com</b>, <b>topstep.com</b> and <b>topstepx.com</b>, lasting <b>4 hours</b>.</li>
+    <li>Open the <b>Shortcuts</b> app → <b>+</b> → name it exactly <b>Trading Lock</b> → add Opal's action to start that session.</li>
+    <li>Come back here and tap <b>Test</b>. The shortcut should run and Opal should start blocking.</li></ol>
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="runLockShortcut">Test shortcut</button><span class="tiny mute">Locks used: ${(tlock().history || []).length}${tlock().broken ? ' · broken ' + tlock().broken + '×' : ''}</span></div></div>`;
+}
+
+/* ========== INSIGHTS ========== */
+function insightData(days = 120) {
+  const t = today(), out = [];
+  const tradesBy = {}; all('trades').forEach(x => { const d = tradeDate(x); (tradesBy[d] = tradesBy[d] || []).push(x); });
+  const train = all('tasks').filter(x => x.kind !== 'once' && /gym|train|workout|lift|run|sport|pushup/i.test(x.title || ''));
+  const rules = tSettings().rules || [];
+  for (let i = 0; i < days; i++) {
+    const d = addDays(t, -i), r = dayRatio(d), dd = dayDoc(d), tr = tradesBy[d] || [], j = S.tjournal[d] || {};
+    out.push({ d, ratio: r.due ? r.r : null, due: r.due, active: activeDay(d), trained: train.some(x => isDoneOn(x, d)), trainDue: train.some(x => isDue(x, d)),
+      ritual: !!dd.ritualAM, closed: !!dd.closed, focus: dd.focus || 0, aar: (S.aar[d] || {}).score || null,
+      trades: tr.length, pnl: sum(tr.map(pnlOf)), wins: tr.filter(x => pnlOf(x) > 0).length,
+      rulesAll: rules.length && j.rulesOk ? rules.every(x => j.rulesOk[x.id]) : null, wd: dow(d) });
+  }
+  return out;
+}
+function cmpTrading(rows, pred, labelA, labelB) {
+  const A = rows.filter(r => r.trades && pred(r)), B = rows.filter(r => r.trades && pred(r) === false);
+  if (A.length < 3 || B.length < 3) return null;
+  const wr = g => sum(g.map(r => r.wins)) / Math.max(1, sum(g.map(r => r.trades))), ap = g => avg(g.map(r => r.pnl));
+  return { a: { n: A.length, wr: wr(A), pnl: ap(A) }, b: { n: B.length, wr: wr(B), pnl: ap(B) }, labelA, labelB };
+}
+function insightCard(icon, title, c) {
+  if (!c) return `<div class="card insight dim"><div class="row"><span class="ico">${icon}</span><b>${title}</b></div><div class="small mute" style="margin-top:6px">Needs more data — at least 3 trading days on each side.</div></div>`;
+  const better = c.a.pnl >= c.b.pnl, diff = c.a.wr - c.b.wr;
+  return `<div class="card insight"><div class="row"><span class="ico">${icon}</span><b>${title}</b></div>
+   <div class="small" style="margin-top:6px">${better ? 'You trade <b class="pos">better</b>' : 'You trade <b class="neg">worse</b>'} on days ${c.labelA}: avg <b class="${cls(c.a.pnl)}">${money(c.a.pnl, true)}</b>/day vs <b class="${cls(c.b.pnl)}">${money(c.b.pnl, true)}</b> ${c.labelB}. Win rate ${pct(c.a.wr, 0)} vs ${pct(c.b.wr, 0)} (${diff >= 0 ? '+' : ''}${Math.round(diff * 100)} pts).</div>
+   <div class="tiny mute" style="margin-top:4px">${c.a.n} vs ${c.b.n} trading days</div></div>`;
+}
+VIEWS.insights = () => {
+  const rows = insightData(UI.insDays || 120);
+  const disc = rows.filter(r => r.ratio != null);
+  const wdNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const wdStats = [0, 1, 2, 3, 4, 5, 6].map(w => { const g = disc.filter(r => r.wd === w); const tg = rows.filter(r => r.wd === w && r.trades); return { w, c: g.length ? avg(g.map(r => r.ratio)) : null, n: g.length, p: tg.length ? avg(tg.map(r => r.pnl)) : null, tn: tg.length }; });
+  const cw = wdStats.filter(x => x.n >= 2), bestW = cw.slice().sort((a, b) => b.c - a.c)[0], worstW = cw.slice().sort((a, b) => a.c - b.c)[0];
+  const tw = wdStats.filter(x => x.tn >= 2), bestTW = tw.slice().sort((a, b) => b.p - a.p)[0], worstTW = tw.slice().sort((a, b) => a.p - b.p)[0];
+  const trades = all('trades').filter(x => tradeDate(x) >= addDays(today(), -(UI.insDays || 120)));
+  const costly = {}; trades.forEach(x => (x.mistakes || []).forEach(m => costly[m] = (costly[m] || 0) + pnlOf(x)));
+  const worstMistake = Object.entries(costly).sort((a, b) => a[1] - b[1])[0];
+  const emo = {}; trades.forEach(x => { if (x.emotion) (emo[x.emotion] = emo[x.emotion] || []).push(pnlOf(x)); });
+  const emoRank = Object.entries(emo).filter(([, a]) => a.length >= 3).map(([k, a]) => [k, avg(a), a.length]).sort((a, b) => a[1] - b[1]);
+  const hours = {}; trades.forEach(x => { if (x.openAt && x.openAt.length > 12) { const h = x.openAt.slice(11, 13); (hours[h] = hours[h] || []).push(pnlOf(x)); } });
+  const hr = Object.entries(hours).filter(([, a]) => a.length >= 3).map(([h, a]) => [h, sum(a), a.length]).sort((a, b) => b[1] - a[1]);
+  const aarRows = disc.filter(r => r.aar);
+  const hiComp = aarRows.filter(r => r.ratio >= .8), loComp = aarRows.filter(r => r.ratio < .8);
+  const ritRows = disc.filter(r => r.d >= (all('days').filter(x => x.ritualAM).map(x => x.id).sort()[0] || '9999'));
+  const ritA = ritRows.filter(r => r.ritual), ritB = ritRows.filter(r => !r.ritual);
+  const fact = (icon, title, body) => `<div class="card insight"><div class="row"><span class="ico">${icon}</span><b>${title}</b></div><div class="small" style="margin-top:6px">${body}</div></div>`;
+  return `<div class="pagehead"><div><div class="eyebrow">Intelligence</div><h1>Insights</h1></div><div class="seg">${[30, 90, 120, 365].map(n => `<button class="${(UI.insDays || 120) === n ? 'on' : ''}" data-act="insDays" data-n="${n}">${n}d</button>`).join('')}</div></div>
+  <p class="small mute" style="margin-top:-6px">Patterns found in your own data. The more you log, the sharper this gets.</p>
+  <h2 class="eyebrow" style="margin:18px 0 8px">Discipline ↔ Trading</h2>
+  <div class="grid g2">
+   ${insightCard('🏋️', 'Training days', cmpTrading(rows, r => r.trainDue ? r.trained : null, 'you trained', 'when you skipped'))}
+   ${insightCard('⚔️', 'Morning ritual', cmpTrading(rows, r => r.ritual, 'you did the morning briefing', 'without it'))}
+   ${insightCard('📜', 'Following your rules', cmpTrading(rows, r => r.rulesAll, 'you followed every rule', 'when you broke one'))}
+   ${insightCard('✅', 'Orders completed', cmpTrading(rows, r => r.ratio == null ? null : r.ratio >= .8, 'you completed 80%+ of your orders', 'below 80%'))}
+   ${insightCard('⏱', 'Deep work', cmpTrading(rows, r => r.focus >= 60, 'with 1h+ focus', 'with less'))}
+  </div>
+  <h2 class="eyebrow" style="margin:18px 0 8px">Patterns</h2>
+  <div class="grid g2">
+   ${bestW && worstW && bestW !== worstW ? fact('📅', 'Discipline by weekday', `Strongest day: <b class="goldt">${wdNames[bestW.w]}</b> (${pct(bestW.c, 0)} completion). Weakest: <b class="neg">${wdNames[worstW.w]}</b> (${pct(worstW.c, 0)}).`) : ''}
+   ${bestTW && worstTW && bestTW !== worstTW ? fact('📈', 'Trading by weekday', `Best: <b class="pos">${wdNames[bestTW.w]}</b> (avg ${money(bestTW.p, true)}/day). Worst: <b class="neg">${wdNames[worstTW.w]}</b> (avg ${money(worstTW.p, true)}/day).`) : ''}
+   ${hr.length >= 2 ? fact('🕐', 'Your hours', `Most profitable entry hour: <b class="pos">${hr[0][0]}:00</b> (${money(hr[0][1], true)} over ${hr[0][2]} trades). Worst: <b class="neg">${hr[hr.length - 1][0]}:00</b> (${money(hr[hr.length - 1][1], true)}).`) : ''}
+   ${worstMistake && worstMistake[1] < 0 ? fact('💸', 'Most expensive mistake', `<b>${esc(worstMistake[0])}</b> cost you <b class="neg">${money(worstMistake[1])}</b> in this period.`) : ''}
+   ${emoRank.length ? fact('🧠', 'Emotions', `Worst state to trade in: <b class="neg">${esc(emoRank[0][0])}</b> (avg ${money(emoRank[0][1], true)}/trade, ${emoRank[0][2]} trades).${emoRank.length > 1 ? ` Best: <b class="pos">${esc(emoRank[emoRank.length - 1][0])}</b> (avg ${money(emoRank[emoRank.length - 1][1], true)}).` : ''}`) : ''}
+   ${hiComp.length >= 3 && loComp.length >= 3 ? fact('📝', 'How your days feel', `On days you finish 80%+ of your orders you score the day <b class="goldt">${avg(hiComp.map(r => r.aar)).toFixed(1)}/10</b> on average, vs <b>${avg(loComp.map(r => r.aar)).toFixed(1)}/10</b> otherwise.`) : ''}
+   ${ritA.length >= 3 && ritB.length >= 3 ? fact('☀️', 'Ritual effect on discipline', `With the morning briefing you complete <b class="goldt">${pct(avg(ritA.map(r => r.ratio)), 0)}</b> of your orders, without it <b>${pct(avg(ritB.map(r => r.ratio)), 0)}</b>.`) : ''}
+   ${(tlock().history || []).length ? fact('🔒', 'Trading lock', `You locked trading <b>${tlock().history.length}</b> time${tlock().history.length > 1 ? 's' : ''}${tlock().broken ? ` and broke it <b class="neg">${tlock().broken}</b>×` : ' and never broke it 👑'}.`) : ''}
+  </div>`;
+};
+ACT.insDays = d => { UI.insDays = +d.n; render(); };
+
+/* ========== COMMAND BAR ========== */
+function parseCommand(raw) {
+  const s = raw.trim(); if (!s) return null; const low = s.toLowerCase();
+  const views = { 'war room': 'warroom', warroom: 'warroom', today: 'home', home: 'home', schedule: 'schedule', trading: 'trading', goals: 'goals', faith: 'faith', reading: 'reading', heatmap: 'heatmap', focus: 'focus', 'weekly review': 'review', review: 'review', monthly: 'monthly', 'monthly report': 'monthly', insights: 'insights', trophies: 'trophies', 'trophy hall': 'trophies', settings: 'settings', tasks: 'tasks', 'all tasks': 'tasks', morning: 'morning', 'begin the day': 'morning', shutdown: 'shutdown', 'close the day': 'shutdown' };
+  if (views[low]) return { label: 'Open ' + s, run: () => go(views[low]) };
+  let m;
+  if ((m = s.match(/^(?:trade)\s+(\S+)(.*)$/i))) {
+    const rest = m[2], side = /\bshort\b/i.test(rest) ? 'short' : 'long';
+    const qty = (rest.match(/\b(\d+(?:\.\d+)?)\s*(?:x|contracts?|lots?|shares?)\b/i) || [])[1];
+    const entry = (rest.match(/(?:@|entry)\s*(\d+(?:\.\d+)?)/i) || [])[1], exit = (rest.match(/exit\s*(\d+(?:\.\d+)?)/i) || [])[1], stop = (rest.match(/(?:stop|sl)\s*(\d+(?:\.\d+)?)/i) || [])[1], tp = (rest.match(/(?:target|tp)\s*(\d+(?:\.\d+)?)/i) || [])[1];
+    return { label: `Log trade: ${m[1].toUpperCase()} ${side}${qty ? ' ×' + qty : ''}${entry ? ' @ ' + entry : ''}`, run: () => { if (tradingLocked()) { toast('Trading is locked 🔒'); return; } go('trading'); tradeModal(null); setTimeout(() => { const md = $('#modal'); if (!md) return; const set = (n, v) => { const el = md.querySelector(`[name=${n}]`); if (el && v != null) el.value = v; }; set('sym', m[1].toUpperCase()); set('qty', qty); set('entry', entry); set('exit', exit); set('stop', stop); set('target', tp); const b = md.querySelector(`#tr-side button[data-v=${side}]`); if (b) b.click(); md.dispatchEvent(new Event('input')); }, 60); } };
+  }
+  if ((m = s.match(/^(?:pray(?:er)?(?:\s+for)?|🙏)\s+(.+)$/i))) return { label: 'Add prayer: ' + m[1], run: () => { put('prayers', uid(), { text: m[1], date: today(), created: Date.now(), answered: false }); toast('Prayer added 🙏'); } };
+  if ((m = s.match(/^watch\s+(\S+)(?:.*?(?:target|tp)\s*(\d+(?:\.\d+)?))?(.*)$/i))) return { label: `Add ${m[1].toUpperCase()} to watchlist${m[2] ? ' (target ' + m[2] + ')' : ''}`, run: () => { put('watch', uid(), { sym: m[1].toUpperCase(), target: m[2] || '', why: (m[3] || '').trim(), added: today() }); toast('Added to watchlist'); refreshQuotes(true); } };
+  if ((m = s.match(/^focus(?:\s+(\d+))?/i))) return { label: `Start ${m[1] || F.dur} min focus`, run: () => { if (m[1]) F.dur = Math.min(600, +m[1]); F.left = null; go('focus'); ACT.fStart(); } };
+  if ((m = s.match(/^book\s+(.+?)(?:\s+by\s+(.+))?$/i))) return { label: `Add book: ${m[1]}${m[2] ? ' — ' + m[2] : ''}`, run: () => { put('books', uid(), { title: m[1], author: m[2] || '', status: 'want', updated: Date.now() }); toast('Added to reading list'); } };
+  if ((m = s.match(/^battle\s+(.+)$/i))) { const c = activeCampaign(); return c ? { label: `Add battle to week ${campWeek(c)}: ${m[1]}`, run: () => { put('campaigns', c.id, { ...c, battles: [...(c.battles || []), { id: uid(), week: campWeek(c), title: m[1], done: false }] }); toast('Battle added ⚔️'); } } : { label: 'No active campaign — start one in the War Room', run: () => { UI.wrTab = 'campaign'; go('warroom'); } }; }
+  if ((m = s.match(/^(?:d-?day|countdown)\s+(.+?)\s+(?:in\s+(\d+)\s*days?|on\s+(\d{4}-\d{2}-\d{2}))$/i))) { const date = m[3] || addDays(today(), +m[2]); return { label: `Add D-Day: ${m[1]} — ${fmtDate(date, { day: 'numeric', month: 'short', year: 'numeric' })}`, run: () => { put('countdowns', uid(), { title: m[1], date }); toast('D-Day added'); } }; }
+  if ((m = s.match(/^(?:mission)\s+(.+)$/i))) return { label: "Set today's #1 mission: " + m[1], run: () => { setDay(today(), { mission: m[1] }); toast('Mission set 🎯'); } };
+  if (/^lock(\s+trading)?$/i.test(s)) return { label: 'Lock trading for 4 hours', run: () => ACT.tradeLock() };
+  // default: task
+  let q = s.replace(/^(?:task|todo|add)\s+/i, ''), time = '', kind = 'once', repeat = { type: 'daily' }, date = '';
+  const tm = q.match(/\b(?:at|@|um)\s*(\d{1,2})(?:[:.h](\d{2}))?\s*(am|pm)?\b/i) || q.match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
+  if (tm) { let h = +tm[1]; if (tm[3] && /pm/i.test(tm[3]) && h < 12) h += 12; if (h < 24) { time = pad(h) + ':' + pad(tm[2] ? +tm[2] : 0); q = q.replace(tm[0], ' '); } }
+  if (/\b(daily|every\s*day|everyday)\b/i.test(q)) { kind = 'rep'; q = q.replace(/\b(daily|every\s*day|everyday)\b/ig, ' '); }
+  if (/\bweekdays\b/i.test(q)) { kind = 'rep'; repeat = { type: 'weekdays', days: [1, 2, 3, 4, 5] }; q = q.replace(/\bweekdays\b/ig, ' '); }
+  if (/\btomorrow\b/i.test(q)) { date = addDays(today(), 1); q = q.replace(/\btomorrow\b/ig, ' '); }
+  q = q.replace(/\s+/g, ' ').trim(); if (!q) return null;
+  const title = q[0].toUpperCase() + q.slice(1);
+  return { label: `Add ${kind === 'rep' ? (repeat.type === 'weekdays' ? 'weekday' : 'daily') + ' ' : ''}task: ${title}${time ? ' · ' + time : ''}${date ? ' · tomorrow' : ''}`, run: () => { put('tasks', uid(), { title, kind, time, dur: 0, repeat, start: date || today(), date: kind === 'once' ? date : '', created: Date.now() }); toast('Task added'); } };
+}
+function openCommand() {
+  openModal(`<div class="row" style="gap:8px"><span style="color:var(--gold);width:22px">${ICON.sword}</span><input type="text" id="cmd" placeholder="Command, Emperor…" autocomplete="off" autocapitalize="sentences" style="font-size:18px;border:none;background:transparent;padding:8px 0"><button class="iconbtn" data-act="close">${ICON.x}</button></div>
+   <div id="cmd-out" style="border-top:1px solid var(--line);margin-top:6px;padding-top:10px"></div>
+   <div class="tiny mute" style="margin-top:10px;line-height:1.7"><b style="color:var(--text)">Examples</b><br>gym at 18:00 daily · call broker tomorrow 10:00<br>trade NQ long 2 contracts @ 18000 stop 17980<br>pray for my family · watch TSLA target 380<br>focus 50 · book Meditations by Marcus Aurelius<br>battle pass phase 1 · d-day Eval ends in 12 days<br>mission pass the eval · lock · war room</div>`, m => {
+    m.querySelector('.modal').style.maxWidth = '560px';
+    const inp = m.querySelector('#cmd'), out = m.querySelector('#cmd-out');
+    const upd = () => { const c = parseCommand(inp.value); out.innerHTML = c ? `<button class="btn pri" id="cmd-go" style="width:100%;text-align:left;white-space:normal">↵ ${esc(c.label)}</button>` : '<div class="small mute">Type a command…</div>'; const b = out.querySelector('#cmd-go'); if (b) b.onclick = exec; };
+    const exec = () => { const c = parseCommand(inp.value); if (!c) return; closeModal(); c.run(); };
+    inp.addEventListener('input', upd); inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); exec(); } });
+    upd(); setTimeout(() => inp.focus(), 50);
+  });
+}
+ACT.cmd = () => openCommand();
+document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (document.body.classList.contains('gated')) return; openCommand(); } });
 
 /* ========== Supabase sync (standalone app build) — overrides the Claude-db store ========== */
 const SB_URL = 'https://npmlicuclezcptclwysv.supabase.co';
