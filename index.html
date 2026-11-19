@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Emperor's Mind">
+<meta name="theme-color" content="#08090b">
+<title>Emperor's Mind</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#0a0a0a; --bg2:#0e1014; --card:#111318; --card2:#161921; --line:#232733; --line2:#2e3342;
+  --text:#ece7da; --mute:#8d8a80; --dim:#5d5b55;
+  --gold:#d4ae5a; --gold2:#f1d48c; --gold3:#9c7a2f; --goldbg:rgba(212,174,90,.10);
+  --green:#3fbf7f; --red:#e0565b; --blue:#5aa6e0;
+  --serif:'Cinzel','Cormorant Garamond',Georgia,serif; --serif2:'Cormorant Garamond',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --r:14px; --nav:64px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.45}
+body{min-height:100vh;padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--gold)}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:.02em;margin:0}
+.serif{font-family:var(--serif2)}
+.app{display:flex;min-height:100vh}
+.side{display:none}
+main{flex:1;min-width:0;max-width:1100px;margin:0 auto;padding:16px 16px 24px}
+.topbar{display:flex;align-items:center;gap:10px;margin:2px 0 16px}
+.topbar img{width:38px;height:auto}
+.topbar .t{font-family:var(--serif);font-size:13px;letter-spacing:.28em;color:var(--gold)}
+.topbar .sync{margin-left:auto;font-size:11px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dim);display:inline-block}
+.dot.on{background:var(--green)} .dot.warn{background:#d9a441}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+.pagehead h1{font-size:24px}
+.eyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.card.gold{border-color:rgba(212,174,90,.45);background:linear-gradient(180deg,#14130f,#101115)}
+.card h2{font-size:15px;margin-bottom:10px}
+.card h3{font-size:13px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g4{grid-template-columns:repeat(4,minmax(0,1fr))} .grid>*{min-width:0} input{min-width:0}
+.row{display:flex;align-items:center;gap:10px}
+.row.wrap{flex-wrap:wrap}
+.sp{flex:1}
+.mute{color:var(--mute)} .dim{color:var(--dim)} .small{font-size:12.5px} .tiny{font-size:11px}
+.pos{color:var(--green)} .neg{color:var(--red)} .goldt{color:var(--gold)}
+.btn{background:var(--card2);border:1px solid var(--line2);border-radius:10px;padding:9px 14px;cursor:pointer;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--gold3)}
+.btn.pri{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1408;border:none;font-weight:600}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 10px;font-size:12.5px;border-radius:8px}
+.btn.danger{color:var(--red)}
+.iconbtn{background:none;border:none;color:var(--mute);cursor:pointer;padding:6px;border-radius:8px;font-size:16px;line-height:1}
+.iconbtn:hover{color:var(--gold);background:var(--card2)}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=email],input[type=search],select,textarea{
+  width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;font-size:16px}
+input:focus,select:focus,textarea:focus{border-color:var(--gold3)}
+textarea{min-height:80px;resize:vertical}
+label.f{display:block;font-size:12px;color:var(--mute);margin:10px 0 5px}
+.seg{display:inline-flex;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:none;border:none;padding:6px 11px;border-radius:7px;cursor:pointer;color:var(--mute);font-size:13px}
+.seg button.on{background:var(--card2);color:var(--gold);box-shadow:0 0 0 1px var(--line2)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{background:none;border:none;color:var(--mute);padding:10px 12px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-size:14px}
+.tabs button.on{color:var(--gold);border-bottom-color:var(--gold)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;background:var(--card2);border:1px solid var(--line2);color:var(--mute)}
+.pill.g{color:var(--gold);border-color:rgba(212,174,90,.4);background:var(--goldbg)}
+.bar{height:6px;background:#1c1f27;border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold3),var(--gold2));border-radius:99px}
+.empty{color:var(--mute);text-align:center;padding:22px 10px;font-size:14px}
+.stat .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.stat .v{font-family:var(--serif2);font-size:24px;font-weight:600;margin-top:2px}
+.list>*+*{border-top:1px solid var(--line)}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(8,9,11,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;z-index:20}
+.nav button{flex:1;background:none;border:none;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;cursor:pointer}
+.nav button svg{width:22px;height:22px}
+.nav button.on{color:var(--gold)}
+@media(min-width:900px){
+  body{padding-bottom:0}
+  .nav{display:none}
+  .side{display:flex;flex-direction:column;width:232px;flex-shrink:0;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;background:#0a0b0e}
+  .side .brand{text-align:center;margin-bottom:18px}
+  .side .brand img{width:96px}
+  .side .brand .t{font-family:var(--serif);letter-spacing:.24em;font-size:12px;color:var(--gold);margin-top:6px}
+  .side button{display:flex;align-items:center;gap:11px;background:none;border:none;color:var(--mute);padding:9px 12px;border-radius:10px;cursor:pointer;font-size:14px;text-align:left;width:100%}
+  .side button svg{width:18px;height:18px}
+  .side button:hover{color:var(--text);background:var(--card)}
+  .side button.on{color:var(--gold);background:var(--goldbg)}
+  .side .sec{font-size:10px;letter-spacing:.2em;color:var(--dim);margin:14px 12px 6px}
+  main{padding:26px 30px}
+  .topbar{display:none}
+}
+@media(max-width:640px){ .g2,.g3,.g4{grid-template-columns:1fr} .g4.keep,.g2.keep{grid-template-columns:repeat(2,minmax(0,1fr))} .g3.keep{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} .g3.keep .card{padding:12px} .g3.keep .stat .v{font-size:19px} .g3.keep .stat .k{font-size:9.5px;letter-spacing:.08em} .pagehead h1{font-size:21px} }
+
+/* home */
+.hero{text-align:center;padding:22px 16px 18px;position:relative;overflow:hidden}
+.hero .greet{font-family:var(--serif);font-size:22px;line-height:1.25}
+.hero .greet b{color:var(--gold);font-weight:600}
+.hero .date{color:var(--mute);font-size:13px;margin-top:4px;letter-spacing:.06em}
+.piecewrap{width:150px;height:150px;margin:14px auto 6px;position:relative}
+.piecewrap svg{width:100%;height:100%}
+.piecewrap.glow::before{content:'';position:absolute;inset:10%;border-radius:50%;filter:blur(28px);opacity:.45;background:var(--glow,#d4ae5a)}
+.rankname{font-family:var(--serif);font-size:18px;letter-spacing:.06em}
+.streakline{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:14px;flex-wrap:wrap}
+.streakline b{font-family:var(--serif2);font-size:20px}
+.ring{width:84px;height:84px}
+.mini-task{display:flex;align-items:center;gap:10px;padding:9px 0}
+
+/* tasks */
+.task{display:flex;align-items:flex-start;gap:12px;padding:11px 0}
+.chk{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1.5px solid var(--gold3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;margin-top:1px}
+.chk.on{background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold);color:#1a1408}
+.chk svg{width:16px;height:16px}
+.task .body{flex:1;min-width:0;cursor:pointer}
+.task .name{font-size:15.5px;font-weight:500}
+.task.done .name{text-decoration:line-through;color:var(--mute)}
+.task .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:3px}
+.task .meta .rep{color:var(--green)}
+.fire{color:#ff9d3a;font-weight:600}
+.grouphead{display:flex;align-items:center;gap:10px;padding:2px 0 8px}
+.grouphead h2{font-size:14px;margin:0;letter-spacing:.12em}
+.addbar{position:sticky;bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 8px);display:flex;gap:8px;margin-top:8px;z-index:5}
+.addbar input{flex:1;border-color:var(--gold3);background:#0d0f13}
+@media(min-width:900px){.addbar{bottom:14px}}
+.days7{display:flex;gap:6px;flex-wrap:wrap}
+.days7 button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:var(--bg2);cursor:pointer;font-size:12.5px;color:var(--mute)}
+.days7 button.on{background:var(--gold);color:#1a1408;border-color:var(--gold);font-weight:600}
+
+/* schedule */
+.tl{position:relative;margin-left:52px;border-left:1px solid var(--line)}
+.tl .hr{position:absolute;left:-52px;width:44px;text-align:right;font-size:11px;color:var(--dim);transform:translateY(-7px)}
+.tl .hl{position:absolute;left:0;right:0;border-top:1px dashed #1b1e26}
+.tl .ev{position:absolute;left:8px;right:4px;border-radius:9px;background:linear-gradient(180deg,rgba(212,174,90,.18),rgba(212,174,90,.08));border:1px solid rgba(212,174,90,.45);padding:5px 9px;font-size:13px;overflow:hidden;cursor:pointer;display:flex;gap:8px;align-items:flex-start}
+.tl .ev.done{opacity:.5;text-decoration:line-through}
+.tl .now{position:absolute;left:-4px;right:0;border-top:2px solid var(--red);z-index:3}
+.tl .now::before{content:'';position:absolute;left:-4px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--red)}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.modal{background:#0c0e12;border:1px solid var(--line2);border-radius:18px 18px 0 0;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;padding:18px 18px calc(22px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.modal-bg{align-items:center}.modal{border-radius:18px;max-height:88vh}}
+.modal .mh{display:flex;align-items:center;margin-bottom:6px}
+.modal .mh h2{font-size:19px;flex:1}
+.modal .actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.sw{width:46px;height:28px;border-radius:99px;background:#252935;position:relative;cursor:pointer;border:none;flex-shrink:0}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#7b7f8c;transition:.2s}
+.sw.on{background:var(--gold)} .sw.on::after{left:21px;background:#fff}
+
+/* celebrate */
+.celebrate{position:fixed;inset:0;z-index:80;background:radial-gradient(circle at 50% 40%,rgba(30,26,14,.97),rgba(0,0,0,.97));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;animation:fadein .5s}
+.celebrate .piecewrap{width:220px;height:220px;animation:rise 1s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes fadein{from{opacity:0}} @keyframes rise{from{transform:scale(.4) translateY(40px);opacity:0}}
+
+/* trophy */
+.trophies{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.trophy{text-align:center;padding:8px 2px;border-radius:12px;background:var(--bg2);border:1px solid var(--line)}
+.trophy svg{width:100%;max-width:64px;height:auto;aspect-ratio:1}
+.trophy .d{font-size:10.5px;color:var(--mute)}
+.trophy.lock svg{opacity:.18;filter:grayscale(1)}
+.trophy.cur{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-weight:500;color:var(--mute);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 6px;border-bottom:1px solid var(--line)}
+.tbl td{padding:9px 6px;border-bottom:1px solid #1a1d25;vertical-align:middle}
+.tbl tr.click{cursor:pointer} .tbl tr.click:hover td{background:#12141a}
+.tbl .r{text-align:right}
+.scrollx{overflow-x:auto}
+
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr) 1.1fr;gap:5px}
+.cal .h{font-size:10.5px;color:var(--mute);text-align:center;letter-spacing:.1em;padding-bottom:3px}
+.cal .c{min-height:70px;border-radius:10px;background:var(--bg2);border:1px solid var(--line);padding:5px 6px;font-size:11px;cursor:pointer;position:relative;display:flex;flex-direction:column}
+.cal .c.out{opacity:.25;cursor:default}
+.cal .c.win{background:rgba(63,191,127,.13);border-color:rgba(63,191,127,.45)}
+.cal .c.loss{background:rgba(224,86,91,.13);border-color:rgba(224,86,91,.45)}
+.cal .c .n{color:var(--mute)}
+.cal .c .p{font-weight:600;font-size:12.5px;margin-top:auto}
+.cal .c .note{position:absolute;top:4px;right:5px;font-size:10px}
+.cal .wk{border-radius:10px;border:1px dashed var(--line2);padding:5px 6px;font-size:11px;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:640px){.cal{gap:3px}.cal .c{min-height:54px;padding:3px 4px}.cal .c .p{font-size:10.5px}.cal .c .t{display:none}}
+.yeargrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.ym .mg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.ym .mg i{aspect-ratio:1;border-radius:3px;background:#161921}
+.ym .mg i.w{background:var(--green)} .ym .mg i.l{background:var(--red)} .ym .mg i.x{background:transparent}
+
+/* heatmap */
+.heat{display:grid;grid-auto-flow:column;grid-auto-columns:13px;justify-content:start;grid-template-rows:repeat(7,1fr);gap:3px;overflow-x:auto;padding-bottom:4px}
+.heat i{width:13px;height:13px;border-radius:3px;background:#15181f;display:block}
+.heat i.l1{background:#3b3220}.heat i.l2{background:#6b5527}.heat i.l3{background:#a8843a}.heat i.l4{background:#f1d48c}
+.heat i.f{visibility:hidden}
+
+/* focus */
+.timer{width:240px;height:240px;margin:6px auto;position:relative}
+.timer .tt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer .tt .big{font-family:var(--serif2);font-size:52px;font-weight:600;letter-spacing:.02em}
+
+/* bible */
+.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.bk{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:7px 9px;cursor:pointer;font-size:12.5px}
+.bk .bar{height:4px;margin-top:5px}
+.chap{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:5px}
+.chap button{height:38px;border-radius:8px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer;font-size:13px;color:var(--mute)}
+.chap button.on{background:var(--gold);color:#1a1408;border-color:var(--gold);font-weight:600}
+
+.vision{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.vcard{border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.vcard .img{height:120px;background:linear-gradient(135deg,#1a1710,#0e0f13);background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:10px}
+.vcard .b{padding:12px 14px}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);background:#1b1d24;border:1px solid var(--gold3);padding:10px 16px;border-radius:12px;z-index:90;font-size:14px;animation:fadein .2s}
+.banner{background:rgba(217,164,65,.1);border:1px solid rgba(217,164,65,.4);color:#e6c27a;border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:12px}
+.verse{font-family:var(--serif2);font-size:19px;line-height:1.4;font-style:italic}
+input[type=datetime-local],input[type=date],input[type=time]{font-size:14px;padding:10px 8px;-webkit-appearance:none;appearance:none;min-height:42px}
+body.gated{padding-bottom:0}
+.login{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 8px;max-width:380px;margin:0 auto}
+.login img{width:190px;margin-bottom:18px}
+.login h1{font-size:30px;margin:8px 0 6px}
+.login-form{width:100%;display:flex;flex-direction:column;gap:12px;margin:18px 0 10px}
+input[type=email],input[type=password]{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;outline:none;font-size:16px;text-align:center}
+input[type=email]:focus,input[type=password]:focus{border-color:var(--gold3)}
+body.gated .nav{display:none}
+
+.card[data-go] svg,[data-go]>span>svg{width:22px;height:22px}
+main{padding-top:max(16px, env(safe-area-inset-top))}
+.side{padding-top:max(22px, env(safe-area-inset-top))}
+html,body{overscroll-behavior-y:none}
+</style></head>
+<body><div class="app"><aside class="side" id="side"></aside><main id="main"></main></div><nav class="nav" id="nav"></nav>
+<script src="supabase.js"></script>
+<script>const EAGLE="data:image/jpeg;base64,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";
+'use strict';
+/* ========== utils ========== */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseD(s); d.setDate(d.getDate() + n); return ymd(d); };
+const diffDays = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
+const today = () => ymd(new Date());
+const dow = s => parseD(s).getDay();
+const DOW = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const fmtDate = (s, o = { weekday: 'long', day: 'numeric', month: 'long' }) => parseD(s).toLocaleDateString('en-GB', o);
+const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : null; };
+const money = (v, sign = false) => { if (v == null || !isFinite(v)) return '–'; const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); return (v < 0 ? '-' : sign && v > 0 ? '+' : '') + '$' + s; };
+const pct = (v, d = 1) => v == null || !isFinite(v) ? '–' : (v * 100).toFixed(d) + '%';
+const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+const minsToHM = m => { m = Math.round(m); if (m < 60) return m + 'm'; const h = Math.floor(m / 60); return h + 'h' + (m % 60 ? ' ' + (m % 60) + 'm' : ''); };
+const durTxt = ms => { if (ms == null || !isFinite(ms) || ms < 0) return '–'; const m = ms / 6e4; if (m < 60) return Math.round(m) + 'm'; if (m < 1440) return (m / 60).toFixed(1) + 'h'; return (m / 1440).toFixed(1) + 'd'; };
+const weekStart = s => { const d = dow(s); return addDays(s, d === 0 ? -6 : 1 - d); };
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2200); }
+const ICON = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>',
+  tasks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6l2 2 3-3M4 13l2 2 3-3M4 20l2 2 3-3M12 7h8M12 14h8M12 21h8"/></svg>',
+  sched: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>',
+  trade: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 20h18M6 16V9M6 7V4M12 16v-3M12 11V5M18 16V12M18 10V6"/><rect x="4.5" y="9" width="3" height="5"/><rect x="10.5" y="7" width="3" height="5"/><rect x="16.5" y="10" width="3" height="4"/></svg>',
+  more: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>',
+  goal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>',
+  faith: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2.5v19M6.5 8h11"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4zM20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>',
+  heat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="10" y="10" width="5" height="5" rx="1"/><rect x="3" y="17" width="5" height="4" rx="1"/></svg>',
+  focus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>',
+  review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg>',
+  trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4.5a3 3 0 0 0 3.5 4M16 6h3.5a3 3 0 0 1-3.5 4M12 13v4M8 21h8M9.5 17h5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" width="18" height="18"><path d="M12 5v14M5 12h14"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="20" height="20"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M15 5l-7 7 7 7"/></svg>',
+  right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M9 5l7 7-7 7"/></svg>',
+  repeat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="vertical-align:-1px"><path d="M4 11V9a3 3 0 0 1 3-3h12l-3-3M20 13v2a3 3 0 0 1-3 3H5l3 3"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="vertical-align:-1px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+};
+
+/* ========== store (synced via Claude db, local fallback) ========== */
+const COLS = ['tasks', 'days', 'goals', 'prayers', 'books', 'accounts', 'trades', 'tjournal', 'holdings', 'watch', 'reviews', 'misc'];
+const S = {}; COLS.forEach(c => S[c] = {});
+const SYNC = { mode: 'connecting', loaded: new Set(), timedOut: false };
+let BASE = null;
+const LKEY = 'emperors-mind-v1';
+function localLoad() { try { const j = JSON.parse(localStorage.getItem(LKEY) || '{}'); COLS.forEach(c => { S[c] = {}; Object.entries(j[c] || {}).forEach(([k, v]) => S[c][k] = { ...v, id: k }); }); } catch (e) { } }
+let localT = null;
+function localSave() { clearTimeout(localT); localT = setTimeout(() => { try { localStorage.setItem(LKEY, JSON.stringify(S)); } catch (e) { } }, 250); }
+const writeChains = {};
+function chain(key, fn) { const p = (writeChains[key] || Promise.resolve()).then(fn, fn); writeChains[key] = p.catch(() => { }); return p; }
+function put(col, id, data) {
+  const body = JSON.parse(JSON.stringify({ ...data })); delete body.id;
+  S[col][id] = { ...body, id }; scheduleRender();
+  if (BASE) {
+    chain(col + '/' + id, () => BASE.collection(col).doc(id).set(body)).catch(e => {
+      console.error(e); toast(e && e.code === 'quota_exceeded' ? 'Storage full — delete some old items.' : 'Could not save — check connection.');
+    });
+  } else localSave();
+  return id;
+}
+function del(col, id) {
+  delete S[col][id]; scheduleRender();
+  if (BASE) chain(col + '/' + id, () => BASE.collection(col).doc(id).delete()).catch(e => console.error(e));
+  else localSave();
+}
+const all = col => Object.values(S[col]);
+const misc = id => S.misc[id] || {};
+async function initStore() {
+  let db = null, user = null, id = null;
+  try {
+    if (window.claude && window.claude.use) {
+      db = await window.claude.use('db');
+      user = await window.claude.use('user');
+      id = user ? await user.id() : null;
+    }
+  } catch (e) { console.warn(e); }
+  if (db && id) {
+    SYNC.mode = 'cloud';
+    BASE = db.doc('data/users/' + id + '/hq');
+    const timer = setTimeout(() => { if (SYNC.loaded.size < COLS.length) { SYNC.timedOut = true; scheduleRender(); } }, 10000);
+    COLS.forEach(c => {
+      BASE.collection(c).onSnapshot(snap => {
+        const o = {}; snap.docs.forEach(d => { o[d.id] = { ...d.data(), id: d.id }; });
+        S[c] = o;
+        if (!snap.metadata.fromCache) SYNC.loaded.add(c);
+        if (SYNC.loaded.size === COLS.length) { clearTimeout(timer); SYNC.timedOut = false; }
+        scheduleRender();
+      }, err => { console.error(c, err); SYNC.mode = 'error'; scheduleRender(); });
+    });
+  } else {
+    SYNC.mode = 'local'; localLoad(); COLS.forEach(c => SYNC.loaded.add(c));
+  }
+  scheduleRender();
+}
+
+/* ========== ranks / chess pieces ========== */
+const METALS = [
+  { key: 'silver', name: 'Silver', a: '#ffffff', b: '#c9ced6', c: '#7d848f', glow: '#cfd6e0' },
+  { key: 'gold', name: 'Gold', a: '#fff1bf', b: '#e2b85a', c: '#8f6a22', glow: '#e9b949' },
+  { key: 'emerald', name: 'Emerald', a: '#c8ffe4', b: '#2fbf7c', c: '#0b5e3a', glow: '#2fd38a' },
+  { key: 'diamond', name: 'Diamond', a: '#ffffff', b: '#b9ecff', c: '#5aa9d6', glow: '#9fe3ff' },
+];
+const PIECES = ['Pawn', 'Knight', 'Bishop', 'Rook', 'Queen', 'King'];
+const PIECE_PATHS = {
+  Pawn: '<circle cx="50" cy="27" r="12.5"/><path d="M39 41h22l-3.5 7h-15z"/><path d="M41.5 48h17c1.5 10 5 20 11 29h-39c6-9 9.5-19 11-29z"/>',
+  Knight: '<path d="M31 77c1-9 4-15 9-19-4-1-9 0-13-3-3-2-4-6-2-9l11-14c1-6 5-11 9-13l1-8 5 6c13 1 21 11 23 26 2 12-1 24-4 34z"/><circle cx="41" cy="35" r="2.6" class="eye"/>',
+  Bishop: '<circle cx="50" cy="12" r="4.5"/><path d="M50 17c10 7 16 16 15 25-1 7-7 10-15 10s-14-3-15-10c-1-9 5-18 15-25z"/><path d="M38 53h24v5H38z"/><path d="M41 58h18c1 7 4 13 9 19H32c5-6 8-12 9-19z"/><path d="M53 26l-7 9" class="cut"/>',
+  Rook: '<path d="M29 17h9v7h6v-7h12v7h6v-7h9v17l-5 5H34l-5-5z"/><path d="M35 39h30l3 38H32z"/>',
+  Queen: '<circle cx="27" cy="19" r="4"/><circle cx="40" cy="14" r="4"/><circle cx="50" cy="11" r="4"/><circle cx="60" cy="14" r="4"/><circle cx="73" cy="19" r="4"/><path d="M27 23l9 20 4-25 6 23 4-26 4 26 6-23 4 25 9-20-5 30H32z"/><path d="M34 53h32l5 24H29z"/>',
+  King: '<path d="M47 4h6v6h6v6h-6v7h-6v-7h-6v-6h6z"/><path d="M50 23c9 0 18 4 18 11 0 6-4 12-6 18H38c-2-6-6-12-6-18 0-7 9-11 18-11z"/><path d="M36 52h28v5H36z"/><path d="M39 57h22c1 8 4 14 8 20H31c4-6 7-12 8-20z"/>',
+};
+function pieceSVG(idx, opts = {}) {
+  const m = METALS[Math.floor(idx / 6)] || METALS[0], p = PIECES[idx % 6];
+  const g = 'g' + Math.random().toString(36).slice(2, 7);
+  const sparkle = m.key === 'diamond' ? '<g fill="#fff" opacity=".9"><path d="M70 30l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/><path d="M33 60l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z"/></g>' : '';
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs>
+  <linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${m.a}"/><stop offset=".45" stop-color="${m.b}"/><stop offset="1" stop-color="${m.c}"/></linearGradient>
+  <linearGradient id="${g}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m.c}"/><stop offset="1" stop-color="${m.b}"/></linearGradient></defs>
+  <g fill="url(#${g})" stroke="${m.c}" stroke-width="1.2" stroke-linejoin="round">${PIECE_PATHS[p].replace('class="eye"', `fill="${m.c}" stroke="none"`).replace('class="cut"', `fill="none" stroke="${m.c}" stroke-width="2.4" stroke-linecap="round"`)}
+  <path d="M27 77h46l3 6H24z"/><rect x="20" y="83" width="60" height="8" rx="2"/></g>${sparkle}</svg>`;
+}
+const pieceName = idx => idx < 0 ? 'No piece yet' : METALS[Math.floor(idx / 6)].name + ' ' + PIECES[idx % 6];
+const pieceIndex = record => record >= 1 ? Math.min(23, Math.floor(record / 30)) : -1;
+const pieceDay = idx => idx === 0 ? 1 : idx * 30;
+
+/* ========== tasks & streak logic ========== */
+function isDue(t, date) {
+  if (t.kind === 'once') return false;
+  const start = t.start || date;
+  if (date < start) return false;
+  if (t.archivedAt && date >= t.archivedAt) return false;
+  const r = t.repeat || { type: 'daily' };
+  if (r.type === 'daily') return true;
+  if (r.type === 'weekdays') return (r.days || []).includes(dow(date));
+  if (r.type === 'interval') return diffDays(start, date) % Math.max(1, r.every || 1) === 0;
+  if (r.type === 'monthly') return parseD(date).getDate() === parseD(start).getDate();
+  return true;
+}
+const dayDone = date => (S.days[date] && S.days[date].done) || {};
+const isDoneOn = (t, date) => t.kind === 'once' ? !!t.done : !!dayDone(date)[t.id];
+const activeDay = date => Object.values(dayDone(date)).some(Boolean);
+function tasksForDate(date) {
+  const ts = all('tasks').filter(t => !t.archived || (t.archivedAt && date < t.archivedAt));
+  const rep = ts.filter(t => isDue(t, date));
+  const once = all('tasks').filter(t => t.kind === 'once' && !t.archived && ((!t.done && (!t.date || t.date <= date)) || (t.done && t.doneAt === date)));
+  return { rep, once };
+}
+function streakInfo() {
+  const t = today();
+  let d = activeDay(t) ? t : addDays(t, -1), cur = 0;
+  while (activeDay(d) && cur < 5000) { cur++; d = addDays(d, -1); }
+  const dates = Object.keys(S.days).filter(activeDay).sort();
+  let best = 0, run = 0, prev = null;
+  for (const x of dates) { run = prev && diffDays(prev, x) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = x; }
+  const storedBest = misc('profile').bestStreak || 0;
+  const record = Math.max(best, cur, storedBest);
+  return { cur, record, todayActive: activeDay(t) };
+}
+function taskStreak(t) {
+  if (t.kind === 'once') return 0;
+  let d = today(), n = 0, guard = 0;
+  if (!isDoneOn(t, d)) d = addDays(d, -1);
+  while (guard++ < 2000) {
+    if (d < (t.start || d)) break;
+    if (isDue(t, d)) { if (isDoneOn(t, d)) n++; else break; }
+    d = addDays(d, -1);
+  }
+  return n;
+}
+function toggleTask(t, date) {
+  date = date || today();
+  const day = S.days[date] || { done: {} };
+  const done = { ...(day.done || {}) };
+  if (t.kind === 'once') {
+    const nv = !t.done;
+    const when = nv ? date : t.doneAt;
+    put('tasks', t.id, { ...t, done: nv, doneAt: nv ? date : null });
+    const d2 = S.days[when] || { done: {} }; const dn = { ...(d2.done || {}) };
+    if (nv) dn[t.id] = true; else delete dn[t.id];
+    put('days', when, { ...d2, done: dn });
+  } else {
+    if (done[t.id]) delete done[t.id]; else done[t.id] = true;
+    put('days', date, { ...day, done });
+  }
+}
+function dayRatio(date) {
+  const { rep } = tasksForDate(date);
+  const dd = dayDone(date);
+  const onceDone = all('tasks').filter(t => t.kind === 'once' && t.done && t.doneAt === date).length;
+  const due = rep.length + onceDone;
+  const done = rep.filter(t => dd[t.id]).length + onceDone;
+  return { due, done, r: due ? done / due : (activeDay(date) ? 1 : 0) };
+}
+const repeatLabel = t => {
+  if (t.kind === 'once') return t.date ? fmtDate(t.date, { day: 'numeric', month: 'short' }) : 'One-time';
+  const r = t.repeat || { type: 'daily' };
+  if (r.type === 'daily') return 'Daily';
+  if (r.type === 'weekdays') { const d = (r.days || []).slice().sort(); if (d.length === 5 && !d.includes(0) && !d.includes(6)) return 'Weekdays'; return d.map(i => DOW[i]).join(' '); }
+  if (r.type === 'interval') return 'Every ' + (r.every || 1) + ' days';
+  if (r.type === 'monthly') return 'Monthly';
+  return 'Daily';
+};
+const timeGroup = time => { if (!time) return 'Anytime'; const h = +time.split(':')[0]; return h < 12 ? 'Morning' : h < 18 ? 'Afternoon' : 'Evening'; };
+
+/* ========== router / render ========== */
+const NAV = [
+  { id: 'home', label: 'Home', icon: 'home' }, { id: 'tasks', label: 'Tasks', icon: 'tasks' }, { id: 'schedule', label: 'Schedule', icon: 'sched' },
+  { id: 'trading', label: 'Trading', icon: 'trade' }, { id: 'goals', label: 'Goals', icon: 'goal' }, { id: 'faith', label: 'Faith', icon: 'faith' },
+  { id: 'reading', label: 'Reading', icon: 'book' }, { id: 'heatmap', label: 'Heatmap', icon: 'heat' }, { id: 'focus', label: 'Focus', icon: 'focus' },
+  { id: 'review', label: 'Weekly Review', icon: 'review' }, { id: 'trophies', label: 'Trophy Hall', icon: 'trophy' },
+  { id: 'settings', label: 'Settings & Data', icon: 'gear' },
+];
+const VIEWS = {};
+const UI = { view: 'home', schedDate: null };
+function go(v) { UI.view = v; try { if (location.hash !== '#' + v) history.replaceState(null, '', '#' + v); } catch (e) { } render(); window.scrollTo(0, 0); }
+let rT = null, pendingRender = false;
+function scheduleRender() { clearTimeout(rT); rT = setTimeout(render, 30); }
+function render(force) {
+  const main = $('#main');
+  const ae = document.activeElement;
+  if (force !== true && ae && main.contains(ae) && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== 'checkbox') { pendingRender = true; return; }
+  pendingRender = false;
+  if (typeof gate === 'function' && gate()) return;
+  document.body.classList.remove('gated');
+  const mobileMain = ['home', 'tasks', 'schedule', 'trading'];
+  const navHTML = (arr, side) => arr.map(n => `<button data-go="${n.id}" class="${UI.view === n.id || (!side && n.id === 'more' && !mobileMain.includes(UI.view)) ? 'on' : ''}">${ICON[n.icon]}<span>${n.label}</span></button>`).join('');
+  $('#side').innerHTML = `<div class="brand"><img src="${EAGLE}" alt=""><div class="t">EMPEROR'S MIND</div></div>`
+    + navHTML(NAV.slice(0, 4), true) + '<div class="sec">LIFE</div>' + navHTML(NAV.slice(4, 7), true) + '<div class="sec">DISCIPLINE</div>' + navHTML(NAV.slice(7), true);
+  $('#nav').innerHTML = navHTML([...NAV.slice(0, 4), { id: 'more', label: 'More', icon: 'more' }], false);
+  const syncTxt = typeof syncLabel === 'function' ? syncLabel() : SYNC.mode === 'cloud' ? (SYNC.timedOut ? '<span class="dot warn"></span>Sync slow' : SYNC.loaded.size < COLS.length ? '<span class="dot warn"></span>Syncing…' : '<span class="dot on"></span>Synced')
+    : SYNC.mode === 'local' ? '<span class="dot warn"></span>This device only' : SYNC.mode === 'error' ? '<span class="dot" style="background:var(--red)"></span>Sync error' : '<span class="dot"></span>Connecting…';
+  const top = `<div class="topbar"><img src="${EAGLE}" alt=""><span class="t">EMPEROR'S MIND</span><span class="sync">${syncTxt}</span></div>`;
+  let banner = '';
+  if (SYNC.mode === 'local') banner = '<div class="banner">Not connected to sync — changes are saved on this device only. Open the app from your Claude link while signed in to sync between iPhone and Mac.</div>';
+  if (SYNC.timedOut) banner = '<div class="banner">Can\'t reach your synced data yet — what you see may be out of date.</div>';
+  const fn = VIEWS[UI.view] || VIEWS.home;
+  let html; try { html = fn(); } catch (e) { console.error(e); html = '<div class="card">Something went wrong in this view: ' + esc(e.message) + '</div>'; }
+  main.innerHTML = top + banner + html;
+  checkRankUp();
+}
+document.addEventListener('focusout', () => setTimeout(() => { if (pendingRender) render(); }, 0));
+
+/* ========== actions (event delegation) ========== */
+const ACT = {};
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const f = ACT[a.dataset.act]; if (f) { e.preventDefault(); f(a.dataset, a, e); }
+});
+document.addEventListener('change', e => {
+  const a = e.target.closest('[data-chg]'); if (!a) return;
+  const f = ACT[a.dataset.chg]; if (f) f(a.dataset, a, e);
+});
+
+/* ========== modal ========== */
+function openModal(html, onMount) {
+  closeModal();
+  const bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'modal';
+  bg.innerHTML = `<div class="modal">${html}</div>`;
+  bg.addEventListener('mousedown', e => { if (e.target === bg) bg.dataset.down = '1'; });
+  bg.addEventListener('click', e => { if (e.target === bg && bg.dataset.down) closeModal(); bg.dataset.down = ''; });
+  document.body.appendChild(bg); document.body.style.overflow = 'hidden';
+  if (onMount) onMount(bg);
+  return bg;
+}
+function closeModal() { const m = $('#modal'); if (m) m.remove(); document.body.style.overflow = ''; if (pendingRender) render(); }
+ACT.close = () => closeModal();
+const mh = title => `<div class="mh"><h2>${title}</h2><button class="iconbtn" data-act="close">${ICON.x}</button></div>`;
+const fv = (root, name) => { const el = root.querySelector(`[name="${name}"]`); return el ? el.value.trim() : ''; };
+function confirmBox(text, onYes, yesLabel = 'Delete') {
+  openModal(mh('Are you sure?') + `<p class="mute">${esc(text)}</p><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="cf-yes">${yesLabel}</button></div>`,
+    m => m.querySelector('#cf-yes').onclick = () => { closeModal(); onYes(); });
+}
+/* read an image file, downscale, return jpeg data URL */
+function readImage(file, max = 900, q = .72) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => { const img = new Image(); img.onload = () => { const s = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', q)); }; img.onerror = rej; img.src = fr.result; };
+    fr.onerror = rej; fr.readAsDataURL(file);
+  });
+}
+
+/* ========== rank-up celebration ========== */
+let celebrating = false;
+function checkRankUp() {
+  if (SYNC.loaded.size < COLS.length || celebrating) return;
+  const { record } = streakInfo();
+  const idx = pieceIndex(record);
+  const prof = misc('profile');
+  if (prof.bestStreak == null || record > (prof.bestStreak || 0) || (prof.seenPiece ?? -1) < idx) {
+    const seen = prof.seenPiece ?? -1;
+    put('misc', 'profile', { ...prof, bestStreak: Math.max(record, prof.bestStreak || 0), seenPiece: Math.max(idx, seen) });
+    if (idx > seen && idx >= 0) {
+      celebrating = true;
+      const m = METALS[Math.floor(idx / 6)];
+      const el = document.createElement('div'); el.className = 'celebrate';
+      el.innerHTML = `<div class="eyebrow">New rank earned</div><div class="piecewrap glow" style="--glow:${m.glow}">${pieceSVG(idx)}</div>
+        <h1 style="font-size:28px;margin-top:8px">${pieceName(idx)}</h1><p class="mute">Day ${pieceDay(idx)} of discipline. This piece is yours forever.</p>
+        <button class="btn pri" style="margin-top:14px">Continue, Emperor</button>`;
+      el.querySelector('button').onclick = () => { el.remove(); celebrating = false; };
+      document.body.appendChild(el);
+    }
+  }
+}
+
+/* ========== HOME ========== */
+function greeting() { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening'; }
+function ringSVG(r, size = 84, label = '') {
+  const R = 36, C = 2 * Math.PI * R;
+  return `<svg class="ring" viewBox="0 0 84 84" style="width:${size}px;height:${size}px"><circle cx="42" cy="42" r="${R}" fill="none" stroke="#1c1f27" stroke-width="7"/>
+  <circle cx="42" cy="42" r="${R}" fill="none" stroke="url(#rg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - Math.min(1, r))}" transform="rotate(-90 42 42)"/>
+  <defs><linearGradient id="rg"><stop offset="0" stop-color="#9c7a2f"/><stop offset="1" stop-color="#f1d48c"/></linearGradient></defs>
+  <text x="42" y="47" text-anchor="middle" fill="#ece7da" font-size="17" font-family="Cormorant Garamond,serif" font-weight="600">${label}</text></svg>`;
+}
+VIEWS.home = () => {
+  const t = today(), si = streakInfo(), idx = pieceIndex(si.record);
+  const m = idx >= 0 ? METALS[Math.floor(idx / 6)] : METALS[0];
+  const next = Math.min(23, idx + 1), nextDay = pieceDay(next);
+  const prevDay = idx < 0 ? 0 : pieceDay(idx);
+  const prog = idx >= 23 ? 1 : (si.record - prevDay) / (nextDay - prevDay);
+  const { rep, once } = tasksForDate(t);
+  const items = [...rep, ...once];
+  const doneN = items.filter(x => isDoneOn(x, t)).length;
+  const upcoming = items.filter(x => !isDoneOn(x, t)).sort((a, b) => (a.time || '99').localeCompare(b.time || '99')).slice(0, 5);
+  const tr = tradesFiltered('all').filter(x => tradeDate(x) === t);
+  const trW = tradesFiltered('all').filter(x => tradeDate(x) >= weekStart(t));
+  const focusToday = (S.days[t] && S.days[t].focus) || 0;
+  const v = verseOfDay();
+  const piece = idx >= 0 ? pieceSVG(idx) : `<div style="opacity:.25">${pieceSVG(0)}</div>`;
+  return `
+  <div class="card gold hero">
+    <div class="greet">${greeting()}, <b>Emperor Blanco</b></div>
+    <div class="date">${fmtDate(t)}</div>
+    <div class="piecewrap glow" style="--glow:${m.glow}" data-go="trophies">${piece}</div>
+    <div class="rankname">${pieceName(idx)}</div>
+    <div class="streakline">
+      <span>🔥 <b>${si.cur}</b> <span class="mute">day streak</span></span>
+      <span>🏆 <b>${si.record}</b> <span class="mute">record</span></span>
+    </div>
+    ${idx < 23 ? `<div style="max-width:320px;margin:12px auto 0"><div class="bar"><i style="width:${Math.max(2, prog * 100)}%"></i></div>
+      <div class="tiny mute" style="margin-top:6px">${idx < 0 ? 'Complete your first task today to earn the Silver Pawn' : (nextDay - si.record) + ' days to ' + pieceName(next) + ' (beat your record)'}</div></div>` : '<div class="tiny goldt" style="margin-top:8px">The highest rank. Long live the Emperor.</div>'}
+    ${!si.todayActive ? '<div class="small" style="margin-top:12px;color:#e6c27a">Today isn\'t counted yet — complete one task to keep the streak.</div>' : ''}
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="row"><div><div class="eyebrow">Today</div><h2 style="margin:4px 0 0">${doneN}/${items.length} tasks done</h2></div><span class="sp"></span>${ringSVG(items.length ? doneN / items.length : 0, 70, items.length ? Math.round(doneN / items.length * 100) + '%' : '–')}</div>
+      <div class="list" style="margin-top:6px">${upcoming.map(x => `<div class="mini-task"><button class="chk" data-act="tick" data-id="${x.id}">${ICON.check}</button><span style="flex:1">${esc(x.title)}</span><span class="tiny mute">${x.time || ''}</span></div>`).join('') || '<div class="empty">All done for today. Well played.</div>'}</div>
+      <button class="btn sm ghost" data-go="tasks" style="margin-top:8px">Open task list →</button>
+    </div>
+    <div>
+      <div class="card"><div class="eyebrow">Verse of the day</div><div class="verse" style="margin-top:8px">“${esc(v.t)}”</div><div class="small goldt" style="margin-top:6px">${esc(v.r)}</div></div>
+      <div class="grid g2 keep">
+        <div class="card stat" data-go="trading" style="cursor:pointer"><div class="k">P&L today</div><div class="v ${cls(sum(tr.map(pnlOf)))}">${tr.length ? money(sum(tr.map(pnlOf)), true) : '–'}</div><div class="tiny mute">Week: <span class="${cls(sum(trW.map(pnlOf)))}">${money(sum(trW.map(pnlOf)), true)}</span></div></div>
+        <div class="card stat" data-go="focus" style="cursor:pointer"><div class="k">Focus today</div><div class="v">${minsToHM(focusToday)}</div><div class="tiny mute">Deep work</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="row"><h2 style="margin:0">Discipline — last 20 weeks</h2><span class="sp"></span><button class="btn sm ghost" data-go="heatmap">Full year →</button></div><div style="margin-top:10px">${heatGrid(addDays(t, -20 * 7 + 1), t)}</div></div>`;
+};
+ACT.tick = d => { const t = S.tasks[d.id]; if (t) toggleTask(t, d.date || today()); };
+
+/* ========== TASKS ========== */
+UI.taskShowAll = false;
+function taskRow(t, date) {
+  const done = isDoneOn(t, date), st = taskStreak(t);
+  const goal = t.goalId && S.goals[t.goalId];
+  return `<div class="task ${done ? 'done' : ''}"><button class="chk ${done ? 'on' : ''}" data-act="tick" data-id="${t.id}" data-date="${date}">${ICON.check}</button>
+  <div class="body" data-act="editTask" data-id="${t.id}"><div class="name">${esc(t.title)}</div>
+  <div class="meta">${t.time ? `<span>${ICON.clock} ${t.time}${t.dur ? ' · ' + minsToHM(t.dur) : ''}</span>` : ''}<span class="${t.kind === 'once' ? '' : 'rep'}">${t.kind === 'once' ? '' : ICON.repeat} ${repeatLabel(t)}</span>${st > 0 ? `<span class="fire">${st} 🔥</span>` : ''}${t.section ? `<span class="pill">${esc(t.section)}</span>` : ''}${goal ? `<span class="pill g">◎ ${esc(goal.title)}</span>` : ''}</div></div></div>`;
+}
+VIEWS.tasks = () => {
+  const date = UI.taskDate || today();
+  const { rep, once } = tasksForDate(date);
+  const items = [...rep, ...once], doneN = items.filter(x => isDoneOn(x, date)).length;
+  const groups = { Morning: [], Afternoon: [], Evening: [], Anytime: [] };
+  rep.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99') || (a.title || '').localeCompare(b.title || '')).forEach(t => groups[timeGroup(t.time)].push(t));
+  const others = all('tasks').filter(t => t.kind !== 'once' && !t.archived && !isDue(t, date));
+  const isToday = date === today();
+  return `<div class="pagehead"><div><div class="eyebrow">Checklist</div><h1>${isToday ? 'Today' : fmtDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}</h1></div>
+    <div class="row"><button class="iconbtn" data-act="taskDay" data-d="-1">${ICON.left}</button>${!isToday ? '<button class="btn sm" data-act="taskDay" data-d="0">Today</button>' : ''}<button class="iconbtn" data-act="taskDay" data-d="1">${ICON.right}</button><button class="btn pri sm" data-act="newTask">${ICON.plus} New</button></div></div>
+  <div class="card" style="padding:12px 16px"><div class="row"><span class="small mute">Progress</span><span class="sp"></span><b>${doneN}/${items.length}</b></div><div class="bar" style="margin-top:8px"><i style="width:${items.length ? doneN / items.length * 100 : 0}%"></i></div></div>
+  <div class="card"><div class="grouphead"><h2>GENERAL TASKS</h2><span class="sp"></span><button class="iconbtn" data-act="newTask" data-kind="once">${ICON.plus}</button></div>
+    <div class="list">${once.map(t => taskRow(t, date)).join('') || '<div class="empty small">No one-time tasks. Use the bar below to add one.</div>'}</div></div>
+  ${Object.entries(groups).filter(([, a]) => a.length).map(([g, a]) => `<div class="card"><div class="grouphead"><h2>${g.toUpperCase()}</h2><span class="pill">${a.filter(x => isDoneOn(x, date)).length}/${a.length}</span></div><div class="list">${a.map(t => taskRow(t, date)).join('')}</div></div>`).join('')}
+  ${!rep.length ? '<div class="card empty">No repeating tasks for this day yet. Tap <b>New</b> to add your daily routine — Daily GM, Gym, Pray…</div>' : ''}
+  ${others.length ? `<div class="card"><div class="grouphead"><h2 class="mute">NOT SCHEDULED THIS DAY</h2><span class="sp"></span><button class="btn sm ghost" data-act="toggleShowAll">${UI.taskShowAll ? 'Hide' : 'Show ' + others.length}</button></div>
+    ${UI.taskShowAll ? `<div class="list">${others.map(t => `<div class="task"><div class="body" data-act="editTask" data-id="${t.id}"><div class="name mute">${esc(t.title)}</div><div class="meta"><span class="rep">${ICON.repeat} ${repeatLabel(t)}</span>${t.time ? '<span>' + t.time + '</span>' : ''}</div></div></div>`).join('')}</div>` : ''}</div>` : ''}
+  <form class="addbar" data-form="quickadd"><input type="text" name="q" placeholder="Describe your task… e.g. “Gym at 18:00 daily”" autocomplete="off"><button class="btn pri" type="submit">${ICON.plus}</button></form>`;
+};
+ACT.taskDay = d => { UI.taskDate = d.d === '0' ? today() : addDays(UI.taskDate || today(), +d.d); render(); };
+ACT.toggleShowAll = () => { UI.taskShowAll = !UI.taskShowAll; render(); };
+document.addEventListener('submit', e => {
+  const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault();
+  const fn = ACT['form_' + f.dataset.form]; if (fn) fn(f);
+});
+ACT.form_quickadd = f => {
+  let q = f.q.value.trim(); if (!q) return;
+  let time = '', kind = 'once', repeat = { type: 'daily' };
+  const tm = q.match(/\b(?:at|@|um)\s*(\d{1,2})(?:[:.h](\d{2}))?\s*(am|pm)?\b/i) || q.match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
+  if (tm) { let h = +tm[1]; const mi = tm[2] ? +tm[2] : 0; if (tm[3]) { if (/pm/i.test(tm[3]) && h < 12) h += 12; if (/am/i.test(tm[3]) && h === 12) h = 0; } if (h < 24 && mi < 60) { time = pad(h) + ':' + pad(mi); q = q.replace(tm[0], ' '); } }
+  if (/\b(daily|every\s*day|everyday|each day)\b/i.test(q)) { kind = 'rep'; q = q.replace(/\b(daily|every\s*day|everyday|each day)\b/ig, ' '); }
+  const wd = q.match(/\bweekdays\b/i); if (wd) { kind = 'rep'; repeat = { type: 'weekdays', days: [1, 2, 3, 4, 5] }; q = q.replace(wd[0], ' '); }
+  q = q.replace(/\s+/g, ' ').trim(); if (!q) return;
+  const date = UI.taskDate || today();
+  put('tasks', uid(), { title: q[0].toUpperCase() + q.slice(1), kind, time, dur: 0, repeat, start: date, date: kind === 'once' && date !== today() ? date : '', created: Date.now() });
+  f.q.value = ''; render(true); const qi = $('[name=q]'); if (qi) qi.focus(); toast('Task added');
+};
+function taskModal(t) {
+  const isNew = !t; t = t || { kind: UI.newKind || 'rep', repeat: { type: 'daily' }, start: today(), dur: 0, time: '' };
+  const r = t.repeat || { type: 'daily' };
+  const sections = [...new Set(all('tasks').map(x => x.section).filter(Boolean))];
+  const goals = all('goals').filter(g => !g.archived);
+  const st = { kind: t.kind, rtype: r.type, days: new Set(r.days || [1, 2, 3, 4, 5]) };
+  const html = mh(isNew ? 'New Task' : 'Edit Task') + `
+   <input type="text" name="title" placeholder="Task name" value="${esc(t.title || '')}">
+   <textarea name="notes" placeholder="Describe your task…" style="margin-top:10px;min-height:60px">${esc(t.notes || '')}</textarea>
+   <label class="f">Type</label><div class="seg" id="tm-kind"><button data-v="rep">Repeating</button><button data-v="once">One-time</button></div>
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Time (optional)</label><input type="time" name="time" value="${esc(t.time || '')}"></div>
+   <div><label class="f" id="tm-datel">Start date</label><input type="date" name="date" value="${esc(t.kind === 'once' ? (t.date || '') : (t.start || today()))}"></div></div>
+   <label class="f">Duration: <b id="tm-durv">${minsToHM(t.dur || 0)}</b></label><input type="range" name="dur" min="0" max="240" step="5" value="${t.dur || 0}" style="width:100%;accent-color:#d4ae5a">
+   <div id="tm-rep"><label class="f">Repeat</label><div class="seg" id="tm-rtype"><button data-v="daily">Every day</button><button data-v="weekdays">Certain days</button><button data-v="interval">Every X days</button><button data-v="monthly">Monthly</button></div>
+     <div id="tm-days" style="margin-top:10px"><div class="days7">${[1, 2, 3, 4, 5, 6, 0].map(i => `<button type="button" data-d="${i}">${DOW[i]}</button>`).join('')}</div></div>
+     <div id="tm-int" style="margin-top:10px"><div class="row"><span class="mute small">Every</span><input type="number" name="every" min="1" value="${r.every || 2}" style="width:80px"><span class="mute small">days</span></div></div>
+     <div class="tiny mute" style="margin-top:8px">💡 Repeating tasks reset every day at midnight.</div></div>
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Section (optional)</label><input type="text" name="section" list="tm-secs" value="${esc(t.section || '')}" placeholder="Health, Work, Faith…"><datalist id="tm-secs">${sections.map(s => `<option value="${esc(s)}">`).join('')}</datalist></div>
+   <div><label class="f">Linked goal</label><select name="goalId"><option value="">None</option>${goals.map(g => `<option value="${g.id}" ${t.goalId === g.id ? 'selected' : ''}>${esc(g.title)}</option>`).join('')}</select></div></div>
+   <div class="actions">${!isNew ? '<button class="btn danger" id="tm-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="tm-save">${isNew ? '+ Add task' : 'Save'}</button></div>`;
+  openModal(html, m => {
+    const sync = () => {
+      m.querySelectorAll('#tm-kind button').forEach(b => b.classList.toggle('on', b.dataset.v === st.kind));
+      m.querySelectorAll('#tm-rtype button').forEach(b => b.classList.toggle('on', b.dataset.v === st.rtype));
+      m.querySelectorAll('#tm-days button').forEach(b => b.classList.toggle('on', st.days.has(+b.dataset.d)));
+      m.querySelector('#tm-rep').style.display = st.kind === 'rep' ? '' : 'none';
+      m.querySelector('#tm-days').style.display = st.rtype === 'weekdays' ? '' : 'none';
+      m.querySelector('#tm-int').style.display = st.rtype === 'interval' ? '' : 'none';
+      m.querySelector('#tm-datel').textContent = st.kind === 'rep' ? 'Start date' : 'Due date (optional)';
+    };
+    m.querySelector('#tm-kind').onclick = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); st.kind = b.dataset.v; const di = m.querySelector('[name=date]'); if (st.kind === 'rep' && !di.value) di.value = today(); sync(); } };
+    m.querySelector('#tm-rtype').onclick = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); st.rtype = b.dataset.v; sync(); } };
+    m.querySelector('#tm-days').onclick = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); const d = +b.dataset.d; st.days.has(d) ? st.days.delete(d) : st.days.add(d); sync(); } };
+    m.querySelector('[name=dur]').oninput = e => m.querySelector('#tm-durv').textContent = minsToHM(+e.target.value);
+    m.querySelector('#tm-save').onclick = () => {
+      const title = fv(m, 'title'); if (!title) { m.querySelector('[name=title]').focus(); return; }
+      const date = fv(m, 'date');
+      const rep = st.rtype === 'weekdays' ? { type: 'weekdays', days: [...st.days].sort() } : st.rtype === 'interval' ? { type: 'interval', every: Math.max(1, +fv(m, 'every') || 1) } : { type: st.rtype };
+      if (rep.type === 'weekdays' && !rep.days.length) { toast('Pick at least one day'); return; }
+      const o = { ...t, title, notes: fv(m, 'notes'), kind: st.kind, time: fv(m, 'time'), dur: +fv(m, 'dur') || 0, repeat: rep, section: fv(m, 'section'), goalId: fv(m, 'goalId') };
+      if (st.kind === 'rep') { o.start = date || t.start || today(); } else { o.date = date; }
+      if (isNew) o.created = Date.now();
+      put('tasks', t.id || uid(), o); closeModal(); toast(isNew ? 'Task added' : 'Saved');
+    };
+    const dl = m.querySelector('#tm-del');
+    if (dl) dl.onclick = () => confirmBox('Delete “' + t.title + '”? Your past streak history stays.', () => {
+      if (t.kind === 'once' && !t.done) del('tasks', t.id); else put('tasks', t.id, { ...t, archived: true, archivedAt: today() });
+    });
+    sync();
+  });
+}
+ACT.newTask = d => { UI.newKind = d.kind || 'rep'; taskModal(null); };
+ACT.editTask = d => { const t = S.tasks[d.id]; if (t) taskModal(t); };
+
+/* ========== SCHEDULE ========== */
+VIEWS.schedule = () => {
+  const date = UI.schedDate || today();
+  const { rep, once } = tasksForDate(date);
+  const items = [...rep, ...once.filter(t => t.time && (t.date === date || (!t.date && date === today())))];
+  const timed = items.filter(t => t.time).map(t => { const [h, mi] = t.time.split(':').map(Number); return { t, s: h * 60 + mi, e: h * 60 + mi + Math.max(t.dur || 30, 20) }; }).sort((a, b) => a.s - b.s);
+  const untimed = items.filter(t => !t.time);
+  const startH = Math.min(5, ...timed.map(x => Math.floor(x.s / 60))), endH = 24, HP = 58;
+  const lanesEnd = []; timed.forEach(x => { let l = lanesEnd.findIndex(e => e <= x.s); if (l < 0) { l = lanesEnd.length; lanesEnd.push(0); } lanesEnd[l] = x.e; x.l = l; });
+  const L = Math.max(1, lanesEnd.length);
+  const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  let hrs = ''; for (let h = startH; h <= endH; h++) { const y = (h - startH) * HP; hrs += `<div class="hr" style="top:${y}px">${pad(h % 24)}:00</div><div class="hl" style="top:${y}px"></div>`; }
+  const evs = timed.map(x => { const done = isDoneOn(x.t, date); const top = (x.s - startH * 60) / 60 * HP, h = Math.max(26, (x.e - x.s) / 60 * HP - 3);
+    return `<div class="ev ${done ? 'done' : ''}" style="top:${top}px;height:${h}px;left:calc(8px + ${x.l * 100 / L}%);width:calc(${100 / L}% - 12px);right:auto" data-act="tick" data-id="${x.t.id}" data-date="${date}"><span>${done ? '✓' : '○'}</span><div><b>${esc(x.t.title)}</b><div class="tiny mute">${x.t.time}${x.t.dur ? ' · ' + minsToHM(x.t.dur) : ''}</div></div></div>`; }).join('');
+  const nowLine = date === today() && nowM >= startH * 60 ? `<div class="now" style="top:${(nowM - startH * 60) / 60 * HP}px"></div>` : '';
+  return `<div class="pagehead"><div><div class="eyebrow">Schedule</div><h1>${fmtDate(date, { weekday: 'long', day: 'numeric', month: 'short' })}</h1></div>
+   <div class="row"><button class="iconbtn" data-act="schedDay" data-d="-1">${ICON.left}</button>${date !== today() ? '<button class="btn sm" data-act="schedDay" data-d="0">Today</button>' : ''}<button class="iconbtn" data-act="schedDay" data-d="1">${ICON.right}</button><button class="btn pri sm" data-act="newTask">${ICON.plus} New</button></div></div>
+   ${untimed.length ? `<div class="card"><div class="eyebrow" style="margin-bottom:6px">Anytime today</div><div class="list">${untimed.map(t => taskRow(t, date)).join('')}</div></div>` : ''}
+   <div class="card"><div class="tiny mute" style="margin-bottom:12px">Tap a block to tick it off. Give tasks a time and duration to place them here.</div>
+   <div class="tl" style="height:${(endH - startH) * HP}px">${hrs}${evs}${nowLine}</div></div>`;
+};
+ACT.schedDay = d => { UI.schedDate = d.d === '0' ? today() : addDays(UI.schedDate || today(), +d.d); render(); };
+
+/* ========== TROPHY HALL ========== */
+VIEWS.trophies = () => {
+  const si = streakInfo(), idx = pieceIndex(si.record);
+  return `<div class="pagehead"><div><div class="eyebrow">Trophy Hall</div><h1>Your chess ranks</h1></div></div>
+  <div class="card gold"><div class="row"><div style="width:76px">${idx >= 0 ? pieceSVG(idx) : '<div style="opacity:.25">' + pieceSVG(0) + '</div>'}</div><div><div class="rankname">${pieceName(idx)}</div><div class="small mute">Record ${si.record} days · current streak ${si.cur} 🔥</div>
+  <div class="tiny mute" style="margin-top:4px">A day counts when you complete your first task. Miss a day and the streak restarts — but every piece you earn is yours forever. You rise again once your new streak beats your record.</div></div></div></div>
+  ${METALS.map((m, mi) => `<div class="card"><h2 style="color:${m.b}">${m.name.toUpperCase()}</h2><div class="trophies">${PIECES.map((p, pi) => { const i = mi * 6 + pi; return `<div class="trophy ${i > idx ? 'lock' : ''} ${i === idx ? 'cur' : ''}">${pieceSVG(i)}<div class="small">${p}</div><div class="d">Day ${pieceDay(i)}</div></div>`; }).join('')}</div></div>`).join('')}`;
+};
+
+/* ========== MORE (mobile) ========== */
+VIEWS.more = () => `<div class="pagehead"><div><div class="eyebrow">Headquarters</div><h1>More</h1></div></div>
+  <div class="grid g2 keep">${NAV.slice(4).map(n => `<button class="card" data-go="${n.id}" style="text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;color:var(--text)"><span style="width:26px;color:var(--gold)">${ICON[n.icon]}</span><span>${n.label}</span></button>`).join('')}</div>`;
+
+/* ========== TRADING DESK ========== */
+const sum = a => a.reduce((s, x) => s + (x || 0), 0);
+const tradeDate = t => String(t.closeAt || t.openAt || '').slice(0, 10);
+function pnlOf(t) {
+  const o = num(t.pnlOverride); if (o != null) return o;
+  const e = num(t.entry), x = num(t.exit), q = num(t.qty); if (e == null || x == null || q == null) return 0;
+  return (x - e) * (t.side === 'short' ? -1 : 1) * q * (num(t.mult) || 1) - (num(t.fees) || 0);
+}
+function riskOf(t) { const e = num(t.entry), s = num(t.stop), q = num(t.qty); if (e == null || s == null || q == null || e === s) return null; return Math.abs(e - s) * q * (num(t.mult) || 1); }
+const rOf = t => { const r = riskOf(t); return r ? pnlOf(t) / r : null; };
+function plannedRR(t) { const e = num(t.entry), s = num(t.stop), g = num(t.target); if (e == null || s == null || g == null || e === s) return null; return Math.abs(g - e) / Math.abs(e - s); }
+function holdMs(t) { if (!t.openAt || !t.closeAt) return null; const d = new Date(t.closeAt) - new Date(t.openAt); return isFinite(d) && d >= 0 ? d : null; }
+const tradesFiltered = acc => all('trades').filter(t => acc === 'all' || !acc || t.acc === acc).sort((a, b) => String(a.closeAt || a.openAt).localeCompare(String(b.closeAt || b.openAt)));
+const avg = a => a.length ? sum(a) / a.length : null;
+function computeStats(tr) {
+  const p = tr.map(pnlOf), wins = tr.filter(t => pnlOf(t) > 0), losses = tr.filter(t => pnlOf(t) < 0);
+  const gw = sum(wins.map(pnlOf)), gl = Math.abs(sum(losses.map(pnlOf)));
+  let eq = 0, peak = 0, mdd = 0, cw = 0, cl = 0, mw = 0, ml = 0;
+  const curve = [0];
+  tr.forEach(t => { const v = pnlOf(t); eq += v; curve.push(eq); peak = Math.max(peak, eq); mdd = Math.min(mdd, eq - peak); if (v > 0) { cw++; cl = 0; } else if (v < 0) { cl++; cw = 0; } mw = Math.max(mw, cw); ml = Math.max(ml, cl); });
+  const rs = tr.map(rOf).filter(v => v != null), rr = tr.map(plannedRR).filter(v => v != null);
+  const h = tr.map(holdMs).filter(v => v != null), hw = wins.map(holdMs).filter(v => v != null), hl = losses.map(holdMs).filter(v => v != null);
+  const days = {}; tr.forEach(t => { const d = tradeDate(t); days[d] = (days[d] || 0) + pnlOf(t); });
+  const dv = Object.values(days);
+  return {
+    n: tr.length, net: sum(p), winRate: tr.length ? wins.length / tr.length : null, pf: gl ? gw / gl : (gw ? Infinity : null),
+    exp: avg(p), avgWin: avg(wins.map(pnlOf)), avgLoss: avg(losses.map(pnlOf)), avgR: avg(rs), avgRR: avg(rr),
+    hold: avg(h), holdW: avg(hw), holdL: avg(hl), best: p.length ? Math.max(...p) : null, worst: p.length ? Math.min(...p) : null,
+    mdd, maxWinStreak: mw, maxLossStreak: ml, curve, days: dv.length, greenDays: dv.filter(v => v > 0).length, fees: sum(tr.map(t => num(t.fees) || 0)),
+    wins: wins.length, losses: losses.length, totalR: sum(rs),
+  };
+}
+UI.tTab = 'dash'; UI.tAcc = 'all'; UI.breakBy = 'setup'; UI.calMode = 'month';
+const tSettings = () => misc('trading');
+const accName = id => (S.accounts[id] && S.accounts[id].name) || 'No account';
+function accSelect() {
+  const accs = all('accounts').sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  return `<select data-chg="setAcc" style="width:auto;min-width:150px;padding:7px 10px;font-size:14px"><option value="all">All accounts</option>${accs.map(a => `<option value="${a.id}" ${UI.tAcc === a.id ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</select>`;
+}
+ACT.setAcc = (d, el) => { UI.tAcc = el.value; el.blur(); render(); };
+VIEWS.trading = () => {
+  const tabs = [['dash', 'Dashboard'], ['trades', 'Trades'], ['cal', 'Calendar'], ['journal', 'Journal & Rules'], ['portfolio', 'Portfolio'], ['watch', 'Watchlist'], ['accounts', 'Accounts']];
+  const body = { dash: tDash, trades: tTrades, cal: tCal, journal: tJournal, portfolio: tPortfolio, watch: tWatch, accounts: tAccounts }[UI.tTab]();
+  return `<div class="pagehead"><div><div class="eyebrow">Trading Desk</div><h1>The Vault</h1></div><div class="row">${['dash', 'trades', 'cal'].includes(UI.tTab) ? accSelect() : ''}<button class="btn pri sm" data-act="newTrade">${ICON.plus} Trade</button></div></div>
+  <div class="tabs">${tabs.map(([k, l]) => `<button class="${UI.tTab === k ? 'on' : ''}" data-act="tTab" data-k="${k}">${l}</button>`).join('')}</div>${body}`;
+};
+ACT.tTab = d => { UI.tTab = d.k; render(); };
+
+function equitySVG(curve) {
+  if (curve.length < 2) return '<div class="empty small">Log trades to see your equity curve.</div>';
+  const W = 600, H = 180, P = 6, mn = Math.min(0, ...curve), mx = Math.max(0, ...curve), rg = mx - mn || 1;
+  const x = i => P + i * (W - 2 * P) / (curve.length - 1), y = v => P + (mx - v) * (H - 2 * P) / rg;
+  const pts = curve.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const last = curve[curve.length - 1], col = last >= 0 ? '#3fbf7f' : '#e0565b';
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:200px;display:block" preserveAspectRatio="none"><defs><linearGradient id="eqg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+   <line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#2e3342" stroke-dasharray="4 4"/>
+   <polygon points="${x(0)},${y(0)} ${pts} ${x(curve.length - 1)},${y(0)}" fill="url(#eqg)"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round"/></svg>`;
+}
+const statCard = (k, v, sub = '', c = '') => `<div class="card stat"><div class="k">${k}</div><div class="v ${c}">${v}</div>${sub ? `<div class="tiny mute">${sub}</div>` : ''}</div>`;
+function breakdown(tr, by) {
+  const g = {};
+  const keyF = {
+    setup: t => [t.setup || '(no setup)'], tag: t => (t.tags && t.tags.length ? t.tags : ['(no tag)']), mistake: t => (t.mistakes && t.mistakes.length ? t.mistakes : ['(no mistake)']),
+    weekday: t => [['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][parseD(tradeDate(t)).getDay()]], hour: t => [t.openAt && t.openAt.length > 11 ? t.openAt.slice(11, 13) + ':00' : '(no time)'],
+    side: t => [t.side === 'short' ? 'Short' : 'Long'], symbol: t => [(t.sym || '?').toUpperCase()], emotion: t => [t.emotion || '(none)'], account: t => [accName(t.acc)],
+  }[by];
+  tr.forEach(t => keyF(t).forEach(k => (g[k] = g[k] || []).push(t)));
+  const rows = Object.entries(g).map(([k, a]) => ({ k, n: a.length, wr: a.filter(t => pnlOf(t) > 0).length / a.length, net: sum(a.map(pnlOf)), r: avg(a.map(rOf).filter(v => v != null)) }));
+  const order = { weekday: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] }[by];
+  rows.sort((a, b) => order ? order.indexOf(a.k) - order.indexOf(b.k) : by === 'hour' ? a.k.localeCompare(b.k) : b.net - a.net);
+  const mx = Math.max(1, ...rows.map(r => Math.abs(r.net)));
+  return rows.length ? `<div class="scrollx"><table class="tbl"><tr><th>${by}</th><th class="r">Trades</th><th class="r">Win %</th><th class="r">Avg R</th><th class="r">Net P&L</th><th style="width:30%"></th></tr>
+   ${rows.map(r => `<tr><td>${esc(r.k)}</td><td class="r">${r.n}</td><td class="r">${pct(r.wr, 0)}</td><td class="r">${r.r == null ? '–' : r.r.toFixed(2) + 'R'}</td><td class="r ${cls(r.net)}">${money(r.net, true)}</td>
+   <td><div style="height:8px;border-radius:4px;width:${Math.abs(r.net) / mx * 100}%;background:${r.net >= 0 ? 'var(--green)' : 'var(--red)'};opacity:.75"></div></td></tr>`).join('')}</table></div>` : '<div class="empty small">No data yet.</div>';
+}
+function tDash() {
+  const tr = tradesFiltered(UI.tAcc), s = computeStats(tr);
+  if (!tr.length) return `<div class="card empty">No trades yet.<br><br><button class="btn pri" data-act="newTrade">Log your first trade</button>${!all('accounts').length ? '<br><br><span class="small">Tip: add your accounts first in the <b>Accounts</b> tab (prop firm, personal, demo…).</span>' : ''}</div>`;
+  const ruleScore = rulesAdherence(30);
+  return `<div class="grid g4 keep">
+    ${statCard('Net P&L', money(s.net, true), s.n + ' trades · ' + s.days + ' days', cls(s.net))}
+    ${statCard('Win rate', pct(s.winRate, 1), s.wins + 'W / ' + s.losses + 'L')}
+    ${statCard('Profit factor', s.pf == null ? '–' : s.pf === Infinity ? '∞' : s.pf.toFixed(2), 'gross win ÷ gross loss')}
+    ${statCard('Expectancy', money(s.exp, true), 'avg per trade', cls(s.exp))}
+    ${statCard('Avg win / loss', `<span class="pos">${money(s.avgWin)}</span> <span class="mute" style="font-size:16px">/</span> <span class="neg">${money(s.avgLoss)}</span>`, s.avgWin && s.avgLoss ? 'ratio ' + (s.avgWin / Math.abs(s.avgLoss)).toFixed(2) : '')}
+    ${statCard('Avg R / planned R:R', (s.avgR == null ? '–' : s.avgR.toFixed(2) + 'R') + ' <span class="mute" style="font-size:16px">/</span> ' + (s.avgRR == null ? '–' : '1:' + s.avgRR.toFixed(1)), 'total ' + s.totalR.toFixed(1) + 'R')}
+    ${statCard('Avg hold time', durTxt(s.hold), `winners ${durTxt(s.holdW)} · losers ${durTxt(s.holdL)}`)}
+    ${statCard('Max drawdown', money(s.mdd), 'from equity peak', s.mdd < 0 ? 'neg' : '')}
+    ${statCard('Best / worst trade', `<span class="pos">${money(s.best)}</span>`, `worst <span class="neg">${money(s.worst)}</span>`)}
+    ${statCard('Streaks', s.maxWinStreak + 'W / ' + s.maxLossStreak + 'L', 'max consecutive')}
+    ${statCard('Green days', s.days ? pct(s.greenDays / s.days, 0) : '–', s.greenDays + ' of ' + s.days + ' days')}
+    ${statCard('Rules followed', ruleScore == null ? '–' : pct(ruleScore, 0), 'last 30 days')}
+  </div>
+  <div class="card"><div class="row"><h2 style="margin:0">Equity curve</h2><span class="sp"></span><span class="small ${cls(s.net)}">${money(s.net, true)}</span></div><div style="margin-top:12px">${equitySVG(s.curve)}</div></div>
+  <div class="card"><div class="row wrap"><h2 style="margin:0">Breakdown</h2><span class="sp"></span><div class="seg">${['setup', 'tag', 'mistake', 'weekday', 'hour', 'side', 'symbol', 'emotion', 'account'].map(k => `<button class="${UI.breakBy === k ? 'on' : ''}" data-act="breakBy" data-k="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div>
+  <div style="margin-top:12px">${breakdown(tr, UI.breakBy)}</div></div>`;
+}
+ACT.breakBy = d => { UI.breakBy = d.k; render(); };
+UI.tLimit = 50;
+function tTrades() {
+  const tr = tradesFiltered(UI.tAcc).reverse();
+  if (!tr.length) return `<div class="card empty">No trades logged yet.<br><br><button class="btn pri" data-act="newTrade">Log a trade</button></div>`;
+  return `<div class="card" style="padding:6px 10px"><div class="scrollx"><table class="tbl"><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Setup</th><th class="r">Hold</th><th class="r">R</th><th class="r">P&L</th></tr>
+   ${tr.slice(0, UI.tLimit).map(t => { const p = pnlOf(t), r = rOf(t); return `<tr class="click" data-act="editTrade" data-id="${t.id}"><td>${tradeDate(t) ? fmtDate(tradeDate(t), { day: 'numeric', month: 'short' }) : '–'}${t.img ? ' 📷' : ''}</td><td><b>${esc((t.sym || '').toUpperCase())}</b>${UI.tAcc === 'all' && t.acc ? `<div class="tiny mute">${esc(accName(t.acc))}</div>` : ''}</td>
+   <td><span class="pill ${t.side === 'short' ? '' : 'g'}">${t.side === 'short' ? 'Short' : 'Long'}</span></td><td class="small">${esc(t.setup || '')}</td><td class="r small mute">${durTxt(holdMs(t))}</td><td class="r ${cls(r)}">${r == null ? '–' : r.toFixed(2)}</td><td class="r ${cls(p)}"><b>${money(p, true)}</b></td></tr>`; }).join('')}</table></div>
+   ${tr.length > UI.tLimit ? `<div style="text-align:center;padding:10px"><button class="btn sm" data-act="moreTrades">Show more (${tr.length - UI.tLimit})</button></div>` : ''}</div>`;
+}
+ACT.moreTrades = () => { UI.tLimit += 100; render(); };
+function tradeModal(t, presetDate) {
+  const isNew = !t;
+  const lastAcc = tSettings().lastAcc;
+  const nowL = (presetDate || today()) + 'T' + pad(new Date().getHours()) + ':' + pad(new Date().getMinutes());
+  t = t || { side: 'long', acc: UI.tAcc !== 'all' ? UI.tAcc : (lastAcc && S.accounts[lastAcc] ? lastAcc : ''), openAt: nowL, closeAt: nowL, mult: 1, rating: 0 };
+  const accs = all('accounts');
+  const setups = [...new Set(all('trades').map(x => x.setup).filter(Boolean))];
+  const st = { side: t.side || 'long', rating: t.rating || 0, img: t.img || '' };
+  const f = (n, l, type = 'number', ph = '') => `<div><label class="f">${l}</label><input type="${type}" name="${n}" value="${esc(t[n] ?? '')}" placeholder="${ph}" ${type === 'number' ? 'step="any" inputmode="decimal"' : ''}></div>`;
+  const html = mh(isNew ? 'Log Trade' : 'Edit Trade') + `
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Account</label><select name="acc"><option value="">No account</option>${accs.map(a => `<option value="${a.id}" ${t.acc === a.id ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}</select></div>
+   ${f('sym', 'Symbol', 'text', 'NQ, AAPL, EURUSD…')}</div>
+   <label class="f">Direction</label><div class="seg" id="tr-side"><button data-v="long">Long</button><button data-v="short">Short</button></div>
+   <div class="grid g2 keep" style="gap:10px">${f('openAt', 'Entry time', 'datetime-local')}${f('closeAt', 'Exit time', 'datetime-local')}
+   ${f('entry', 'Entry price')}${f('exit', 'Exit price')}${f('qty', 'Size (shares / contracts / lots)')}${f('mult', 'Point value / multiplier', 'number', '1')}
+   ${f('stop', 'Stop loss')}${f('target', 'Take profit')}${f('fees', 'Fees & commissions')}${f('pnlOverride', 'Net P&L override (optional)', 'number', 'auto')}</div>
+   <div class="card" id="tr-calc" style="margin:12px 0 0;padding:10px 14px"></div>
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Setup</label><input type="text" name="setup" list="tr-setups" value="${esc(t.setup || '')}" placeholder="Breakout, ORB, Pullback…"><datalist id="tr-setups">${setups.map(s => `<option value="${esc(s)}">`).join('')}</datalist></div>
+   <div><label class="f">Emotion</label><select name="emotion">${['', 'Calm', 'Confident', 'Focused', 'Anxious', 'Fearful', 'Greedy', 'FOMO', 'Revenge', 'Bored', 'Tired'].map(e => `<option ${t.emotion === e ? 'selected' : ''}>${e}</option>`).join('')}</select></div></div>
+   <label class="f">Tags (comma separated)</label><input type="text" name="tags" value="${esc((t.tags || []).join(', '))}" placeholder="A+ setup, news, London session">
+   <label class="f">Mistakes (comma separated)</label><input type="text" name="mistakes" value="${esc((t.mistakes || []).join(', '))}" placeholder="Moved stop, early exit, oversized">
+   <label class="f">Rating</label><div class="row" id="tr-rate" style="font-size:24px;gap:4px;cursor:pointer">${[1, 2, 3, 4, 5].map(i => `<span data-v="${i}">★</span>`).join('')}</div>
+   <label class="f">Notes</label><textarea name="notes" placeholder="Why did you take it? What did you learn?">${esc(t.notes || '')}</textarea>
+   <label class="f">Screenshot</label><div class="row"><label class="btn sm" style="cursor:pointer">📷 Choose image<input type="file" accept="image/*" id="tr-file" style="display:none"></label><button class="btn sm ghost" id="tr-imgdel">Remove</button></div><div id="tr-img" style="margin-top:8px"></div>
+   <div class="actions">${!isNew ? '<button class="btn danger" id="tr-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="tr-save">Save trade</button></div>`;
+  openModal(html, m => {
+    const read = () => ({ ...t, acc: fv(m, 'acc'), sym: fv(m, 'sym').toUpperCase(), side: st.side, openAt: fv(m, 'openAt'), closeAt: fv(m, 'closeAt'), entry: fv(m, 'entry'), exit: fv(m, 'exit'), qty: fv(m, 'qty'), mult: fv(m, 'mult') || '1', stop: fv(m, 'stop'), target: fv(m, 'target'), fees: fv(m, 'fees'), pnlOverride: fv(m, 'pnlOverride'), setup: fv(m, 'setup'), emotion: fv(m, 'emotion'), tags: fv(m, 'tags').split(',').map(s => s.trim()).filter(Boolean), mistakes: fv(m, 'mistakes').split(',').map(s => s.trim()).filter(Boolean), rating: st.rating, notes: fv(m, 'notes'), img: st.img });
+    const sync = () => {
+      m.querySelectorAll('#tr-side button').forEach(b => b.classList.toggle('on', b.dataset.v === st.side));
+      m.querySelectorAll('#tr-rate span').forEach(s => s.style.color = +s.dataset.v <= st.rating ? '#d4ae5a' : '#2e3342');
+      m.querySelector('#tr-img').innerHTML = st.img ? `<img src="${st.img}" style="max-width:100%;border-radius:10px;border:1px solid var(--line)">` : '';
+      const x = read(), p = pnlOf(x), r = rOf(x), rr = plannedRR(x), h = holdMs(x);
+      m.querySelector('#tr-calc').innerHTML = `<div class="row wrap" style="gap:18px;font-size:13px"><span>P&L <b class="${cls(p)}">${money(p, true)}</b></span><span>R-multiple <b class="${cls(r)}">${r == null ? '–' : r.toFixed(2) + 'R'}</b></span><span>Planned R:R <b>${rr == null ? '–' : '1:' + rr.toFixed(2)}</b></span><span>Risk <b>${money(riskOf(x))}</b></span><span>Hold <b>${durTxt(h)}</b></span></div>`;
+    };
+    m.querySelector('#tr-side').onclick = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); st.side = b.dataset.v; sync(); } };
+    m.querySelector('#tr-rate').onclick = e => { const s = e.target.closest('span'); if (s) { st.rating = +s.dataset.v === st.rating ? 0 : +s.dataset.v; sync(); } };
+    m.addEventListener('input', sync);
+    m.querySelector('#tr-file').onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { st.img = await readImage(fl, 1100, .7); sync(); } catch (er) { toast('Could not read image'); } };
+    m.querySelector('#tr-imgdel').onclick = e => { e.preventDefault(); st.img = ''; sync(); };
+    m.querySelector('#tr-save').onclick = () => {
+      const x = read(); if (!x.sym) { m.querySelector('[name=sym]').focus(); toast('Add a symbol'); return; }
+      if (isNew) x.created = Date.now();
+      put('trades', t.id || uid(), x); if (x.acc) put('misc', 'trading', { ...tSettings(), lastAcc: x.acc });
+      closeModal(); toast('Trade saved');
+    };
+    const dl = m.querySelector('#tr-del'); if (dl) dl.onclick = () => confirmBox('Delete this ' + (t.sym || '') + ' trade?', () => del('trades', t.id));
+    sync();
+  });
+}
+ACT.newTrade = d => tradeModal(null, d.date);
+ACT.editTrade = d => { const t = S.trades[d.id]; if (t) tradeModal(t); };
+
+/* calendar */
+function tCal() {
+  const tr = tradesFiltered(UI.tAcc);
+  const byDay = {}; tr.forEach(t => { const d = tradeDate(t); (byDay[d] = byDay[d] || []).push(t); });
+  const cm = UI.calMonth || today().slice(0, 7);
+  const head = `<div class="row wrap" style="margin-bottom:12px"><div class="seg"><button class="${UI.calMode === 'month' ? 'on' : ''}" data-act="calMode" data-k="month">Month</button><button class="${UI.calMode === 'year' ? 'on' : ''}" data-act="calMode" data-k="year">Year</button></div><span class="sp"></span>
+   <button class="iconbtn" data-act="calNav" data-d="-1">${ICON.left}</button><b class="serif" style="font-size:18px;min-width:130px;text-align:center">${UI.calMode === 'month' ? MONTHS[+cm.slice(5) - 1] + ' ' + cm.slice(0, 4) : cm.slice(0, 4)}</b><button class="iconbtn" data-act="calNav" data-d="1">${ICON.right}</button></div>`;
+  if (UI.calMode === 'year') {
+    const y = +cm.slice(0, 4);
+    const yt = tr.filter(t => tradeDate(t).startsWith(y + '-')), ys = computeStats(yt);
+    return head + `<div class="grid g4 keep">${statCard('Year P&L', money(ys.net, true), ys.n + ' trades', cls(ys.net))}${statCard('Win rate', pct(ys.winRate, 0))}${statCard('Green days', ys.greenDays + '/' + ys.days)}${statCard('Profit factor', ys.pf == null ? '–' : ys.pf === Infinity ? '∞' : ys.pf.toFixed(2))}</div>
+     <div class="card"><div class="yeargrid">${MONTHS.map((mn, mi) => { const first = new Date(y, mi, 1), dim = new Date(y, mi + 1, 0).getDate(), off = (first.getDay() + 6) % 7; let cells = ''; for (let i = 0; i < off; i++) cells += '<i class="x"></i>';
+       let mp = 0; for (let d = 1; d <= dim; d++) { const k = y + '-' + pad(mi + 1) + '-' + pad(d); const v = byDay[k] ? sum(byDay[k].map(pnlOf)) : null; if (v != null) mp += v; cells += `<i class="${v == null ? '' : v >= 0 ? 'w' : 'l'}" title="${k}${v != null ? ' ' + money(v, true) : ''}"></i>`; }
+       return `<div class="ym" data-act="calOpenMonth" data-m="${y}-${pad(mi + 1)}" style="cursor:pointer"><div class="row small" style="margin-bottom:5px"><b>${mn.slice(0, 3)}</b><span class="sp"></span><span class="${cls(mp)}">${mp ? money(mp, true) : ''}</span></div><div class="mg">${cells}</div></div>`; }).join('')}</div></div>`;
+  }
+  const [y, mo] = cm.split('-').map(Number), first = new Date(y, mo - 1, 1), dim = new Date(y, mo, 0).getDate(), off = (first.getDay() + 6) % 7;
+  const mt = tr.filter(t => tradeDate(t).startsWith(cm)), ms = computeStats(mt);
+  let cells = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Week'].map(h => `<div class="h">${h}</div>`).join('');
+  const total = Math.ceil((off + dim) / 7) * 7; let wk = 0, wkN = 0, wkI = 1;
+  for (let i = 0; i < total; i++) {
+    const d = i - off + 1;
+    if (d < 1 || d > dim) cells += '<div class="c out"></div>';
+    else { const k = cm + '-' + pad(d), a = byDay[k] || [], v = sum(a.map(pnlOf)); wk += v; wkN += a.length; const j = S.tjournal[k]; const hasNote = j && (j.pre || j.post);
+      cells += `<div class="c ${a.length ? (v >= 0 ? 'win' : 'loss') : ''}" data-act="calDay" data-d="${k}"><span class="n">${d}</span>${hasNote ? '<span class="note">📝</span>' : ''}${a.length ? `<span class="t tiny mute">${a.length} trade${a.length > 1 ? 's' : ''}</span><span class="p ${cls(v)}">${money(v, true).replace('.00', '')}</span>` : ''}</div>`; }
+    if (i % 7 === 6) { cells += `<div class="wk"><span class="mute">Week ${wkI}</span><b class="${cls(wk)}">${wkN ? money(wk, true).replace('.00', '') : '–'}</b><span class="tiny mute">${wkN ? wkN + ' tr' : ''}</span></div>`; wk = 0; wkN = 0; wkI++; }
+  }
+  return head + `<div class="grid g4 keep">${statCard('Month P&L', money(ms.net, true), ms.n + ' trades', cls(ms.net))}${statCard('Win rate', pct(ms.winRate, 0))}${statCard('Trading days', ms.days, ms.greenDays + ' green')}${statCard('Avg R', ms.avgR == null ? '–' : ms.avgR.toFixed(2) + 'R')}</div>
+   <div class="card" style="padding:12px"><div class="cal">${cells}</div></div>`;
+}
+ACT.calMode = d => { UI.calMode = d.k; render(); };
+ACT.calNav = d => { const cm = UI.calMonth || today().slice(0, 7); let [y, m] = cm.split('-').map(Number); if (UI.calMode === 'year') y += +d.d; else { m += +d.d; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; } } UI.calMonth = y + '-' + pad(m); render(); };
+ACT.calOpenMonth = d => { UI.calMonth = d.m; UI.calMode = 'month'; render(); };
+ACT.calDay = d => {
+  const k = d.d, a = tradesFiltered(UI.tAcc).filter(t => tradeDate(t) === k), j = S.tjournal[k] || {};
+  openModal(mh(fmtDate(k)) + `<div class="row"><span class="mute small">${a.length} trades</span><span class="sp"></span><b class="${cls(sum(a.map(pnlOf)))}">${money(sum(a.map(pnlOf)), true)}</b></div>
+   <div class="list" style="margin-top:8px">${a.map(t => `<div class="row" style="padding:9px 0;cursor:pointer" data-act="editTrade" data-id="${t.id}"><b>${esc(t.sym)}</b><span class="pill">${t.side === 'short' ? 'Short' : 'Long'}</span><span class="small mute">${esc(t.setup || '')}</span><span class="sp"></span><span class="${cls(pnlOf(t))}">${money(pnlOf(t), true)}</span></div>`).join('') || '<div class="empty small">No trades this day.</div>'}</div>
+   ${j.pre ? `<label class="f">Pre-market plan</label><div class="small" style="white-space:pre-wrap">${esc(j.pre)}</div>` : ''}${j.post ? `<label class="f">Post-market recap</label><div class="small" style="white-space:pre-wrap">${esc(j.post)}</div>` : ''}
+   <div class="actions"><button class="btn" data-act="journalFor" data-d="${k}">Open journal</button><button class="btn pri" data-act="newTrade" data-date="${k}">${ICON.plus} Trade</button></div>`);
+};
+ACT.journalFor = d => { closeModal(); UI.jDate = d.d; UI.tTab = 'journal'; render(); };
+
+/* journal & rules */
+function rulesAdherence(days) {
+  const rules = tSettings().rules || []; if (!rules.length) return null;
+  const t = today(); let ok = 0, tot = 0;
+  for (let i = 0; i < days; i++) { const k = addDays(t, -i), j = S.tjournal[k]; if (!j || !j.rulesOk) continue; const traded = all('trades').some(x => tradeDate(x) === k); if (!traded && !Object.keys(j.rulesOk).length) continue; tot += rules.length; ok += rules.filter(r => j.rulesOk[r.id]).length; }
+  return tot ? ok / tot : null;
+}
+function tJournal() {
+  const k = UI.jDate || today(), j = S.tjournal[k] || {}, rules = tSettings().rules || [];
+  const a = all('trades').filter(t => tradeDate(t) === k), v = sum(a.map(pnlOf));
+  const okN = rules.filter(r => (j.rulesOk || {})[r.id]).length;
+  return `<div class="row" style="margin-bottom:12px"><button class="iconbtn" data-act="jNav" data-d="-1">${ICON.left}</button><b class="serif" style="font-size:18px">${fmtDate(k, { weekday: 'short', day: 'numeric', month: 'long' })}</b><button class="iconbtn" data-act="jNav" data-d="1">${ICON.right}</button>${k !== today() ? '<button class="btn sm" data-act="jNav" data-d="0">Today</button>' : ''}<span class="sp"></span><span class="${cls(v)}"><b>${a.length ? money(v, true) : ''}</b></span></div>
+  <div class="grid g2"><div class="card"><div class="row"><h2 style="margin:0">Trading rules</h2><span class="sp"></span>${rules.length ? `<span class="pill g">${okN}/${rules.length}</span>` : ''}<button class="btn sm ghost" data-act="editRules">Edit</button></div>
+    <div class="list" style="margin-top:8px">${rules.map(r => { const on = (j.rulesOk || {})[r.id]; return `<div class="task" style="padding:8px 0"><button class="chk ${on ? 'on' : ''}" data-act="ruleTick" data-r="${r.id}" data-d="${k}">${ICON.check}</button><div class="body" style="padding-top:4px">${esc(r.text)}</div></div>`; }).join('') || '<div class="empty small">Add your rules, e.g. “Max 3 trades a day”, “No revenge trades”, “Risk max 1% per trade”.</div>'}</div>
+    <div class="tiny mute" style="margin-top:8px">30-day adherence: <b class="goldt">${rulesAdherence(30) == null ? '–' : pct(rulesAdherence(30), 0)}</b></div></div>
+   <div class="card"><h2>Trades this day</h2><div class="list">${a.map(t => `<div class="row" style="padding:8px 0;cursor:pointer" data-act="editTrade" data-id="${t.id}"><b>${esc(t.sym)}</b><span class="small mute">${esc(t.setup || '')}</span><span class="sp"></span><span class="${cls(pnlOf(t))}">${money(pnlOf(t), true)}</span></div>`).join('') || '<div class="empty small">No trades.</div>'}</div><button class="btn sm" data-act="newTrade" data-date="${k}" style="margin-top:8px">${ICON.plus} Trade</button></div></div>
+  <div class="card"><h2>Pre-market plan</h2><textarea data-chg="jText" data-f="pre" data-d="${k}" placeholder="Bias, key levels, news, what you will and won't trade…">${esc(j.pre || '')}</textarea>
+   <h2 style="margin-top:14px">Post-market recap</h2><textarea data-chg="jText" data-f="post" data-d="${k}" placeholder="What went well? What will you do better tomorrow?">${esc(j.post || '')}</textarea><div class="tiny mute" style="margin-top:6px">Saves automatically when you leave the field.</div></div>`;
+}
+ACT.jNav = d => { UI.jDate = d.d === '0' ? today() : addDays(UI.jDate || today(), +d.d); render(); };
+ACT.jText = (d, el) => { const j = S.tjournal[d.d] || {}; if ((j[d.f] || '') === el.value) return; put('tjournal', d.d, { ...j, [d.f]: el.value }); toast('Journal saved'); };
+ACT.ruleTick = d => { const j = S.tjournal[d.d] || {}; const ok = { ...(j.rulesOk || {}) }; if (ok[d.r]) delete ok[d.r]; else ok[d.r] = true; put('tjournal', d.d, { ...j, rulesOk: ok }); };
+ACT.editRules = () => {
+  const rules = tSettings().rules || [];
+  openModal(mh('Trading rules') + `<p class="small mute">One rule per line.</p><textarea id="rl" style="min-height:180px">${esc(rules.map(r => r.text).join('\n'))}</textarea><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="rl-s">Save</button></div>`, m => {
+    m.querySelector('#rl-s').onclick = () => { const lines = m.querySelector('#rl').value.split('\n').map(s => s.trim()).filter(Boolean); const nr = lines.map(text => { const ex = rules.find(r => r.text === text); return ex || { id: uid(), text }; }); put('misc', 'trading', { ...tSettings(), rules: nr }); closeModal(); };
+  });
+};
+
+/* portfolio */
+function tPortfolio() {
+  const h = all('holdings').sort((a, b) => hv(b) - hv(a));
+  const tv = sum(h.map(hv)), tc = sum(h.map(x => (num(x.qty) || 0) * (num(x.cost) || 0))), tp = tv - tc;
+  const colors = ['#d4ae5a', '#5aa6e0', '#3fbf7f', '#c77dff', '#e0565b', '#e6a23c', '#4fd1c5', '#a0aec0', '#f687b3', '#9ae6b4'];
+  return `<div class="grid g3 keep">${statCard('Portfolio value', money(tv), h.length + ' positions')}${statCard('Unrealized P&L', money(tp, true), tc ? pct(tp / tc, 2) : '', cls(tp))}${statCard('Cost basis', money(tc))}</div>
+  ${h.length ? `<div class="card"><h2>Allocation</h2><div style="display:flex;height:14px;border-radius:7px;overflow:hidden">${h.map((x, i) => `<div style="width:${tv ? hv(x) / tv * 100 : 0}%;background:${colors[i % colors.length]}" title="${esc(x.sym)}"></div>`).join('')}</div>
+   <div class="row wrap small" style="margin-top:8px;gap:12px">${h.map((x, i) => `<span><span class="dot" style="background:${colors[i % colors.length]}"></span> ${esc(x.sym)} ${tv ? pct(hv(x) / tv, 0) : ''}</span>`).join('')}</div></div>` : ''}
+  <div class="card" style="padding:6px 10px"><div class="row" style="padding:8px 6px"><h2 style="margin:0">Holdings</h2><span class="sp"></span><button class="btn sm pri" data-act="editHolding">${ICON.plus} Add</button></div>
+  ${h.length ? `<div class="scrollx"><table class="tbl"><tr><th>Asset</th><th class="r">Qty</th><th class="r">Avg cost</th><th class="r">Price</th><th class="r">Value</th><th class="r">P&L</th></tr>
+   ${h.map(x => { const c = (num(x.qty) || 0) * (num(x.cost) || 0), p = hv(x) - c; return `<tr class="click" data-act="editHolding" data-id="${x.id}"><td><b>${esc(x.sym)}</b><div class="tiny mute">${esc(x.type || '')}${x.priceAt ? ' · price ' + fmtDate(x.priceAt, { day: 'numeric', month: 'short' }) : ''}</div></td><td class="r">${esc(x.qty)}</td><td class="r">${money(num(x.cost))}</td><td class="r">${money(num(x.price))}</td><td class="r"><b>${money(hv(x))}</b></td><td class="r ${cls(p)}">${money(p, true)}<div class="tiny">${c ? pct(p / c, 1) : ''}</div></td></tr>`; }).join('')}</table></div>` : '<div class="empty small">Add your stocks, ETFs, crypto… Prices are entered by hand — tap a holding to update its price.</div>'}</div>`;
+}
+const hv = x => (num(x.qty) || 0) * (num(x.price) ?? num(x.cost) ?? 0);
+ACT.editHolding = d => {
+  const x = d.id ? S.holdings[d.id] : { type: 'Stock' };
+  openModal(mh(d.id ? 'Edit holding' : 'Add holding') + `<div class="grid g2 keep" style="gap:10px">
+   <div><label class="f">Symbol</label><input type="text" name="sym" value="${esc(x.sym || '')}" placeholder="AAPL, BTC…"></div><div><label class="f">Type</label><select name="type">${['Stock', 'ETF', 'Crypto', 'Forex', 'Commodity', 'Bond', 'Other'].map(o => `<option ${x.type === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+   <div><label class="f">Quantity</label><input type="number" step="any" name="qty" value="${esc(x.qty || '')}"></div><div><label class="f">Average cost</label><input type="number" step="any" name="cost" value="${esc(x.cost || '')}"></div>
+   <div><label class="f">Current price</label><input type="number" step="any" name="price" value="${esc(x.price || '')}"></div></div>
+   <label class="f">Notes / thesis</label><textarea name="notes">${esc(x.notes || '')}</textarea>
+   <div class="actions">${d.id ? '<button class="btn danger" id="h-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="h-s">Save</button></div>`, m => {
+    m.querySelector('#h-s').onclick = () => { const sym = fv(m, 'sym').toUpperCase(); if (!sym) return; const price = fv(m, 'price'); put('holdings', x.id || uid(), { ...x, sym, type: fv(m, 'type'), qty: fv(m, 'qty'), cost: fv(m, 'cost'), price, priceAt: price !== (x.price || '') ? today() : (x.priceAt || today()), notes: fv(m, 'notes') }); closeModal(); };
+    const dl = m.querySelector('#h-del'); if (dl) dl.onclick = () => confirmBox('Remove ' + x.sym + '?', () => del('holdings', x.id));
+  });
+};
+
+/* watchlist */
+function tWatch() {
+  const w = all('watch').sort((a, b) => (a.sym || '').localeCompare(b.sym || ''));
+  return `<div class="row" style="margin-bottom:12px"><span class="mute small">${w.length} on watch</span><span class="sp"></span><button class="btn sm pri" data-act="editWatch">${ICON.plus} Add ticker</button></div>
+  ${w.length ? `<div class="grid g3">${w.map(x => { const p = num(x.price), tg = num(x.target), dist = p && tg ? (tg - p) / p : null; return `<div class="card" style="cursor:pointer" data-act="editWatch" data-id="${x.id}">
+   <div class="row"><b style="font-size:17px">${esc(x.sym)}</b>${x.bias ? `<span class="pill ${x.bias === 'Bullish' ? 'g' : ''}">${esc(x.bias)}</span>` : ''}<span class="sp"></span><span>${p != null ? money(p) : ''}</span></div>
+   ${tg != null ? `<div class="small mute" style="margin-top:4px">Target ${money(tg)} ${dist != null ? `<span class="${cls(dist)}">(${dist > 0 ? '+' : ''}${pct(dist, 1)})</span>` : ''}</div>` : ''}
+   ${x.why ? `<div class="small" style="margin-top:8px;color:#c9c4b6">${esc(x.why)}</div>` : ''}<div class="tiny dim" style="margin-top:8px">Added ${x.added ? fmtDate(x.added, { day: 'numeric', month: 'short' }) : ''}</div></div>`; }).join('')}</div>` : '<div class="card empty">Your watchlist is empty. Add tickers with the reason you\'re watching them and your target price.</div>'}`;
+}
+ACT.editWatch = d => {
+  const x = d.id ? S.watch[d.id] : { added: today() };
+  openModal(mh(d.id ? 'Edit ticker' : 'Add to watchlist') + `<div class="grid g2 keep" style="gap:10px"><div><label class="f">Symbol</label><input type="text" name="sym" value="${esc(x.sym || '')}"></div>
+   <div><label class="f">Bias</label><select name="bias">${['', 'Bullish', 'Bearish', 'Neutral'].map(o => `<option ${x.bias === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+   <div><label class="f">Current price</label><input type="number" step="any" name="price" value="${esc(x.price || '')}"></div><div><label class="f">Target / alert price</label><input type="number" step="any" name="target" value="${esc(x.target || '')}"></div></div>
+   <label class="f">Why are you watching it?</label><textarea name="why">${esc(x.why || '')}</textarea>
+   <div class="actions">${d.id ? '<button class="btn danger" id="w-del">Remove</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="w-s">Save</button></div>`, m => {
+    m.querySelector('#w-s').onclick = () => { const sym = fv(m, 'sym').toUpperCase(); if (!sym) return; put('watch', x.id || uid(), { ...x, sym, bias: fv(m, 'bias'), price: fv(m, 'price'), target: fv(m, 'target'), why: fv(m, 'why') }); closeModal(); };
+    const dl = m.querySelector('#w-del'); if (dl) dl.onclick = () => confirmBox('Remove ' + x.sym + ' from watchlist?', () => del('watch', x.id), 'Remove');
+  });
+};
+
+/* accounts */
+function tAccounts() {
+  const accs = all('accounts');
+  return `<div class="row" style="margin-bottom:12px"><span class="mute small">Track each account separately — or all combined on the dashboard.</span><span class="sp"></span><button class="btn sm pri" data-act="editAcc">${ICON.plus} Account</button></div>
+  ${accs.length ? `<div class="grid g3">${accs.map(a => { const tr = tradesFiltered(a.id), s = computeStats(tr), bal = (num(a.start) || 0) + s.net; return `<div class="card" style="cursor:pointer" data-act="editAcc" data-id="${a.id}">
+    <div class="row"><b style="font-size:16px">${esc(a.name)}</b><span class="sp"></span><span class="pill">${esc(a.type || '')}</span></div>
+    <div class="stat" style="margin-top:10px"><div class="k">Balance</div><div class="v">${money(bal)}</div></div>
+    <div class="small mute">Start ${money(num(a.start) || 0)} · <span class="${cls(s.net)}">${money(s.net, true)}</span> · ${s.n} trades · WR ${pct(s.winRate, 0)}</div>
+    ${num(a.target) ? `<div class="bar" style="margin-top:10px"><i style="width:${Math.max(0, Math.min(100, s.net / num(a.target) * 100))}%"></i></div><div class="tiny mute" style="margin-top:4px">Profit target ${money(num(a.target))}</div>` : ''}</div>`; }).join('')}</div>` : '<div class="card empty">No accounts yet. Add e.g. “Prop Firm 50K”, “Personal”, “Demo”.</div>'}`;
+}
+ACT.editAcc = d => {
+  const a = d.id ? S.accounts[d.id] : { type: 'Prop firm' };
+  openModal(mh(d.id ? 'Edit account' : 'New account') + `<label class="f">Name</label><input type="text" name="name" value="${esc(a.name || '')}" placeholder="Prop Firm 50K">
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Type</label><select name="type">${['Prop firm', 'Personal', 'Demo', 'Crypto', 'Other'].map(o => `<option ${a.type === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+   <div><label class="f">Starting balance</label><input type="number" step="any" name="start" value="${esc(a.start || '')}"></div><div><label class="f">Profit target (optional)</label><input type="number" step="any" name="target" value="${esc(a.target || '')}"></div></div>
+   <div class="actions">${d.id ? '<button class="btn danger" id="a-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="a-s">Save</button></div>`, m => {
+    m.querySelector('#a-s').onclick = () => { const name = fv(m, 'name'); if (!name) return; put('accounts', a.id || uid(), { ...a, name, type: fv(m, 'type'), start: fv(m, 'start'), target: fv(m, 'target') }); closeModal(); };
+    const dl = m.querySelector('#a-del'); if (dl) dl.onclick = () => confirmBox('Delete account “' + a.name + '”? Its trades are kept but become “No account”.', () => { del('accounts', a.id); if (UI.tAcc === a.id) UI.tAcc = 'all'; });
+  });
+};
+
+/* ========== HEATMAP ========== */
+function heatGrid(from, to, taskId) {
+  const t = today(); let start = addDays(from, -((dow(from) + 6) % 7)); let cells = '', d = start, months = '', lastM = -1, col = 0;
+  while (d <= to) {
+    let lvl = 0, title = d;
+    if (d < from || d > t) { cells += '<i class="f"></i>'; }
+    else {
+      if (taskId) { const tk = S.tasks[taskId]; const done = tk && isDoneOn(tk, d), due = tk && isDue(tk, d); lvl = done ? 4 : 0; title += done ? ' ✓' : due ? ' missed' : ''; }
+      else { const r = dayRatio(d); lvl = r.done === 0 ? 0 : r.r < .34 ? 1 : r.r < .67 ? 2 : r.r < 1 ? 3 : 4; title += ` · ${r.done}/${r.due}`; }
+      cells += `<i class="${lvl ? 'l' + lvl : ''}" title="${title}"></i>`;
+    }
+    if (dow(d) === 1) { const m = parseD(d).getMonth(); if (m !== lastM && d >= addDays(from, -6)) { months += `<span style="position:absolute;left:${col * 16}px">${MONTHS[m].slice(0, 3)}</span>`; lastM = m; } col++; }
+    d = addDays(d, 1);
+  }
+  return `<div style="overflow-x:auto"><div style="position:relative;height:16px;font-size:10px;color:var(--dim);min-width:${col * 16}px">${months}</div><div class="heat">${cells}</div></div>
+   <div class="row tiny mute" style="margin-top:8px;gap:4px">Less <span class="heat" style="display:inline-flex;grid-auto-flow:unset;gap:3px"><i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i></span> More</div>`;
+}
+UI.heatYear = null; UI.heatTask = '';
+VIEWS.heatmap = () => {
+  const y = UI.heatYear || +today().slice(0, 4);
+  const from = y + '-01-01', to = y + '-12-31', t = today();
+  let full = 0, active = 0, ratios = [];
+  for (let d = from; d <= to && d <= t; d = addDays(d, 1)) { const r = dayRatio(d); if (r.due) ratios.push(r.r); if (r.done) active++; if (r.due && r.r >= 1) full++; }
+  const tasks = all('tasks').filter(x => x.kind !== 'once');
+  return `<div class="pagehead"><div><div class="eyebrow">Habit Heatmap</div><h1>${y}</h1></div><div class="row"><button class="iconbtn" data-act="heatY" data-d="-1">${ICON.left}</button><button class="iconbtn" data-act="heatY" data-d="1">${ICON.right}</button></div></div>
+  <div class="grid g3 keep">${statCard('Perfect days', full, 'every task done')}${statCard('Active days', active, 'at least one task')}${statCard('Avg completion', ratios.length ? pct(avg(ratios), 0) : '–')}</div>
+  <div class="card"><div class="row wrap"><h2 style="margin:0">Daily completion</h2><span class="sp"></span><select data-chg="heatTask" style="width:auto;padding:7px 10px;font-size:14px"><option value="">All tasks</option>${tasks.map(x => `<option value="${x.id}" ${UI.heatTask === x.id ? 'selected' : ''}>${esc(x.title)}</option>`).join('')}</select></div>
+  <div style="margin-top:14px">${heatGrid(from, to, UI.heatTask)}</div></div>
+  <div class="card"><h2>Task streaks</h2><div class="list">${tasks.filter(x => !x.archived).map(x => `<div class="row" style="padding:9px 0"><span style="flex:1">${esc(x.title)}</span><span class="small mute">${repeatLabel(x)}</span><span class="fire" style="min-width:56px;text-align:right">${taskStreak(x)} 🔥</span></div>`).join('') || '<div class="empty small">No repeating tasks yet.</div>'}</div></div>`;
+};
+ACT.heatY = d => { UI.heatYear = (UI.heatYear || +today().slice(0, 4)) + +d.d; render(); };
+ACT.heatTask = (d, el) => { UI.heatTask = el.value; el.blur(); render(); };
+
+/* ========== GOALS & VISION ========== */
+UI.goalYear = null;
+VIEWS.goals = () => {
+  const y = UI.goalYear || +today().slice(0, 4);
+  const gs = all('goals').filter(g => !g.archived && +g.year === y).sort((a, b) => (a.created || 0) - (b.created || 0));
+  const vision = misc('vision');
+  const prog = g => { const ms = g.milestones || []; return ms.length ? ms.filter(m => m.done).length / ms.length : (g.done ? 1 : 0); };
+  return `<div class="pagehead"><div><div class="eyebrow">Goals & Vision Board</div><h1>${y}</h1></div><div class="row"><button class="iconbtn" data-act="goalY" data-d="-1">${ICON.left}</button><button class="iconbtn" data-act="goalY" data-d="1">${ICON.right}</button><button class="btn pri sm" data-act="editGoal">${ICON.plus} Goal</button></div></div>
+  <div class="card gold" data-act="editVision" style="cursor:pointer;text-align:center;padding:22px"><div class="eyebrow">My vision</div><div class="verse" style="margin-top:8px;font-style:normal">${vision.text ? esc(vision.text) : '<span class="mute">Tap to write who you are becoming…</span>'}</div></div>
+  ${gs.length ? `<div class="grid g3 keep" style="margin-bottom:4px">${statCard('Goals', gs.length)}${statCard('Avg progress', pct(avg(gs.map(prog)), 0))}${statCard('Completed', gs.filter(g => prog(g) >= 1).length)}</div>` : ''}
+  <div class="vision">${gs.map(g => { const p = prog(g), linked = all('tasks').filter(t => t.goalId === g.id && !t.archived), ms = g.milestones || [], nextM = ms.find(m => !m.done);
+    return `<div class="vcard" data-act="editGoal" data-id="${g.id}"><div class="img" style="${g.img ? `background-image:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.75)),url(${g.img})` : ''}">${g.category ? `<span class="pill g">${esc(g.category)}</span>` : ''}</div>
+     <div class="b"><div class="row"><b style="font-size:16px;flex:1">${esc(g.title)}</b><span class="goldt small">${Math.round(p * 100)}%</span></div><div class="bar" style="margin-top:8px"><i style="width:${p * 100}%"></i></div>
+     <div class="tiny mute" style="margin-top:8px">${ms.length ? ms.filter(m => m.done).length + '/' + ms.length + ' milestones' : 'No milestones'}${linked.length ? ' · ' + linked.length + ' daily task' + (linked.length > 1 ? 's' : '') : ''}${g.deadline ? ' · by ' + fmtDate(g.deadline, { day: 'numeric', month: 'short' }) : ''}</div>
+     ${nextM ? `<div class="small" style="margin-top:6px">Next: ${esc(nextM.title)}${nextM.month ? ' <span class="mute">(' + MONTHS[nextM.month - 1].slice(0, 3) + ')</span>' : ''}</div>` : ''}</div></div>`; }).join('')}</div>
+  ${!gs.length ? '<div class="card empty">No goals for this year yet. Add a goal, break it into monthly milestones, and link your daily tasks to it.</div>' : ''}`;
+};
+ACT.goalY = d => { UI.goalYear = (UI.goalYear || +today().slice(0, 4)) + +d.d; render(); };
+ACT.editVision = () => {
+  const v = misc('vision');
+  openModal(mh('My vision') + `<textarea id="vi" style="min-height:160px" placeholder="Who am I becoming? What does my life look like in 5 years?">${esc(v.text || '')}</textarea><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="vi-s">Save</button></div>`,
+    m => m.querySelector('#vi-s').onclick = () => { put('misc', 'vision', { ...v, text: m.querySelector('#vi').value.trim() }); closeModal(); });
+};
+ACT.editGoal = d => {
+  const g = d.id ? JSON.parse(JSON.stringify(S.goals[d.id])) : { year: UI.goalYear || +today().slice(0, 4), milestones: [] };
+  const st = { ms: g.milestones || [], img: g.img || '' };
+  const linked = d.id ? all('tasks').filter(t => t.goalId === g.id && !t.archived) : [];
+  const last30 = t => { let n = 0; for (let i = 0; i < 30; i++) if (isDoneOn(t, addDays(today(), -i)) && t.kind !== 'once') n++; return n; };
+  openModal(mh(d.id ? 'Goal' : 'New goal') + `<input type="text" name="title" placeholder="Goal, e.g. Reach a funded account" value="${esc(g.title || '')}">
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Category</label><input type="text" name="category" list="g-cats" value="${esc(g.category || '')}" placeholder="Wealth, Body, Faith, Mind…"><datalist id="g-cats">${['Wealth', 'Trading', 'Body', 'Faith', 'Mind', 'Family', 'Business', 'Skills'].map(c => `<option value="${c}">`).join('')}</datalist></div>
+   <div><label class="f">Deadline</label><input type="date" name="deadline" value="${esc(g.deadline || '')}"></div><div><label class="f">Year</label><input type="number" name="year" value="${esc(g.year)}"></div></div>
+   <label class="f">Why it matters</label><textarea name="why" style="min-height:60px">${esc(g.why || '')}</textarea>
+   <label class="f">Milestones</label><div id="g-ms" class="list"></div>
+   <div class="row" style="margin-top:8px"><input type="text" id="g-mt" placeholder="Add milestone…"><select id="g-mm" style="width:96px"><option value="">Month</option>${MONTHS.map((m, i) => `<option value="${i + 1}">${m.slice(0, 3)}</option>`).join('')}</select><button class="btn" id="g-ma">${ICON.plus}</button></div>
+   ${linked.length ? `<label class="f">Linked daily tasks (last 30 days)</label><div class="list">${linked.map(t => `<div class="row small" style="padding:6px 0"><span style="flex:1">${esc(t.title)}</span><span class="goldt">${last30(t)}× done</span></div>`).join('')}</div>` : (d.id ? '<div class="tiny mute" style="margin-top:10px">Link daily tasks to this goal from the task editor.</div>' : '')}
+   <label class="f">Vision image</label><div class="row"><label class="btn sm" style="cursor:pointer">🖼 Choose image<input type="file" accept="image/*" id="g-file" style="display:none"></label><button class="btn sm ghost" id="g-imgdel">Remove</button></div><div id="g-img" style="margin-top:8px"></div>
+   <div class="actions">${d.id ? '<button class="btn danger" id="g-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="g-s">Save</button></div>`, m => {
+    const draw = () => {
+      m.querySelector('#g-ms').innerHTML = st.ms.map((x, i) => `<div class="task" style="padding:7px 0"><button class="chk ${x.done ? 'on' : ''}" data-i="${i}" data-k="t">${ICON.check}</button><div class="body" style="padding-top:4px">${esc(x.title)} ${x.month ? '<span class="pill">' + MONTHS[x.month - 1].slice(0, 3) + '</span>' : ''}</div><button class="iconbtn" data-i="${i}" data-k="d">${ICON.x}</button></div>`).join('') || '<div class="tiny mute">No milestones yet.</div>';
+      m.querySelector('#g-img').innerHTML = st.img ? `<img src="${st.img}" style="max-width:100%;max-height:160px;border-radius:10px">` : '';
+    };
+    m.querySelector('#g-ms').onclick = e => { const b = e.target.closest('button'); if (!b) return; const i = +b.dataset.i; if (b.dataset.k === 't') { st.ms[i].done = !st.ms[i].done; st.ms[i].doneAt = st.ms[i].done ? today() : null; } else st.ms.splice(i, 1); draw(); };
+    const addM = () => { const t = m.querySelector('#g-mt').value.trim(); if (!t) return; st.ms.push({ id: uid(), title: t, month: +m.querySelector('#g-mm').value || null, done: false }); m.querySelector('#g-mt').value = ''; draw(); };
+    m.querySelector('#g-ma').onclick = addM; m.querySelector('#g-mt').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addM(); } };
+    m.querySelector('#g-file').onchange = async e => { const f = e.target.files[0]; if (f) { try { st.img = await readImage(f, 700, .7); draw(); } catch (er) { } } };
+    m.querySelector('#g-imgdel').onclick = e => { e.preventDefault(); st.img = ''; draw(); };
+    m.querySelector('#g-s').onclick = () => { const title = fv(m, 'title'); if (!title) return; put('goals', g.id || uid(), { ...g, title, category: fv(m, 'category'), deadline: fv(m, 'deadline'), year: +fv(m, 'year') || g.year, why: fv(m, 'why'), milestones: st.ms, img: st.img, created: g.created || Date.now() }); closeModal(); };
+    const dl = m.querySelector('#g-del'); if (dl) dl.onclick = () => confirmBox('Delete goal “' + g.title + '”?', () => del('goals', g.id));
+    draw();
+  });
+};
+
+/* ========== FAITH CORNER ========== */
+const VERSES = [
+  ['I can do all things through Christ which strengtheneth me.', 'Philippians 4:13'],
+  ['Trust in the LORD with all thine heart; and lean not unto thine own understanding.', 'Proverbs 3:5'],
+  ['Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.', 'Joshua 1:9'],
+  ['But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.', 'Matthew 6:33'],
+  ['For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.', '2 Timothy 1:7'],
+  ['The LORD is my shepherd; I shall not want.', 'Psalm 23:1'],
+  ['And we know that all things work together for good to them that love God.', 'Romans 8:28'],
+  ['Commit thy works unto the LORD, and thy thoughts shall be established.', 'Proverbs 16:3'],
+  ['The hand of the diligent shall bear rule: but the slothful shall be under tribute.', 'Proverbs 12:24'],
+  ['Whatsoever ye do, do it heartily, as to the Lord, and not unto men.', 'Colossians 3:23'],
+  ['They that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles.', 'Isaiah 40:31'],
+  ['Be still, and know that I am God.', 'Psalm 46:10'],
+  ['Iron sharpeneth iron; so a man sharpeneth the countenance of his friend.', 'Proverbs 27:17'],
+  ['No chastening for the present seemeth to be joyous, but grievous: nevertheless afterward it yieldeth the peaceable fruit of righteousness.', 'Hebrews 12:11'],
+  ['Thy word is a lamp unto my feet, and a light unto my path.', 'Psalm 119:105'],
+  ['Watch ye, stand fast in the faith, quit you like men, be strong.', '1 Corinthians 16:13'],
+  ['In all thy ways acknowledge him, and he shall direct thy paths.', 'Proverbs 3:6'],
+  ['The fear of the LORD is the beginning of wisdom.', 'Proverbs 9:10'],
+  ['Let us not be weary in well doing: for in due season we shall reap, if we faint not.', 'Galatians 6:9'],
+  ['Seest thou a man diligent in his business? he shall stand before kings.', 'Proverbs 22:29'],
+  ['Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.', 'Philippians 4:6'],
+  ['I have fought a good fight, I have finished my course, I have kept the faith.', '2 Timothy 4:7'],
+  ['Wait on the LORD: be of good courage, and he shall strengthen thine heart.', 'Psalm 27:14'],
+  ['He that is faithful in that which is least is faithful also in much.', 'Luke 16:10'],
+  ['Know ye not that they which run in a race run all, but one receiveth the prize? So run, that ye may obtain.', '1 Corinthians 9:24'],
+  ['This is the day which the LORD hath made; we will rejoice and be glad in it.', 'Psalm 118:24'],
+  ['Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.', 'Matthew 7:7'],
+  ['Where there is no vision, the people perish.', 'Proverbs 29:18'],
+  ['For which of you, intending to build a tower, sitteth not down first, and counteth the cost?', 'Luke 14:28'],
+  ['The thoughts of the diligent tend only to plenteousness.', 'Proverbs 21:5'],
+  ['Finally, my brethren, be strong in the Lord, and in the power of his might.', 'Ephesians 6:10'],
+  ['Create in me a clean heart, O God; and renew a right spirit within me.', 'Psalm 51:10'],
+  ['Go to the ant, thou sluggard; consider her ways, and be wise.', 'Proverbs 6:6'],
+  ['Every good gift and every perfect gift is from above.', 'James 1:17'],
+  ['Blessed is the man that endureth temptation: for when he is tried, he shall receive the crown of life.', 'James 1:12'],
+  ['He giveth power to the faint; and to them that have no might he increaseth strength.', 'Isaiah 40:29'],
+  ['Delight thyself also in the LORD; and he shall give thee the desires of thine heart.', 'Psalm 37:4'],
+  ['A good name is rather to be chosen than great riches.', 'Proverbs 22:1'],
+  ['Be ye doers of the word, and not hearers only.', 'James 1:22'],
+  ['Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee.', 'Isaiah 41:10'],
+];
+function verseOfDay(date = today()) { const i = Math.floor(parseD(date).getTime() / 864e5 + 0.5) % VERSES.length; const v = VERSES[(i + VERSES.length) % VERSES.length]; return { t: v[0], r: v[1] }; }
+const BIBLE = [['Genesis', 50], ['Exodus', 40], ['Leviticus', 27], ['Numbers', 36], ['Deuteronomy', 34], ['Joshua', 24], ['Judges', 21], ['Ruth', 4], ['1 Samuel', 31], ['2 Samuel', 24], ['1 Kings', 22], ['2 Kings', 25], ['1 Chronicles', 29], ['2 Chronicles', 36], ['Ezra', 10], ['Nehemiah', 13], ['Esther', 10], ['Job', 42], ['Psalms', 150], ['Proverbs', 31], ['Ecclesiastes', 12], ['Song of Solomon', 8], ['Isaiah', 66], ['Jeremiah', 52], ['Lamentations', 5], ['Ezekiel', 48], ['Daniel', 12], ['Hosea', 14], ['Joel', 3], ['Amos', 9], ['Obadiah', 1], ['Jonah', 4], ['Micah', 7], ['Nahum', 3], ['Habakkuk', 3], ['Zephaniah', 3], ['Haggai', 2], ['Zechariah', 14], ['Malachi', 4],
+  ['Matthew', 28], ['Mark', 16], ['Luke', 24], ['John', 21], ['Acts', 28], ['Romans', 16], ['1 Corinthians', 16], ['2 Corinthians', 13], ['Galatians', 6], ['Ephesians', 6], ['Philippians', 4], ['Colossians', 4], ['1 Thessalonians', 5], ['2 Thessalonians', 3], ['1 Timothy', 6], ['2 Timothy', 4], ['Titus', 3], ['Philemon', 1], ['Hebrews', 13], ['James', 5], ['1 Peter', 5], ['2 Peter', 3], ['1 John', 5], ['2 John', 1], ['3 John', 1], ['Jude', 1], ['Revelation', 22]];
+const bookKey = n => n.replace(/\s+/g, '_');
+UI.faithTab = 'prayer';
+VIEWS.faith = () => {
+  const v = verseOfDay(), bible = misc('bible'), read = bible.read || {};
+  const totalCh = 1189, readCh = sum(BIBLE.map(([n]) => (read[bookKey(n)] || []).length));
+  const pr = all('prayers').sort((a, b) => (b.created || 0) - (a.created || 0));
+  const open = pr.filter(p => !p.answered), ans = pr.filter(p => p.answered);
+  const bookCard = ([n, c]) => { const r = (read[bookKey(n)] || []).length; return `<div class="bk" data-act="openBook" data-b="${esc(n)}"><div class="row"><span style="flex:1">${n}</span><span class="tiny ${r === c ? 'goldt' : 'mute'}">${r === c ? '✓' : r + '/' + c}</span></div><div class="bar"><i style="width:${r / c * 100}%"></i></div></div>`; };
+  return `<div class="pagehead"><div><div class="eyebrow">Faith Corner</div><h1>Prayer & the Word</h1></div></div>
+  <div class="card gold" style="text-align:center;padding:24px"><div class="eyebrow">Verse of the day</div><div class="verse" style="font-size:22px;margin-top:10px">“${esc(v.t)}”</div><div class="goldt" style="margin-top:8px">${esc(v.r)}</div></div>
+  <div class="tabs"><button class="${UI.faithTab === 'prayer' ? 'on' : ''}" data-act="faithTab" data-k="prayer">Prayer list</button><button class="${UI.faithTab === 'bible' ? 'on' : ''}" data-act="faithTab" data-k="bible">Bible reading</button></div>
+  ${UI.faithTab === 'prayer' ? `<div class="card"><form data-form="prayer" class="row"><input type="text" name="p" placeholder="Add a prayer request or thanksgiving…"><button class="btn pri" type="submit">${ICON.plus}</button></form>
+    <div class="list" style="margin-top:10px">${open.map(p => `<div class="task"><button class="chk" data-act="prayAns" data-id="${p.id}" title="Mark answered">${ICON.check}</button><div class="body"><div class="name">${esc(p.text)}</div><div class="meta">Since ${fmtDate(p.date || today(), { day: 'numeric', month: 'short', year: 'numeric' })}</div></div><button class="iconbtn" data-act="prayDel" data-id="${p.id}">${ICON.x}</button></div>`).join('') || '<div class="empty small">No open prayers.</div>'}</div></div>
+    ${ans.length ? `<div class="card"><h2>🙏 Answered prayers (${ans.length})</h2><div class="list">${ans.map(p => `<div class="task done"><button class="chk on" data-act="prayAns" data-id="${p.id}">${ICON.check}</button><div class="body"><div class="name">${esc(p.text)}</div><div class="meta">Answered ${p.ansAt ? fmtDate(p.ansAt, { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div></div></div>`).join('')}</div></div>` : ''}`
+    : `<div class="card"><div class="row"><div><div class="eyebrow">Whole Bible</div><h2 style="margin:4px 0 0">${readCh} / ${totalCh} chapters</h2></div><span class="sp"></span>${ringSVG(readCh / totalCh, 70, Math.round(readCh / totalCh * 100) + '%')}</div></div>
+    <div class="card"><h2>Old Testament</h2><div class="books">${BIBLE.slice(0, 39).map(bookCard).join('')}</div></div>
+    <div class="card"><h2>New Testament</h2><div class="books">${BIBLE.slice(39).map(bookCard).join('')}</div></div>`}`;
+};
+ACT.faithTab = d => { UI.faithTab = d.k; render(); };
+ACT.form_prayer = f => { const t = f.p.value.trim(); if (!t) return; put('prayers', uid(), { text: t, date: today(), created: Date.now(), answered: false }); f.p.value = ''; render(true); };
+ACT.prayAns = d => { const p = S.prayers[d.id]; if (p) put('prayers', p.id, { ...p, answered: !p.answered, ansAt: !p.answered ? today() : null }); };
+ACT.prayDel = d => { const p = S.prayers[d.id]; if (p) confirmBox('Remove this prayer?', () => del('prayers', p.id), 'Remove'); };
+ACT.openBook = d => {
+  const [n, c] = BIBLE.find(b => b[0] === d.b), k = bookKey(n);
+  const draw = m => { const read = new Set((misc('bible').read || {})[k] || []); m.querySelector('#ch').innerHTML = Array.from({ length: c }, (_, i) => `<button class="${read.has(i + 1) ? 'on' : ''}" data-c="${i + 1}">${i + 1}</button>`).join(''); m.querySelector('#chn').textContent = read.size + ' / ' + c + ' read'; };
+  const save = arr => { const b = misc('bible'); put('misc', 'bible', { ...b, read: { ...(b.read || {}), [k]: arr } }); };
+  openModal(mh(n) + `<div class="row" style="margin-bottom:10px"><span class="mute small" id="chn"></span><span class="sp"></span><button class="btn sm" id="ch-all">Mark all</button><button class="btn sm ghost" id="ch-none">Clear</button></div><div class="chap" id="ch"></div><div class="actions"><button class="btn pri" data-act="close">Done</button></div>`, m => {
+    m.querySelector('#ch').onclick = e => { const b = e.target.closest('button'); if (!b) return; const read = new Set((misc('bible').read || {})[k] || []); const ch = +b.dataset.c; read.has(ch) ? read.delete(ch) : read.add(ch); save([...read].sort((a, b) => a - b)); draw(m); };
+    m.querySelector('#ch-all').onclick = () => { save(Array.from({ length: c }, (_, i) => i + 1)); draw(m); };
+    m.querySelector('#ch-none').onclick = () => { save([]); draw(m); };
+    draw(m);
+  });
+};
+
+/* ========== READING LIST ========== */
+UI.readTab = 'reading';
+VIEWS.reading = () => {
+  const bs = all('books'), y = today().slice(0, 4);
+  const by = s => bs.filter(b => (b.status || 'reading') === s).sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  const finY = bs.filter(b => b.status === 'finished' && (b.finished || '').startsWith(y));
+  const pagesY = sum(finY.map(b => num(b.pages) || 0)) + sum(by('reading').map(b => num(b.current) || 0));
+  const list = by(UI.readTab);
+  return `<div class="pagehead"><div><div class="eyebrow">Library</div><h1>Reading List</h1></div><button class="btn pri sm" data-act="editBook">${ICON.plus} Book</button></div>
+  <div class="grid g3 keep">${statCard('Reading now', by('reading').length)}${statCard('Finished ' + y, finY.length)}${statCard('Pages ' + y, pagesY.toLocaleString())}</div>
+  <div class="tabs">${[['reading', 'Reading'], ['want', 'Want to read'], ['finished', 'Finished']].map(([k, l]) => `<button class="${UI.readTab === k ? 'on' : ''}" data-act="readTab" data-k="${k}">${l} (${by(k).length})</button>`).join('')}</div>
+  <div class="grid g2">${list.map(b => { const p = num(b.pages), c = num(b.current) || 0, r = p ? Math.min(1, c / p) : (b.status === 'finished' ? 1 : 0);
+    return `<div class="card" style="cursor:pointer" data-act="editBook" data-id="${b.id}"><div class="row" style="align-items:flex-start"><div style="width:44px;height:62px;border-radius:5px;background:linear-gradient(160deg,#2a2416,#14120c);border:1px solid var(--gold3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);color:var(--gold);flex-shrink:0">${esc((b.title || '?')[0])}</div>
+     <div style="flex:1;min-width:0"><b style="font-size:15.5px">${esc(b.title)}</b><div class="small mute">${esc(b.author || '')}${b.category ? ' · ' + esc(b.category) : ''}</div>
+     ${b.status !== 'want' ? `<div class="bar" style="margin-top:8px"><i style="width:${r * 100}%"></i></div><div class="tiny mute" style="margin-top:4px">${p ? c + ' / ' + p + ' pages · ' + Math.round(r * 100) + '%' : ''}${b.rating ? ' · ' + '★'.repeat(b.rating) : ''}</div>` : ''}
+     ${b.lessons ? `<div class="small" style="margin-top:6px;color:#c9c4b6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(b.lessons)}</div>` : ''}</div></div></div>`; }).join('')}</div>
+  ${!list.length ? '<div class="card empty">Nothing here yet.</div>' : ''}`;
+};
+ACT.readTab = d => { UI.readTab = d.k; render(); };
+ACT.editBook = d => {
+  const b = d.id ? S.books[d.id] : { status: UI.readTab || 'reading', started: today() };
+  const st = { status: b.status || 'reading', rating: b.rating || 0 };
+  openModal(mh(d.id ? 'Book' : 'Add book') + `<input type="text" name="title" placeholder="Title" value="${esc(b.title || '')}">
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Author</label><input type="text" name="author" value="${esc(b.author || '')}"></div><div><label class="f">Category</label><input type="text" name="category" list="bk-c" value="${esc(b.category || '')}"><datalist id="bk-c">${['Faith', 'Business', 'Trading', 'Mindset', 'Biography', 'History', 'Health'].map(c => `<option value="${c}">`).join('')}</datalist></div></div>
+   <label class="f">Status</label><div class="seg" id="bk-s"><button data-v="reading">Reading</button><button data-v="want">Want to read</button><button data-v="finished">Finished</button></div>
+   <div class="grid g2 keep" style="gap:10px"><div><label class="f">Current page</label><input type="number" name="current" value="${esc(b.current || '')}"></div><div><label class="f">Total pages</label><input type="number" name="pages" value="${esc(b.pages || '')}"></div>
+   <div><label class="f">Started</label><input type="date" name="started" value="${esc(b.started || '')}"></div><div><label class="f">Finished</label><input type="date" name="finished" value="${esc(b.finished || '')}"></div></div>
+   <label class="f">Rating</label><div class="row" id="bk-r" style="font-size:24px;gap:4px;cursor:pointer">${[1, 2, 3, 4, 5].map(i => `<span data-v="${i}">★</span>`).join('')}</div>
+   <label class="f">Key lessons</label><textarea name="lessons" style="min-height:120px" placeholder="What did this book teach you?">${esc(b.lessons || '')}</textarea>
+   <div class="actions">${d.id ? '<button class="btn danger" id="bk-del">Delete</button><span class="sp"></span>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn pri" id="bk-save">Save</button></div>`, m => {
+    const sync = () => { m.querySelectorAll('#bk-s button').forEach(x => x.classList.toggle('on', x.dataset.v === st.status)); m.querySelectorAll('#bk-r span').forEach(s => s.style.color = +s.dataset.v <= st.rating ? '#d4ae5a' : '#2e3342'); };
+    m.querySelector('#bk-s').onclick = e => { const x = e.target.closest('button'); if (x) { e.preventDefault(); st.status = x.dataset.v; if (st.status === 'finished') { const f = m.querySelector('[name=finished]'); if (!f.value) f.value = today(); const p = m.querySelector('[name=pages]').value; if (p) m.querySelector('[name=current]').value = p; } sync(); } };
+    m.querySelector('#bk-r').onclick = e => { const s = e.target.closest('span'); if (s) { st.rating = +s.dataset.v === st.rating ? 0 : +s.dataset.v; sync(); } };
+    m.querySelector('#bk-save').onclick = () => { const title = fv(m, 'title'); if (!title) return; put('books', b.id || uid(), { ...b, title, author: fv(m, 'author'), category: fv(m, 'category'), status: st.status, current: fv(m, 'current'), pages: fv(m, 'pages'), started: fv(m, 'started'), finished: fv(m, 'finished'), rating: st.rating, lessons: fv(m, 'lessons'), updated: Date.now() }); closeModal(); };
+    const dl = m.querySelector('#bk-del'); if (dl) dl.onclick = () => confirmBox('Delete “' + b.title + '”?', () => del('books', b.id));
+    sync();
+  });
+};
+
+/* ========== FOCUS TIMER ========== */
+const FKEY = 'em-focus';
+const F = (() => { try { return JSON.parse(localStorage.getItem(FKEY) || 'null') || {}; } catch (e) { return {}; } })();
+F.dur = F.dur || 50; F.label = F.label || '';
+const fSave = () => { try { localStorage.setItem(FKEY, JSON.stringify(F)); } catch (e) { } };
+function fRemaining() { if (F.endAt) return Math.max(0, F.endAt - Date.now()); if (F.left != null) return F.left; return F.dur * 6e4; }
+let audioCtx = null;
+function beep() { try { if (!audioCtx) return; [0, .35, .7].forEach(t => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(.0001, audioCtx.currentTime + t); g.gain.exponentialRampToValueAtTime(.3, audioCtx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + t + .3); o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + .32); }); } catch (e) { } }
+function fFinish() {
+  const mins = F.dur, d = today(), day = S.days[d] || { done: {} };
+  put('days', d, { ...day, focus: (day.focus || 0) + mins, sessions: [...(day.sessions || []), { label: F.label || 'Deep work', min: mins, at: new Date().toTimeString().slice(0, 5) }] });
+  F.endAt = null; F.left = null; fSave(); beep(); toast('Focus session complete — ' + mins + ' min logged 👑'); if (UI.view === 'focus') render();
+}
+setInterval(() => {
+  if (F.endAt && Date.now() >= F.endAt) { if (SYNC.loaded.size === COLS.length) fFinish(); return; }
+  const el = $('#ftime'); if (el) { const r = fRemaining(); el.textContent = pad(Math.floor(r / 6e4)) + ':' + pad(Math.floor(r / 1000) % 60); const ring = $('#fring'); if (ring) ring.setAttribute('stroke-dashoffset', ring.dataset.c * (r / (F.dur * 6e4))); }
+}, 500);
+VIEWS.focus = () => {
+  const r = fRemaining(), running = !!F.endAt, paused = !F.endAt && F.left != null, C = 2 * Math.PI * 108;
+  const d = today(), td = S.days[d] || {};
+  let week = 0, bars = ''; const last7 = [];
+  for (let i = 6; i >= 0; i--) { const k = addDays(d, -i), m = (S.days[k] && S.days[k].focus) || 0; last7.push([k, m]); if (k >= weekStart(d)) week += m; }
+  const mx = Math.max(60, ...last7.map(x => x[1]));
+  bars = last7.map(([k, m]) => `<div style="flex:1;text-align:center"><div style="height:90px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;height:${m / mx * 100}%;min-height:2px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--gold2),var(--gold3))"></div></div><div class="tiny mute" style="margin-top:4px">${DOW[dow(k)]}</div><div class="tiny">${m ? minsToHM(m) : ''}</div></div>`).join('');
+  return `<div class="pagehead"><div><div class="eyebrow">Focus Timer</div><h1>Deep Work</h1></div></div>
+  <div class="grid g2"><div class="card gold" style="text-align:center">
+    <input type="text" data-chg="fLabel" value="${esc(F.label)}" placeholder="What are you working on?" style="text-align:center;max-width:340px;margin:0 auto 6px" ${running ? 'disabled' : ''}>
+    <div class="timer"><svg viewBox="0 0 240 240" style="width:100%;height:100%"><circle cx="120" cy="120" r="108" fill="none" stroke="#1c1f27" stroke-width="9"/><circle id="fring" data-c="${C}" cx="120" cy="120" r="108" fill="none" stroke="url(#rg2)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (r / (F.dur * 6e4))}" transform="rotate(-90 120 120)"/><defs><linearGradient id="rg2"><stop offset="0" stop-color="#9c7a2f"/><stop offset="1" stop-color="#f1d48c"/></linearGradient></defs></svg>
+     <div class="tt"><div class="big" id="ftime">${pad(Math.floor(r / 6e4))}:${pad(Math.floor(r / 1000) % 60)}</div><div class="tiny mute">${running ? 'Stay locked in' : paused ? 'Paused' : F.dur + ' min session'}</div></div></div>
+    ${!running && !paused ? `<div class="seg" style="margin-bottom:12px">${[25, 50, 90].map(m => `<button class="${F.dur === m ? 'on' : ''}" data-act="fDur" data-m="${m}">${m} min</button>`).join('')}<button class="${![25, 50, 90].includes(F.dur) ? 'on' : ''}" data-act="fCustom">Custom</button></div>` : ''}
+    <div class="row" style="justify-content:center">${running ? '<button class="btn" data-act="fPause">Pause</button>' : `<button class="btn pri" data-act="fStart">${paused ? 'Resume' : 'Start focus'}</button>`}${running || paused ? '<button class="btn ghost" data-act="fReset">Reset</button>' : ''}${running || paused ? '<button class="btn ghost" data-act="fDone">Finish now</button>' : ''}</div>
+    <div class="tiny mute" style="margin-top:12px">Keep this tab open for the alarm. Minutes are logged to today when the session ends.</div></div>
+   <div><div class="grid g2 keep">${statCard('Today', minsToHM(td.focus || 0))}${statCard('This week', minsToHM(week))}</div>
+    <div class="card"><h2>Last 7 days</h2><div style="display:flex;gap:4px">${bars}</div></div>
+    <div class="card"><h2>Today's sessions</h2><div class="list">${(td.sessions || []).slice().reverse().map(s => `<div class="row small" style="padding:7px 0"><span class="mute">${s.at}</span><span style="flex:1">${esc(s.label)}</span><b>${minsToHM(s.min)}</b></div>`).join('') || '<div class="empty small">No sessions yet today.</div>'}</div></div></div></div>`;
+};
+ACT.fLabel = (d, el) => { F.label = el.value; fSave(); };
+ACT.fDur = d => { F.dur = +d.m; F.left = null; fSave(); render(); };
+ACT.fCustom = () => openModal(mh('Custom length') + `<input type="number" id="fc" min="1" max="600" value="${F.dur}"><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="fc-s">Set</button></div>`, m => m.querySelector('#fc-s').onclick = () => { const v = Math.round(+m.querySelector('#fc').value); if (v > 0) { F.dur = Math.min(600, v); F.left = null; fSave(); } closeModal(); render(); });
+ACT.fStart = () => { try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume && audioCtx.resume(); } catch (e) { } const lab = $('[data-chg=fLabel]'); if (lab) F.label = lab.value; F.endAt = Date.now() + (F.left != null ? F.left : F.dur * 6e4); F.left = null; fSave(); render(); };
+ACT.fPause = () => { F.left = fRemaining(); F.endAt = null; fSave(); render(); };
+ACT.fReset = () => { F.endAt = null; F.left = null; fSave(); render(); };
+ACT.fDone = () => { const elapsed = F.dur * 6e4 - fRemaining(); const mins = Math.max(1, Math.round(elapsed / 6e4)); const full = F.dur; F.dur = mins; fFinish(); F.dur = full; fSave(); };
+
+/* ========== WEEKLY REVIEW ========== */
+VIEWS.review = () => {
+  const ws = UI.revWeek || weekStart(today()), we = addDays(ws, 6), rv = S.reviews[ws] || {};
+  let due = 0, done = 0, active = 0, focus = 0, perfect = 0;
+  for (let d = ws; d <= we && d <= today(); d = addDays(d, 1)) { const r = dayRatio(d); due += r.due; done += r.done; if (r.done) active++; if (r.due && r.r >= 1) perfect++; focus += (S.days[d] && S.days[d].focus) || 0; }
+  const tr = all('trades').filter(t => tradeDate(t) >= ws && tradeDate(t) <= we), s = computeStats(tr);
+  const msDone = []; all('goals').forEach(g => (g.milestones || []).forEach(m => { if (m.done && m.doneAt >= ws && m.doneAt <= we) msDone.push(g.title + ' — ' + m.title); }));
+  const bkDone = all('books').filter(b => b.status === 'finished' && b.finished >= ws && b.finished <= we);
+  const ch = [];
+  for (let d = ws; d <= we; d = addDays(d, 1)) { const r = dayRatio(d); ch.push(`<div style="flex:1;text-align:center"><div style="height:70px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;height:${r.r * 100}%;min-height:2px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--gold2),var(--gold3))"></div></div><div class="tiny mute">${DOW[dow(d)]}</div></div>`); }
+  const past = all('reviews').filter(x => x.id !== ws).sort((a, b) => b.id.localeCompare(a.id)).slice(0, 8);
+  return `<div class="pagehead"><div><div class="eyebrow">Weekly Review</div><h1>${fmtDate(ws, { day: 'numeric', month: 'short' })} – ${fmtDate(we, { day: 'numeric', month: 'short' })}</h1></div><div class="row"><button class="iconbtn" data-act="revW" data-d="-7">${ICON.left}</button>${ws !== weekStart(today()) ? '<button class="btn sm" data-act="revW" data-d="0">This week</button>' : ''}<button class="iconbtn" data-act="revW" data-d="7">${ICON.right}</button></div></div>
+  <div class="grid g4 keep">${statCard('Tasks done', done + '/' + due, due ? pct(done / due, 0) + ' completion' : '')}${statCard('Active days', active + '/7', perfect + ' perfect days')}${statCard('Focus', minsToHM(focus))}${statCard('Trading P&L', tr.length ? money(s.net, true) : '–', tr.length ? s.n + ' trades · WR ' + pct(s.winRate, 0) : 'no trades', cls(s.net))}</div>
+  <div class="grid g2"><div class="card"><h2>Daily completion</h2><div style="display:flex;gap:4px">${ch.join('')}</div></div>
+   <div class="card"><h2>Wins this week</h2><div class="small">${msDone.map(x => '<div>◎ ' + esc(x) + '</div>').join('')}${bkDone.map(b => '<div>📖 Finished ' + esc(b.title) + '</div>').join('')}${!msDone.length && !bkDone.length ? '<span class="mute">No milestones or books finished this week.</span>' : ''}
+   <div style="margin-top:8px">🔥 Streak: <b>${streakInfo().cur}</b> days · ${pieceName(pieceIndex(streakInfo().record))}</div></div></div></div>
+  <div class="card gold"><h2>Reflection</h2>
+   <label class="f">What went well? Biggest wins</label><textarea data-chg="revText" data-f="wins" data-w="${ws}">${esc(rv.wins || '')}</textarea>
+   <label class="f">What didn't go well? Lessons</label><textarea data-chg="revText" data-f="lessons" data-w="${ws}">${esc(rv.lessons || '')}</textarea>
+   <label class="f">Main focus for next week</label><textarea data-chg="revText" data-f="next" data-w="${ws}">${esc(rv.next || '')}</textarea>
+   <label class="f">Rate this week</label><div class="seg">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `<button class="${rv.rating === i ? 'on' : ''}" data-act="revRate" data-w="${ws}" data-v="${i}">${i}</button>`).join('')}</div></div>
+  ${past.length ? `<div class="card"><h2>Past reviews</h2><div class="list">${past.map(p => `<div class="row" style="padding:9px 0;cursor:pointer" data-act="revW" data-set="${p.id}"><span style="flex:1">Week of ${fmtDate(p.id, { day: 'numeric', month: 'short', year: 'numeric' })}</span>${p.rating ? `<span class="pill g">${p.rating}/10</span>` : ''}</div>`).join('')}</div></div>` : ''}`;
+};
+ACT.revW = d => { if (d.set) UI.revWeek = d.set; else UI.revWeek = d.d === '0' ? weekStart(today()) : addDays(UI.revWeek || weekStart(today()), +d.d); render(); };
+ACT.revText = (d, el) => { const r = S.reviews[d.w] || {}; if ((r[d.f] || '') === el.value) return; put('reviews', d.w, { ...r, [d.f]: el.value }); toast('Saved'); };
+ACT.revRate = d => { const r = S.reviews[d.w] || {}; put('reviews', d.w, { ...r, rating: +d.v }); };
+
+/* ========== SETTINGS & DATA ========== */
+function exportJSON() { const out = {}; COLS.forEach(c => { out[c] = {}; Object.values(S[c]).forEach(x => { const b = { ...x }; delete b.id; out[c][x.id] = b; }); }); return JSON.stringify({ app: 'emperors-mind', v: 1, exported: new Date().toISOString(), data: out }); }
+async function bulkImport(data) { let n = 0; for (const c of COLS) for (const [id, body] of Object.entries(data[c] || {})) { put(c, id, body); n++; await new Promise(r => setTimeout(r, 15)); } return n; }
+VIEWS.settings = () => {
+  const counts = COLS.map(c => [c, Object.keys(S[c]).length]).filter(x => x[1]);
+  const acct = typeof accountCard === 'function' ? accountCard() : '';
+  return `<div class="pagehead"><div><div class="eyebrow">Settings</div><h1>Settings & Data</h1></div></div>
+  ${acct}
+  <div class="card"><h2>Export your data</h2><p class="small mute">Copies everything (tasks, streak history, trades, goals, journal…) as one block of text. Use it to move to the new app or as a backup.</p>
+   <div class="row wrap"><button class="btn pri" data-act="exportCopy">Copy all data</button>${typeof SB !== 'undefined' ? '<button class="btn" data-act="exportFile">Download backup file</button>' : ''}</div>
+   <div class="tiny mute" style="margin-top:8px">${counts.map(([c, n]) => c + ': ' + n).join(' · ') || 'No data yet.'}</div></div>
+  <div class="card"><h2>Import data</h2><p class="small mute">Paste data you copied from the other version. Items with the same ID are overwritten; nothing else is deleted.</p>
+   <textarea id="imp" placeholder="Paste here…" style="min-height:90px"></textarea><div class="row" style="margin-top:8px"><button class="btn pri" data-act="importRun">Import</button><span class="small mute" id="impmsg"></span></div></div>`;
+};
+ACT.exportCopy = async () => { try { await navigator.clipboard.writeText(exportJSON()); toast('Copied all data to clipboard'); } catch (e) { openModal(mh('Copy your data') + '<p class="small mute">Select all and copy:</p><textarea style="min-height:220px" onfocus="this.select()">' + esc(exportJSON()) + '</textarea>'); } };
+ACT.exportFile = () => { const b = new Blob([exportJSON()], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'emperors-mind-backup-' + today() + '.json'; document.body.appendChild(a); a.click(); a.remove(); };
+ACT.importRun = async () => {
+  const ta = $('#imp'), msg = $('#impmsg'); let j;
+  try { j = JSON.parse(ta.value.trim()); } catch (e) { msg.textContent = 'That doesn\'t look like exported data.'; return; }
+  const data = j && j.data ? j.data : j; if (!data || typeof data !== 'object') { msg.textContent = 'Nothing to import.'; return; }
+  msg.textContent = 'Importing…';
+  try { const n = await bulkImport(data); ta.value = ''; msg.textContent = ''; toast('Imported ' + n + ' items 👑'); render(true); } catch (e) { console.error(e); msg.textContent = 'Import failed: ' + (e.message || e); }
+};
+
+/* ========== Supabase sync (standalone app build) — overrides the Claude-db store ========== */
+const SB_URL = 'https://npmlicuclezcptclwysv.supabase.co';
+const SB_KEY = 'sb_publishable_UxONMwXf1HQWvS1js6GF1g_z5ERc14Y';
+const SB = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+let SESSION = null, AUTH_READY = false, CHANNEL = null;
+const QKEY = 'em-queue', CKEY = 'em-cache-';
+let Q = (() => { try { return JSON.parse(localStorage.getItem(QKEY) || '{}'); } catch (e) { return {}; } })();
+const saveQ = () => { try { localStorage.setItem(QKEY, JSON.stringify(Q)); } catch (e) { } };
+let cacheT = null;
+function saveCache() { if (!SESSION) return; clearTimeout(cacheT); cacheT = setTimeout(() => { try { localStorage.setItem(CKEY + SESSION.user.id, JSON.stringify(S)); } catch (e) { } }, 400); }
+function loadCache(uid) { try { const j = JSON.parse(localStorage.getItem(CKEY + uid) || 'null'); if (j) COLS.forEach(c => S[c] = j[c] || {}); return !!j; } catch (e) { return false; } }
+const qkey = (c, id) => c + '/' + id;
+function applyQueue() { Object.values(Q).forEach(it => { if (it.op === 'set') S[it.col][it.id] = { ...it.data, id: it.id }; else delete S[it.col][it.id]; }); }
+
+function put(col, id, data) {
+  const body = JSON.parse(JSON.stringify({ ...data })); delete body.id;
+  S[col][id] = { ...body, id }; Q[qkey(col, id)] = { op: 'set', col, id, data: body, t: Date.now() }; saveQ(); saveCache(); scheduleRender(); flush(); return id;
+}
+function del(col, id) { delete S[col][id]; Q[qkey(col, id)] = { op: 'del', col, id, t: Date.now() }; saveQ(); saveCache(); scheduleRender(); flush(); }
+
+let flushing = false, flushAgain = false, retryT = null;
+async function flush() {
+  if (!SESSION) return; if (flushing) { flushAgain = true; return; }
+  flushing = true; clearTimeout(retryT);
+  try {
+    for (const k of Object.keys(Q)) {
+      const it = Q[k]; if (!it) continue; let r;
+      if (it.op === 'set') r = await SB.from('docs').upsert({ user_id: SESSION.user.id, col: it.col, id: it.id, data: it.data, updated_at: new Date().toISOString() });
+      else r = await SB.from('docs').delete().match({ user_id: SESSION.user.id, col: it.col, id: it.id });
+      if (r.error) throw r.error;
+      if (Q[k] === it) { delete Q[k]; saveQ(); }
+    }
+    SYNC.mode = 'cloud'; SYNC.offline = false;
+  } catch (e) { console.warn('sync', e); SYNC.offline = true; retryT = setTimeout(flush, 8000); }
+  flushing = false; scheduleRender();
+  if (flushAgain) { flushAgain = false; flush(); }
+}
+window.addEventListener('online', () => flush());
+
+async function loadAll() {
+  const fresh = {}; COLS.forEach(c => fresh[c] = {});
+  let from = 0;
+  while (true) {
+    const { data, error } = await SB.from('docs').select('col,id,data').range(from, from + 999);
+    if (error) throw error;
+    data.forEach(r => { if (fresh[r.col]) fresh[r.col][r.id] = { ...r.data, id: r.id }; });
+    if (data.length < 1000) break; from += 1000;
+  }
+  COLS.forEach(c => S[c] = fresh[c]); applyQueue(); COLS.forEach(c => SYNC.loaded.add(c)); saveCache();
+}
+function subscribe() {
+  if (CHANNEL) SB.removeChannel(CHANNEL);
+  CHANNEL = SB.channel('docs-' + SESSION.user.id).on('postgres_changes', { event: '*', schema: 'public', table: 'docs', filter: 'user_id=eq.' + SESSION.user.id }, p => {
+    const row = p.eventType === 'DELETE' ? p.old : p.new; if (!row || !S[row.col]) return;
+    if (Q[qkey(row.col, row.id)]) return;
+    if (p.eventType === 'DELETE') delete S[row.col][row.id]; else S[row.col][row.id] = { ...row.data, id: row.id };
+    saveCache(); scheduleRender();
+  }).subscribe();
+}
+async function startSession(sess) {
+  SESSION = sess; SYNC.loaded = new Set();
+  if (loadCache(sess.user.id)) { applyQueue(); COLS.forEach(c => SYNC.loaded.add(c)); }
+  SYNC.mode = 'connecting'; render(true);
+  try { await loadAll(); SYNC.mode = 'cloud'; SYNC.offline = false; } catch (e) { console.warn(e); SYNC.offline = true; if (!SYNC.loaded.size) COLS.forEach(c => SYNC.loaded.add(c)); }
+  subscribe(); flush(); render(true);
+}
+async function initStore() {
+  SB.auth.onAuthStateChange((ev, sess) => {
+    if (ev === 'SIGNED_OUT') { SESSION = null; COLS.forEach(c => S[c] = {}); if (CHANNEL) SB.removeChannel(CHANNEL); render(true); return; }
+    if (sess && (!SESSION || SESSION.user.id !== sess.user.id)) { AUTH_READY = true; startSession(sess); }
+    else if (sess) SESSION = sess;
+  });
+  const { data } = await SB.auth.getSession();
+  AUTH_READY = true;
+  if (data.session) { if (!SESSION) startSession(data.session); } else render(true);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && SESSION) { loadAll().then(() => render()).catch(() => { }); flush(); } });
+
+/* sync label override */
+function syncLabel() { return SYNC.offline ? '<span class="dot warn"></span>Offline — will sync' : Object.keys(Q).length ? '<span class="dot warn"></span>Saving…' : SYNC.mode === 'cloud' ? '<span class="dot on"></span>Synced' : '<span class="dot"></span>Connecting…'; }
+
+/* login gate */
+UI.authMode = 'in';
+function gate() {
+  if (SESSION) return false;
+  document.body.classList.add('gated');
+  $('#side').innerHTML = ''; $('#nav').innerHTML = '';
+  const signup = UI.authMode === 'up';
+  $('#main').innerHTML = !AUTH_READY ? `<div class="login"><img src="${EAGLE}" alt=""></div>` : `<div class="login">
+    <img src="${EAGLE}" alt="">
+    <div class="eyebrow" style="letter-spacing:.35em">Member access</div>
+    <h1>Emperor's Mind</h1>
+    <p class="mute small">${signup ? 'Create your account. You only do this once.' : 'Sign in to enter your headquarters.'}</p>
+    <form data-form="auth" class="login-form">
+      <input type="email" name="email" placeholder="you@domain.com" autocomplete="email" required>
+      <input type="password" name="pw" placeholder="Password${signup ? ' (min. 6 characters)' : ''}" autocomplete="${signup ? 'new-password' : 'current-password'}" required minlength="6">
+      <button class="btn pri" type="submit" style="width:100%;letter-spacing:.25em">${signup ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
+      <div class="small" id="authmsg" style="min-height:20px;margin-top:6px"></div>
+    </form>
+    <button class="btn ghost sm" data-act="authToggle">${signup ? 'I already have an account → Sign in' : 'First time here? Create account'}</button>
+    ${!signup ? '<button class="btn ghost sm" data-act="authReset" style="margin-top:4px">Forgot password?</button>' : ''}
+  </div>`;
+  return true;
+}
+ACT.authToggle = () => { UI.authMode = UI.authMode === 'up' ? 'in' : 'up'; render(true); };
+ACT.form_auth = async f => {
+  const email = f.email.value.trim(), pw = f.pw.value, msg = $('#authmsg'), btn = f.querySelector('button');
+  btn.disabled = true; msg.className = 'small mute'; msg.textContent = 'One moment…';
+  try {
+    if (UI.authMode === 'up') {
+      const { data, error } = await SB.auth.signUp({ email, password: pw, options: { emailRedirectTo: location.origin + location.pathname } });
+      if (error) throw error;
+      if (!data.session) { UI.authMode = 'in'; render(true); const m = $('#authmsg'); m.className = 'small goldt'; m.textContent = 'Check your email and tap the confirmation link, then sign in here.'; return; }
+    } else {
+      const { error } = await SB.auth.signInWithPassword({ email, password: pw });
+      if (error) throw error;
+    }
+  } catch (e) { msg.className = 'small neg'; msg.textContent = e.message || 'Something went wrong'; btn.disabled = false; }
+};
+ACT.authReset = async () => {
+  const em = $('[name=email]'); const email = em && em.value.trim(); const msg = $('#authmsg');
+  if (!email) { msg.className = 'small neg'; msg.textContent = 'Type your email first.'; return; }
+  const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+  msg.className = error ? 'small neg' : 'small goldt'; msg.textContent = error ? error.message : 'Password reset email sent.';
+};
+/* password recovery link lands here */
+SB.auth.onAuthStateChange((ev) => {
+  if (ev === 'PASSWORD_RECOVERY') setTimeout(() => openModal(mh('Set a new password') + '<input type="password" id="np" placeholder="New password" minlength="6"><div class="actions"><button class="btn pri" id="np-s">Save</button></div>', m => m.querySelector('#np-s').onclick = async () => { const { error } = await SB.auth.updateUser({ password: m.querySelector('#np').value }); toast(error ? error.message : 'Password updated'); if (!error) closeModal(); }), 300);
+});
+
+function accountCard() {
+  return `<div class="card gold"><div class="row"><div><div class="eyebrow">Account</div><div style="margin-top:4px">${esc(SESSION ? SESSION.user.email : '')}</div><div class="tiny mute" style="margin-top:2px">${syncLabel()}</div></div><span class="sp"></span><button class="btn sm" data-act="signOut">Sign out</button></div></div>
+  <div class="card"><h2>Install on your devices</h2><div class="small mute"><b style="color:var(--text)">iPhone:</b> open this page in Safari → Share → <i>Add to Home Screen</i>.<br><b style="color:var(--text)">Mac:</b> Safari → File → <i>Add to Dock</i> (or Chrome → ⋮ → <i>Cast, save and share → Install page as app</i>).<br>Sign in once on each device — everything syncs automatically.</div></div>`;
+}
+ACT.signOut = () => confirmBox('Sign out on this device?', async () => { await SB.auth.signOut(); }, 'Sign out');
+
+async function bulkImport(data) {
+  if (!SESSION) throw new Error('Not signed in');
+  const rows = []; COLS.forEach(c => Object.entries(data[c] || {}).forEach(([id, body]) => { const b = { ...body }; delete b.id; rows.push({ user_id: SESSION.user.id, col: c, id, data: b, updated_at: new Date().toISOString() }); }));
+  for (let i = 0; i < rows.length; i += 300) { const { error } = await SB.from('docs').upsert(rows.slice(i, i + 300)); if (error) throw error; }
+  await loadAll(); return rows.length;
+}
+
+/* ========== boot ========== */
+(function boot() {
+  const h = (location.hash || '').slice(1);
+  if (h && (VIEWS[h])) UI.view = h;
+  window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (VIEWS[v] && v !== UI.view) { UI.view = v; render(); } });
+  render();
+  initStore();
+  let lastDay = today();
+  setInterval(() => { if (today() !== lastDay) { lastDay = today(); render(); } }, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+})();
+
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script></body></html>
