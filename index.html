@@ -451,16 +451,18 @@ function tasksForDate(date) {
   const once = all('tasks').filter(t => t.kind === 'once' && !t.archived && ((!t.done && (!t.date || t.date <= date)) || (t.done && t.doneAt === date)));
   return { rep, once };
 }
+const restDays = () => { const r = misc('profile').restDays; return Array.isArray(r) ? r : [0]; };
+const isRestDay = date => restDays().includes(dow(date));
 function streakInfo() {
   const t = today();
-  let d = activeDay(t) ? t : addDays(t, -1), cur = 0;
-  while (activeDay(d) && cur < 5000) { cur++; d = addDays(d, -1); }
+  let d = activeDay(t) ? t : addDays(t, -1), cur = 0, guard = 0;
+  while (guard++ < 6000) { if (activeDay(d)) cur++; else if (!isRestDay(d)) break; d = addDays(d, -1); }
   const dates = Object.keys(S.days).filter(activeDay).sort();
-  let best = 0, run = 0, prev = null;
-  for (const x of dates) { run = prev && diffDays(prev, x) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = x; }
+  let best = 0, run = 0;
+  if (dates.length) for (let x = dates[0], g = 0; x <= t && g < 6000; x = addDays(x, 1), g++) { if (activeDay(x)) { run++; best = Math.max(best, run); } else if (!isRestDay(x)) run = 0; }
   const storedBest = misc('profile').bestStreak || 0;
   const record = Math.max(best, cur, storedBest);
-  return { cur, record, todayActive: activeDay(t) };
+  return { cur, record, todayActive: activeDay(t), restToday: isRestDay(t) };
 }
 function taskStreak(t) {
   if (t.kind === 'once') return 0;
@@ -468,7 +470,7 @@ function taskStreak(t) {
   if (!isDoneOn(t, d)) d = addDays(d, -1);
   while (guard++ < 2000) {
     if (d < (t.start || d)) break;
-    if (isDue(t, d)) { if (isDoneOn(t, d)) n++; else break; }
+    if (isDue(t, d)) { if (isDoneOn(t, d)) n++; else if (!isRestDay(d)) break; }
     d = addDays(d, -1);
   }
   return n;
@@ -1262,19 +1264,22 @@ const FKEY = 'em-focus';
 const F = (() => { try { return JSON.parse(localStorage.getItem(FKEY) || 'null') || {}; } catch (e) { return {}; } })();
 F.dur = F.dur || 50; F.label = F.label || '';
 const fSave = () => { try { localStorage.setItem(FKEY, JSON.stringify(F)); } catch (e) { } };
+/* tell the server when the session ends, so it can send the alarm even if the app is closed */
+const fSync = () => { try { const cur = misc('focus'); const endAt = F.endAt || null; if ((cur.endAt || null) !== endAt) put('misc', 'focus', { endAt, label: F.label || 'Deep work', dur: F.dur }); } catch (e) { } };
 function fRemaining() { if (F.endAt) return Math.max(0, F.endAt - Date.now()); if (F.left != null) return F.left; return F.dur * 6e4; }
 let audioCtx = null;
 function beep() { try { if (!audioCtx) return; [0, .35, .7].forEach(t => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(.0001, audioCtx.currentTime + t); g.gain.exponentialRampToValueAtTime(.3, audioCtx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + t + .3); o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + .32); }); } catch (e) { } }
 function fFinish() {
   const mins = F.dur, d = today(), day = S.days[d] || { done: {} };
   put('days', d, { ...day, focus: (day.focus || 0) + mins, sessions: [...(day.sessions || []), { label: F.label || 'Deep work', min: mins, at: new Date().toTimeString().slice(0, 5) }] });
-  F.endAt = null; F.left = null; fSave(); beep(); toast('Focus session complete — ' + mins + ' min logged 👑'); if (UI.view === 'focus') render();
+  F.endAt = null; F.left = null; fSave(); fSync(); beep(); toast('Focus session complete — ' + mins + ' min logged 👑'); if (UI.view === 'focus') render();
 }
 setInterval(() => {
   if (F.endAt && Date.now() >= F.endAt) { if (SYNC.loaded.size === COLS.length) fFinish(); return; }
   const el = $('#ftime'); if (el) { const r = fRemaining(); el.textContent = pad(Math.floor(r / 6e4)) + ':' + pad(Math.floor(r / 1000) % 60); const ring = $('#fring'); if (ring) ring.setAttribute('stroke-dashoffset', ring.dataset.c * (r / (F.dur * 6e4))); }
 }, 500);
 VIEWS.focus = () => {
+  if (typeof pushRefresh === 'function') setTimeout(pushRefresh, 0);
   const r = fRemaining(), running = !!F.endAt, paused = !F.endAt && F.left != null, C = 2 * Math.PI * 108;
   const d = today(), td = S.days[d] || {};
   let week = 0, bars = ''; const last7 = [];
@@ -1288,7 +1293,7 @@ VIEWS.focus = () => {
      <div class="tt"><div class="big" id="ftime">${pad(Math.floor(r / 6e4))}:${pad(Math.floor(r / 1000) % 60)}</div><div class="tiny mute">${running ? 'Stay locked in' : paused ? 'Paused' : F.dur + ' min session'}</div></div></div>
     ${!running && !paused ? `<div class="seg" style="margin-bottom:12px">${[25, 50, 90].map(m => `<button class="${F.dur === m ? 'on' : ''}" data-act="fDur" data-m="${m}">${m} min</button>`).join('')}<button class="${![25, 50, 90].includes(F.dur) ? 'on' : ''}" data-act="fCustom">Custom</button></div>` : ''}
     <div class="row" style="justify-content:center">${running ? '<button class="btn" data-act="fPause">Pause</button>' : `<button class="btn pri" data-act="fStart">${paused ? 'Resume' : 'Start focus'}</button>`}${running || paused ? '<button class="btn ghost" data-act="fReset">Reset</button>' : ''}${running || paused ? '<button class="btn ghost" data-act="fDone">Finish now</button>' : ''}</div>
-    <div class="tiny mute" style="margin-top:12px">Keep this tab open for the alarm. Minutes are logged to today when the session ends.</div></div>
+    <div class="tiny mute" style="margin-top:12px">${typeof FN_URL !== 'undefined' ? (UI.push === 'on' ? 'You can close the app — a notification will tell you when the session ends.' : 'Turn on notifications in Settings to get the alarm even when the app is closed.') : 'Keep this tab open for the alarm.'} Minutes are logged to today when the session ends.</div></div>
    <div><div class="grid g2 keep">${statCard('Today', minsToHM(td.focus || 0))}${statCard('This week', minsToHM(week))}</div>
     <div class="card"><h2>Last 7 days</h2><div style="display:flex;gap:4px">${bars}</div></div>
     <div class="card"><h2>Today's sessions</h2><div class="list">${(td.sessions || []).slice().reverse().map(s => `<div class="row small" style="padding:7px 0"><span class="mute">${s.at}</span><span style="flex:1">${esc(s.label)}</span><b>${minsToHM(s.min)}</b></div>`).join('') || '<div class="empty small">No sessions yet today.</div>'}</div></div></div></div>`;
@@ -1296,10 +1301,42 @@ VIEWS.focus = () => {
 ACT.fLabel = (d, el) => { F.label = el.value; fSave(); };
 ACT.fDur = d => { F.dur = +d.m; F.left = null; fSave(); render(); };
 ACT.fCustom = () => openModal(mh('Custom length') + `<input type="number" id="fc" min="1" max="600" value="${F.dur}"><div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="fc-s">Set</button></div>`, m => m.querySelector('#fc-s').onclick = () => { const v = Math.round(+m.querySelector('#fc').value); if (v > 0) { F.dur = Math.min(600, v); F.left = null; fSave(); } closeModal(); render(); });
-ACT.fStart = () => { try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume && audioCtx.resume(); } catch (e) { } const lab = $('[data-chg=fLabel]'); if (lab) F.label = lab.value; F.endAt = Date.now() + (F.left != null ? F.left : F.dur * 6e4); F.left = null; fSave(); render(); };
-ACT.fPause = () => { F.left = fRemaining(); F.endAt = null; fSave(); render(); };
-ACT.fReset = () => { F.endAt = null; F.left = null; fSave(); render(); };
+ACT.fStart = () => { try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume && audioCtx.resume(); } catch (e) { } const lab = $('[data-chg=fLabel]'); if (lab) F.label = lab.value; F.endAt = Date.now() + (F.left != null ? F.left : F.dur * 6e4); F.left = null; fSave(); fSync(); render(); };
+ACT.fPause = () => { F.left = fRemaining(); F.endAt = null; fSave(); fSync(); render(); };
+ACT.fReset = () => { F.endAt = null; F.left = null; fSave(); fSync(); render(); };
 ACT.fDone = () => { const elapsed = F.dur * 6e4 - fRemaining(); const mins = Math.max(1, Math.round(elapsed / 6e4)); const full = F.dur; F.dur = mins; fFinish(); F.dur = full; fSave(); };
+
+/* ========== period stats (weekly review + monthly report) ========== */
+function periodStats(from, to) {
+  const end = to < today() ? to : today();
+  let due = 0, done = 0, active = 0, perfect = 0, focus = 0, best = null;
+  for (let d = from; d <= end; d = addDays(d, 1)) { const r = dayRatio(d); due += r.due; done += r.done; if (r.done) active++; if (r.due && r.r >= 1) perfect++; focus += (S.days[d] && S.days[d].focus) || 0; if (r.due && (!best || r.r > best.r)) best = { d, r: r.r }; }
+  const tr = all('trades').filter(t => tradeDate(t) >= from && tradeDate(t) <= to), st = computeStats(tr);
+  const missed = all('tasks').filter(t => t.kind !== 'once').map(t => { let dd = 0, dn = 0; for (let d = from; d <= end; d = addDays(d, 1)) { if (!isDue(t, d)) continue; const ok = isDoneOn(t, d); if (!ok && (d === today() || isRestDay(d))) continue; dd++; if (ok) dn++; } return { t, dd, dn, miss: dd - dn }; }).filter(x => x.miss > 0).sort((a, b) => b.miss - a.miss || a.dn / a.dd - b.dn / b.dd);
+  return { due, done, rate: due ? done / due : null, active, perfect, focus, best, trades: tr.length, pnl: tr.length ? st.net : 0, winRate: st.winRate, missed };
+}
+/* best streak reached up to a given date (rest days respected) */
+function recordUpTo(date) {
+  const dates = Object.keys(S.days).filter(activeDay).sort(); let best = 0, run = 0;
+  if (dates.length) for (let x = dates[0], g = 0; x <= date && g < 6000; x = addDays(x, 1), g++) { if (activeDay(x)) { run++; best = Math.max(best, run); } else if (!isRestDay(x)) run = 0; }
+  return best;
+}
+const deltaTxt = (cur, prev, kind) => {
+  if (cur == null || prev == null) return '';
+  const d = cur - prev; if (Math.abs(d) < (kind === 'pct' ? .005 : .5)) return '<span class="mute">= vs last</span>';
+  const up = d > 0, v = kind === 'pct' ? Math.round(Math.abs(d) * 100) + ' pts' : kind === 'min' ? minsToHM(Math.abs(d)) : kind === 'money' ? money(Math.abs(d)) : Math.abs(Math.round(d));
+  return `<span class="${up ? 'pos' : 'neg'}">${up ? '▲' : '▼'} ${v}</span> <span class="mute">vs last</span>`;
+};
+function periodSummary(c, p, label) {
+  const out = [];
+  if (c.rate != null) out.push(`You completed <b>${pct(c.rate, 0)}</b> of your tasks${p.rate != null ? ` — ${c.rate > p.rate + .005 ? 'up' : c.rate < p.rate - .005 ? 'down' : 'level'} from ${pct(p.rate, 0)} last ${label}` : ''}.`);
+  out.push(`<b>${c.active}</b> active day${c.active === 1 ? '' : 's'}${c.perfect ? `, <b>${c.perfect}</b> perfect` : ''}${c.best ? `; strongest day was ${fmtDate(c.best.d, { weekday: 'long', day: 'numeric', month: 'short' })} (${Math.round(c.best.r * 100)}%)` : ''}.`);
+  if (c.focus || p.focus) out.push(`Deep work: <b>${minsToHM(c.focus)}</b>${p.focus ? ` (${c.focus >= p.focus ? '+' : '−'}${minsToHM(Math.abs(c.focus - p.focus))} vs last ${label})` : ''}.`);
+  if (c.trades) out.push(`Trading: <b class="${cls(c.pnl)}">${money(c.pnl, true)}</b> over ${c.trades} trade${c.trades === 1 ? '' : 's'}, win rate ${pct(c.winRate, 0)}${p.trades ? ` (last ${label}: ${money(p.pnl, true)})` : ''}.`);
+  if (c.missed.length) out.push(`Most missed: ${c.missed.slice(0, 3).map(x => `<b>${esc(x.t.title)}</b> (${x.dn}/${x.dd})`).join(', ')}.`);
+  else if (c.due) out.push('No repeating task was missed. Flawless.');
+  return out.map(x => `<p style="margin:0 0 6px">${x}</p>`).join('');
+}
 
 /* ========== WEEKLY REVIEW ========== */
 VIEWS.review = () => {
@@ -1311,9 +1348,11 @@ VIEWS.review = () => {
   const bkDone = all('books').filter(b => b.status === 'finished' && b.finished >= ws && b.finished <= we);
   const ch = [];
   for (let d = ws; d <= we; d = addDays(d, 1)) { const r = dayRatio(d); ch.push(`<div style="flex:1;text-align:center"><div style="height:70px;display:flex;align-items:flex-end;justify-content:center"><div style="width:60%;height:${r.r * 100}%;min-height:2px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--gold2),var(--gold3))"></div></div><div class="tiny mute">${DOW[dow(d)]}</div></div>`); }
+  const pc = periodStats(ws, we), pp = periodStats(addDays(ws, -7), addDays(ws, -1));
   const past = all('reviews').filter(x => x.id !== ws && !x.id.startsWith('M-')).sort((a, b) => b.id.localeCompare(a.id)).slice(0, 8);
   return `<div class="pagehead"><div><div class="eyebrow">Weekly Review</div><h1>${fmtDate(ws, { day: 'numeric', month: 'short' })} – ${fmtDate(we, { day: 'numeric', month: 'short' })}</h1></div><div class="row"><button class="iconbtn" data-act="revW" data-d="-7">${ICON.left}</button>${ws !== weekStart(today()) ? '<button class="btn sm" data-act="revW" data-d="0">This week</button>' : ''}<button class="iconbtn" data-act="revW" data-d="7">${ICON.right}</button></div></div>
-  <div class="grid g4 keep">${statCard('Tasks done', done + '/' + due, due ? pct(done / due, 0) + ' completion' : '')}${statCard('Active days', active + '/7', perfect + ' perfect days')}${statCard('Focus', minsToHM(focus))}${statCard('Trading P&L', tr.length ? money(s.net, true) : '–', tr.length ? s.n + ' trades · WR ' + pct(s.winRate, 0) : 'no trades', cls(s.net))}</div>
+  <div class="grid g4 keep">${statCard('Tasks done', done + '/' + due, (due ? pct(done / due, 0) + ' · ' : '') + deltaTxt(pc.rate, pp.rate, 'pct'))}${statCard('Active days', active + '/7', perfect + ' perfect · ' + deltaTxt(pc.active, pp.active))}${statCard('Focus', minsToHM(focus), deltaTxt(pc.focus, pp.focus, 'min'))}${statCard('Trading P&L', tr.length ? money(s.net, true) : '–', (tr.length ? s.n + ' trades · WR ' + pct(s.winRate, 0) + ' · ' : '') + (tr.length || pp.trades ? deltaTxt(pc.pnl, pp.pnl, 'money') : 'no trades'), cls(s.net))}</div>
+  <div class="card gold"><h2>The week in brief</h2><div class="small">${periodSummary(pc, pp, 'week')}</div></div>
   <div class="grid g2"><div class="card"><h2>Daily completion</h2><div style="display:flex;gap:4px">${ch.join('')}</div></div>
    <div class="card"><h2>Wins this week</h2><div class="small">${msDone.map(x => '<div>◎ ' + esc(x) + '</div>').join('')}${bkDone.map(b => '<div>📖 Finished ' + esc(b.title) + '</div>').join('')}${!msDone.length && !bkDone.length ? '<span class="mute">No milestones or books finished this week.</span>' : ''}
    <div style="margin-top:8px">🔥 Streak: <b>${streakInfo().cur}</b> days · ${pieceName(pieceIndex(streakInfo().record))}</div></div></div></div>
@@ -1337,12 +1376,20 @@ VIEWS.settings = () => {
   return `<div class="pagehead"><div><div class="eyebrow">Settings</div><h1>Settings & Data</h1></div></div>
   ${acct}
   ${lockSetupCard()}
+  ${restDayCard()}
   <div class="card"><h2>Export your data</h2><p class="small mute">Copies everything (tasks, streak history, trades, goals, journal…) as one block of text. Use it to move to the new app or as a backup.</p>
    <div class="row wrap"><button class="btn pri" data-act="exportCopy">Copy all data</button>${typeof SB !== 'undefined' ? '<button class="btn" data-act="exportFile">Download backup file</button>' : ''}</div>
    <div class="tiny mute" style="margin-top:8px">${counts.map(([c, n]) => c + ': ' + n).join(' · ') || 'No data yet.'}</div></div>
   <div class="card"><h2>Import data</h2><p class="small mute">Paste data you copied from the other version. Items with the same ID are overwritten; nothing else is deleted.</p>
    <textarea id="imp" placeholder="Paste here…" style="min-height:90px"></textarea><div class="row" style="margin-top:8px"><button class="btn pri" data-act="importRun">Import</button><span class="small mute" id="impmsg"></span></div></div>`;
 };
+function restDayCard() {
+  const r = restDays(), names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], order = [1, 2, 3, 4, 5, 6, 0];
+  return `<div class="card"><h2>Rest day</h2><p class="small mute">On a rest day your streak is protected: missing it doesn't reset the streak, and completing a task still counts. Task fire streaks are protected too.</p>
+   <div class="seg">${order.map(i => `<button class="${r.includes(i) ? 'on' : ''}" data-act="restDay" data-i="${i}">${names[i]}</button>`).join('')}</div>
+   <div class="tiny mute" style="margin-top:8px">${r.length ? 'Rest: ' + order.filter(i => r.includes(i)).map(i => names[i]).join(', ') : 'No rest day — every day counts.'}</div></div>`;
+}
+ACT.restDay = d => { const i = +d.i, r = restDays(), nr = r.includes(i) ? r.filter(x => x !== i) : [...r, i]; if (nr.length > 2) { toast('At most 2 rest days a week'); return; } put('misc', 'profile', { ...misc('profile'), restDays: nr }); };
 ACT.exportCopy = async () => { try { await navigator.clipboard.writeText(exportJSON()); toast('Copied all data to clipboard'); } catch (e) { openModal(mh('Copy your data') + '<p class="small mute">Select all and copy:</p><textarea style="min-height:220px" onfocus="this.select()">' + esc(exportJSON()) + '</textarea>'); } };
 ACT.exportFile = () => { const b = new Blob([exportJSON()], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'emperors-mind-backup-' + today() + '.json'; document.body.appendChild(a); a.click(); a.remove(); };
 ACT.importRun = async () => {
@@ -1394,7 +1441,7 @@ VIEWS.home = () => {
   </div>
   <div class="grid g2 keep tiles">
     <div class="card tile" style="display:flex;flex-direction:column">${ringSVG(items.length ? doneN / items.length : 0, 92, doneN + '/' + items.length, 'today')}<div class="tk" style="margin-top:12px">Progress</div><div class="tsub">${items.length ? (left ? left + ' left today' : 'All done 👑') : 'No tasks yet'}</div></div>
-    ${tile(si.cur + ' ' + FLAME(si.todayActive), 'Day streak', si.todayActive ? 'Today is counted' : 'Complete one task to keep it')}
+    ${tile(si.cur + ' ' + FLAME(si.todayActive), 'Day streak', si.todayActive ? 'Today is counted' : si.restToday ? 'Rest day · streak protected 🕊' : 'Complete one task to keep it')}
     ${tile(si.record, 'Record', idx >= 23 ? 'Max rank reached' : Math.max(0, nextDay - si.record) + ' day' + (nextDay - si.record === 1 ? '' : 's') + ' to next piece')}
     ${tile(minsToHM(focusToday).toUpperCase(), 'Focus today', focusToday ? 'Deep work logged' : 'Start a session in Focus', '').replace('class="card tile"', 'class="card tile" data-go="focus" style="cursor:pointer"')}
   </div>
@@ -1594,9 +1641,13 @@ const liveQ = x => UI.quotes[dataSym(x)];
 const livePrice = x => { const q = liveQ(x); return q ? q.price : null; };
 function liveBar() {
   if (!HAS_LIVE()) return '<div class="tiny mute" style="margin-bottom:10px">Live prices work in the installed app.</div>';
-  return `<div class="row tiny mute" style="margin-bottom:10px"><span class="dot ${UI.quotesAt ? 'on' : ''}"></span>${UI.quotesBusy ? 'Loading live prices…' : UI.quotesAt ? 'Live prices · updated ' + new Date(UI.quotesAt).toTimeString().slice(0, 5) : 'Live prices'}<span class="sp"></span><button class="btn sm ghost" data-act="qRefresh">↻ Refresh</button></div>`;
+  return `<div class="row tiny mute" style="margin-bottom:10px"><span class="dot ${UI.quotesAt ? 'on' : ''}"></span>${UI.quotesBusy ? 'Loading live prices…' : UI.quotesAt ? 'Live prices · updated ' + new Date(UI.quotesAt).toTimeString().slice(0, 5) + ' · auto-refresh every minute' : 'Live prices'}<span class="sp"></span><button class="btn sm ghost" data-act="qRefresh">↻ Refresh</button></div>`;
 }
 ACT.qRefresh = () => refreshQuotes(true);
+/* auto-refresh: every 60s while Portfolio or Watchlist is on screen, and right away when the app comes back */
+const quotesOnScreen = () => UI.view === 'trading' && (UI.tTab === 'portfolio' || UI.tTab === 'watch') && document.visibilityState === 'visible';
+setInterval(() => { if (quotesOnScreen() && !$('#modal') && Date.now() - UI.quotesAt >= 60e3) refreshQuotes(true); }, 15e3);
+document.addEventListener('visibilitychange', () => { if (quotesOnScreen() && Date.now() - UI.quotesAt >= 30e3) refreshQuotes(true); });
 
 UI.cal = null; UI.calAt = 0; UI.calBusy = false;
 async function refreshCalendar(force) {
@@ -1647,12 +1698,12 @@ VIEWS.monthly = () => {
   for (let d = first; d <= last; d = addDays(d, 1)) {
     const r = d <= end ? dayRatio(d) : { due: 0, done: 0, r: 0 }; daysArr.push([d, r]);
     if (d > end) continue;
-    due += r.due; done += r.done; if (r.done) { active++; run++; bestRun = Math.max(bestRun, run); } else run = 0;
+    due += r.due; done += r.done; if (r.done) { active++; run++; bestRun = Math.max(bestRun, run); } else if (!isRestDay(d)) run = 0;
     if (r.due && r.r >= 1) perfect++; focus += (S.days[d] && S.days[d].focus) || 0;
   }
   const tr = all('trades').filter(t => tradeDate(t).startsWith(m)), s = computeStats(tr);
   const byDayPnl = {}; tr.forEach(t => { const d = tradeDate(t); byDayPnl[d] = (byDayPnl[d] || 0) + pnlOf(t); });
-  const scored = daysArr.filter(([d, r]) => d <= end && r.due).map(([d, r]) => ({ d, r: r.r, p: byDayPnl[d] || 0, a: (S.aar[d] || {}).score || 0 }));
+  const scored = daysArr.filter(([d, r]) => d <= end && r.due && (r.done || (!isRestDay(d) && d < now))).map(([d, r]) => ({ d, r: r.r, p: byDayPnl[d] || 0, a: (S.aar[d] || {}).score || 0 }));
   const best = scored.slice().sort((a, b) => b.r - a.r || b.a - a.a || b.p - a.p)[0], worst = scored.slice().sort((a, b) => a.r - b.r || a.a - b.a || a.p - b.p)[0];
   const pDays = Object.entries(byDayPnl).sort((a, b) => b[1] - a[1]);
   const aars = all('aar').filter(a => a.id.startsWith(m) && a.score), aarAvg = aars.length ? avg(aars.map(a => a.score)) : null;
@@ -1662,9 +1713,14 @@ VIEWS.monthly = () => {
   const reps = all('tasks').filter(t => t.kind !== 'once').map(t => { let dd = 0, dn = 0; for (let d = first; d <= end; d = addDays(d, 1)) if (isDue(t, d)) { dd++; if (isDoneOn(t, d)) dn++; } return { t, dd, dn }; }).filter(x => x.dd).sort((a, b) => b.dn / b.dd - a.dn / a.dd);
   const bars = daysArr.map(([d, r]) => `<div title="${d} ${Math.round(r.r * 100)}%" style="flex:1;display:flex;align-items:flex-end;height:80px"><div style="width:100%;height:${d <= end ? Math.max(3, r.r * 100) : 0}%;border-radius:3px 3px 1px 1px;background:${r.r >= 1 ? 'var(--gold)' : r.done ? 'var(--gold3)' : '#2a2a2c'}"></div></div>`).join('');
   const isCur = m === now.slice(0, 7);
+  const pm = mo === 1 ? (y - 1) + '-12' : y + '-' + pad(mo - 1), pFirst = pm + '-01', pLast = addDays(first, -1);
+  const mc = periodStats(first, last), mp = periodStats(pFirst, pLast);
+  const recStart = recordUpTo(pLast), recEnd = recordUpTo(end), iS = pieceIndex(recStart), iE = pieceIndex(recEnd);
+  const rankLine = iE > iS ? `Rank up this month: <b class="goldt">${pieceName(iE)}</b>${iE - iS > 1 ? ' (' + (iE - iS) + ' pieces earned)' : ''} 👑` : iE >= 0 ? `Holding <b>${pieceName(iE)}</b> · record ${recEnd} day${recEnd === 1 ? '' : 's'}${iE < 23 ? ' · ' + Math.max(0, pieceDay(iE + 1) - recEnd) + ' to ' + pieceName(iE + 1) : ''}` : 'No piece yet — the Pawn comes on day 1.';
   return `<div class="pagehead"><div><div class="eyebrow">Monthly Report</div><h1>${MONTHS[mo - 1]} ${y}</h1></div><div class="row"><button class="iconbtn" data-act="monNav" data-d="-1">${ICON.left}</button>${!isCur ? '<button class="btn sm" data-act="monNav" data-d="0">This month</button>' : ''}<button class="iconbtn" data-act="monNav" data-d="1">${ICON.right}</button></div></div>
   ${isCur ? '<div class="tiny mute" style="margin:-6px 0 12px">Month in progress — numbers so far.</div>' : ''}
-  <div class="grid g4 keep">${statCard('Completion', due ? pct(done / due, 0) : '–', done + '/' + due + ' tasks')}${statCard('Perfect days', perfect, active + ' active days')}${statCard('Best streak', bestRun + ' 🔥', 'in this month')}${statCard('Focus', minsToHM(focus), aarAvg ? 'AAR avg ' + aarAvg.toFixed(1) + '/10' : 'deep work')}</div>
+  <div class="grid g4 keep">${statCard('Completion', due ? pct(done / due, 0) : '–', done + '/' + due + ' · ' + deltaTxt(mc.rate, mp.rate, 'pct'))}${statCard('Perfect days', perfect, active + ' active · ' + deltaTxt(mc.perfect, mp.perfect))}${statCard('Best streak', bestRun + ' 🔥', 'in this month')}${statCard('Focus', minsToHM(focus), (aarAvg ? 'AAR ' + aarAvg.toFixed(1) + '/10 · ' : '') + deltaTxt(mc.focus, mp.focus, 'min'))}</div>
+  <div class="card gold"><h2>State of the Empire</h2><div class="small"><p style="margin:0 0 8px">${rankLine}</p>${periodSummary(mc, mp, 'month')}</div></div>
   <div class="card"><h2>Daily completion</h2><div style="display:flex;gap:2px;align-items:flex-end">${bars}</div><div class="row tiny mute" style="margin-top:4px"><span>1</span><span class="sp"></span><span>${dim}</span></div></div>
   <div class="grid g2">
    <div class="card"><h2>Best & worst day</h2>${best ? `<div class="row" style="padding:6px 0"><span class="pill g">Best</span><b>${fmtDate(best.d, { weekday: 'short', day: 'numeric', month: 'short' })}</b><span class="sp"></span><span class="small">${Math.round(best.r * 100)}%${best.p ? ' · <span class="' + cls(best.p) + '">' + money(best.p, true) + '</span>' : ''}</span></div>` : '<div class="empty small">No data yet.</div>'}
@@ -2138,7 +2194,7 @@ async function pushRefresh() {
       else { const reg = await navigator.serviceWorker.ready; st = (await reg.pushManager.getSubscription()) ? 'on' : 'off'; }
     }
   } catch (e) { }
-  if (st !== UI.push) { UI.push = st; if (UI.view === 'settings') scheduleRender(); }
+  if (st !== UI.push) { UI.push = st; if (UI.view === 'settings' || UI.view === 'focus') scheduleRender(); }
 }
 const notifyCfg = () => ({ morning: '07:00', streak: '21:00', aar: '21:30', weekly: true, weeklyTime: '18:00', monthly: true, ...misc('notify') });
 function notifyCard() {

@@ -73,12 +73,16 @@ async function sendTo(userId: string, payload: Record<string, unknown>) {
   }
   return sent;
 }
+const dowOf = (s: string) => new Date(s + "T12:00:00Z").getUTCDay();
 async function streakOf(userId: string, today: string) {
   const { data } = await admin.from("docs").select("id,data").eq("user_id", userId).eq("col", "days").gte("id", addDays(today, -800));
   const active = new Set((data || []).filter((r) => Object.values((r.data as { done?: Record<string, boolean> })?.done || {}).some(Boolean)).map((r) => r.id));
-  let d = active.has(today) ? today : addDays(today, -1), n = 0;
-  while (active.has(d) && n < 5000) { n++; d = addDays(d, -1); }
-  return { cur: n, todayActive: active.has(today) };
+  const prof = (await doc(userId, "misc", "profile")) || {};
+  const rest: number[] = Array.isArray(prof.restDays) ? prof.restDays as number[] : [0];
+  const isRest = (d: string) => rest.includes(dowOf(d));
+  let d = active.has(today) ? today : addDays(today, -1), n = 0, g = 0;
+  while (g++ < 900) { if (active.has(d)) n++; else if (!isRest(d)) break; d = addDays(d, -1); }
+  return { cur: n, todayActive: active.has(today), restToday: isRest(today) };
 }
 async function doc(userId: string, col: string, id: string) { const { data } = await admin.from("docs").select("data").eq("user_id", userId).eq("col", col).eq("id", id).maybeSingle(); return (data?.data || null) as Record<string, unknown> | null; }
 
@@ -98,7 +102,7 @@ async function notifyAll() {
       return { title: "Good morning, Emperor Blanco", body: `Day ${s.cur} 🔥 — win the morning.${redToday ? ` ${redToday} red-folder event${redToday > 1 ? "s" : ""} today.` : ""} Tap to begin your briefing.`, url: "#morning" };
     } });
     if (st.streak) due.push({ key: "streak", time: hm(st.streak as string), build: async () => {
-      const s = await streakOf(uid, z.day); if (s.todayActive) return null;
+      const s = await streakOf(uid, z.day); if (s.todayActive || s.restToday) return null;
       return { title: s.cur ? `🔥 Your ${s.cur}-day streak is in danger` : "No task done today", body: "Complete one task before midnight to keep it alive.", url: "#home" };
     } });
     if (st.aar) due.push({ key: "aar", time: hm(st.aar as string), build: async () => {
@@ -107,6 +111,13 @@ async function notifyAll() {
     } });
     if (st.weekly && z.wd === "Sun") due.push({ key: "weekly", time: hm((st.weeklyTime as string) || "18:00"), build: async () => ({ title: "Weekly review", body: "Sunday debrief — review the week and set next week's focus.", url: "#review" }) });
     if (st.monthly && z.dom === 1) due.push({ key: "monthly", time: 9 * 60, build: async () => ({ title: "Your monthly report is ready", body: "See how last month went — and plan the next one.", url: "#monthly" }) });
+    // focus timer alarm: fires once, as soon as a session's end time has passed
+    const f = await doc(uid, "misc", "focus");
+    const fEnd = Number(f?.endAt || 0);
+    if (fEnd && Date.now() >= fEnd && Date.now() - fEnd < 15 * 60e3) {
+      const { error } = await admin.from("push_log").insert({ user_id: uid, key: "focus-" + fEnd, day: z.day });
+      if (!error) total += await sendTo(uid, { title: "Focus session complete 👑", body: `${f?.label || "Deep work"} — ${f?.dur || ""} min done. Open the app to log it.`, url: "#focus", tag: "focus" });
+    }
     for (const r of due) {
       if (r.time < 0 || z.mins < r.time || z.mins - r.time > 30) continue;
       const { error } = await admin.from("push_log").insert({ user_id: uid, key: r.key, day: z.day });
