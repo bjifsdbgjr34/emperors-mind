@@ -29,11 +29,16 @@ async function vapid() {
   VAPID_PUB = pub; return pub;
 }
 
-/* ---------- time in Zurich ---------- */
-function zurich(d = new Date()) {
-  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Zurich", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false, weekday: "short" }).formatToParts(d).map((x) => [x.type, x.value]));
+/* ---------- time in the user's time zone (misc/clock, set by the app) ---------- */
+const HOME_TZ = "Europe/Zurich"; // used until the app has saved a zone
+function validZone(z: unknown) {
+  if (typeof z !== "string" || !z) return HOME_TZ;
+  try { new Intl.DateTimeFormat("en-CA", { timeZone: z }); return z; } catch (_) { return HOME_TZ; }
+}
+function zoned(timeZone: string, d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false, weekday: "short" }).formatToParts(d).map((x) => [x.type, x.value]));
   const hour = +p.hour % 24;
-  return { day: `${p.year}-${p.month}-${p.day}`, mins: hour * 60 + +p.minute, wd: p.weekday as string, dom: +p.day };
+  return { tz: timeZone, day: `${p.year}-${p.month}-${p.day}`, mins: hour * 60 + +p.minute, wd: p.weekday as string, dom: +p.day };
 }
 const addDays = (s: string, n: number) => { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const hm = (s: string) => { const [h, m] = (s || "").split(":").map(Number); return isFinite(h) ? h * 60 + (m || 0) : -1; };
@@ -87,18 +92,18 @@ async function streakOf(userId: string, today: string) {
 async function doc(userId: string, col: string, id: string) { const { data } = await admin.from("docs").select("data").eq("user_id", userId).eq("col", col).eq("id", id).maybeSingle(); return (data?.data || null) as Record<string, unknown> | null; }
 
 async function notifyAll() {
-  const z = zurich();
   const { data: subs } = await admin.from("push_subs").select("user_id");
   const users = [...new Set((subs || []).map((s) => s.user_id))];
   let total = 0;
-  let redToday: number | null = null;
   for (const uid of users) {
+    const z = zoned(validZone((await doc(uid, "misc", "clock"))?.zone));
     const st = { enabled: true, morning: "07:00", streak: "21:00", aar: "21:30", weekly: true, weeklyTime: "18:00", monthly: true, ...(await doc(uid, "misc", "notify") || {}) } as Record<string, unknown>;
     if (st.enabled === false) continue;
     const due: { key: string; time: number; build: () => Promise<Record<string, unknown> | null> }[] = [];
     if (st.morning) due.push({ key: "morning", time: hm(st.morning as string), build: async () => {
       const s = await streakOf(uid, z.day);
-      if (redToday === null) { try { const ev = await calendar(); redToday = ev.filter((e: { impact: string; country: string; date: string }) => e.impact === "High" && e.country === "USD" && zurich(new Date(e.date)).day === z.day).length; } catch (_) { redToday = 0; } }
+      let redToday = 0;
+      try { const ev = await calendar(); redToday = ev.filter((e: { impact: string; country: string; date: string }) => e.impact === "High" && e.country === "USD" && zoned(z.tz, new Date(e.date)).day === z.day).length; } catch (_) { /* no calendar */ }
       return { title: "Good morning, Emperor Blanco", body: `Day ${s.cur} 🔥 — win the morning.${redToday ? ` ${redToday} red-folder event${redToday > 1 ? "s" : ""} today.` : ""} Tap to begin your briefing.`, url: "#morning" };
     } });
     if (st.streak) due.push({ key: "streak", time: hm(st.streak as string), build: async () => {
@@ -126,7 +131,7 @@ async function notifyAll() {
       total += await sendTo(uid, p);
     }
   }
-  return { users: users.length, sent: total, at: z };
+  return { users: users.length, sent: total, at: new Date().toISOString() };
 }
 
 async function userFrom(req: Request) {

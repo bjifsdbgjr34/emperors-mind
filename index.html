@@ -303,7 +303,22 @@ const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.get
 const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 const addDays = (s, n) => { const d = parseD(s); d.setDate(d.getDate() + n); return ymd(d); };
 const diffDays = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
-const today = () => ymd(new Date());
+/* ---------- time zone: 'auto' follows this device, 'manual' uses the zone chosen in Settings ---------- */
+const deviceTz = () => Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Zurich';
+const TZF = {};
+const tzFmt = z => TZF[z] || (TZF[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }));
+const validTz = z => { try { return !!z && !!tzFmt(z); } catch (e) { return false; } };
+const clockCfg = () => { try { return misc('clock'); } catch (e) { return {}; } };
+const appTz = () => { const c = clockCfg(); return c.mode === 'manual' && validTz(c.zone) ? c.zone : deviceTz(); };
+/* wall(t): a Date whose getHours(), getDate()… read as the clock in the app's time zone. For display and calendar days only — keep Date.now() for real moments. */
+function wall(t = Date.now()) {
+  const d = new Date(t), z = appTz();
+  if (z === deviceTz() || isNaN(d)) return d;
+  const p = {}; tzFmt(z).formatToParts(d).forEach(x => p[x.type] = +x.value);
+  return new Date(p.year, p.month - 1, p.day, p.hour % 24, p.minute, p.second, d.getMilliseconds());
+}
+const hhmm = t => { const d = wall(t); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const today = () => ymd(wall());
 const dow = s => parseD(s).getDay();
 const DOW = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -727,7 +742,7 @@ VIEWS.schedule = () => {
   const startH = Math.min(5, ...timed.map(x => Math.floor(x.s / 60))), endH = 24, HP = 58;
   const lanesEnd = []; timed.forEach(x => { let l = lanesEnd.findIndex(e => e <= x.s); if (l < 0) { l = lanesEnd.length; lanesEnd.push(0); } lanesEnd[l] = x.e; x.l = l; });
   const L = Math.max(1, lanesEnd.length);
-  const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  const now = wall(), nowM = now.getHours() * 60 + now.getMinutes();
   let hrs = ''; for (let h = startH; h <= endH; h++) { const y = (h - startH) * HP; hrs += `<div class="hr" style="top:${y}px">${pad(h % 24)}:00</div><div class="hl" style="top:${y}px"></div>`; }
   const evs = timed.map(x => { const done = isDoneOn(x.t, date); const top = (x.s - startH * 60) / 60 * HP, h = Math.max(26, (x.e - x.s) / 60 * HP - 3);
     return `<div class="ev ${done ? 'done' : ''}" style="top:${top}px;height:${h}px;left:calc(8px + ${x.l * 100 / L}%);width:calc(${100 / L}% - 12px);right:auto" data-act="tick" data-id="${x.t.id}" data-date="${date}"><span>${done ? '✓' : '○'}</span><div><b>${esc(x.t.title)}</b><div class="tiny mute">${x.t.time}${x.t.dur ? ' · ' + minsToHM(x.t.dur) : ''}</div></div></div>`; }).join('');
@@ -864,7 +879,7 @@ ACT.moreTrades = () => { UI.tLimit += 100; render(); };
 function tradeModal(t, presetDate) {
   const isNew = !t;
   const lastAcc = tSettings().lastAcc;
-  const nowL = (presetDate || today()) + 'T' + pad(new Date().getHours()) + ':' + pad(new Date().getMinutes());
+  const nowL = (presetDate || today()) + 'T' + hhmm();
   t = t || { side: 'long', acc: UI.tAcc !== 'all' ? UI.tAcc : (lastAcc && S.accounts[lastAcc] ? lastAcc : ''), openAt: nowL, closeAt: nowL, mult: 1, rating: 0 };
   const accs = all('accounts');
   const setups = [...new Set(all('trades').map(x => x.setup).filter(Boolean))];
@@ -1271,7 +1286,7 @@ let audioCtx = null;
 function beep() { try { if (!audioCtx) return; [0, .35, .7].forEach(t => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(.0001, audioCtx.currentTime + t); g.gain.exponentialRampToValueAtTime(.3, audioCtx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + t + .3); o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + .32); }); } catch (e) { } }
 function fFinish() {
   const mins = F.dur, d = today(), day = S.days[d] || { done: {} };
-  put('days', d, { ...day, focus: (day.focus || 0) + mins, sessions: [...(day.sessions || []), { label: F.label || 'Deep work', min: mins, at: new Date().toTimeString().slice(0, 5) }] });
+  put('days', d, { ...day, focus: (day.focus || 0) + mins, sessions: [...(day.sessions || []), { label: F.label || 'Deep work', min: mins, at: hhmm() }] });
   F.endAt = null; F.left = null; fSave(); fSync(); beep(); toast('Focus session complete — ' + mins + ' min logged 👑'); if (UI.view === 'focus') render();
 }
 setInterval(() => {
@@ -1383,6 +1398,35 @@ VIEWS.settings = () => {
   <div class="card"><h2>Import data</h2><p class="small mute">Paste data you copied from the other version. Items with the same ID are overwritten; nothing else is deleted.</p>
    <textarea id="imp" placeholder="Paste here…" style="min-height:90px"></textarea><div class="row" style="margin-top:8px"><button class="btn pri" data-act="importRun">Import</button><span class="small mute" id="impmsg"></span></div></div>`;
 };
+const TZ_PICKS = ['Europe/Zurich', 'America/Sao_Paulo', 'Europe/London', 'America/New_York', 'Asia/Dubai', 'Asia/Singapore', 'Asia/Tokyo'];
+const tzCity = z => z.split('/').pop().replace(/_/g, ' ').replace('Sao Paulo', 'São Paulo');
+function tzOffset(z) { try { const v = new Intl.DateTimeFormat('en-GB', { timeZone: z, timeZoneName: 'shortOffset' }).formatToParts(new Date()).find(x => x.type === 'timeZoneName').value; return v === 'GMT' ? 'GMT+0' : v; } catch (e) { return ''; } }
+const tzNow = () => hhmm() + ' · ' + fmtDate(today(), { weekday: 'short', day: 'numeric', month: 'short' });
+function timeZoneCard() {
+  const manual = clockCfg().mode === 'manual' && validTz(clockCfg().zone), z = appTz();
+  let zones = []; try { zones = Intl.supportedValuesOf('timeZone'); } catch (e) { zones = TZ_PICKS.slice(); }
+  if (manual && !zones.includes(z) && !TZ_PICKS.includes(z)) zones.push(z);
+  let chosen = false;
+  const opt = v => { const sel = manual && !chosen && v === z; if (sel) chosen = true; return `<option value="${esc(v)}" ${sel ? 'selected' : ''}>${esc(tzCity(v))} (${tzOffset(v)})</option>`; };
+  const picks = TZ_PICKS.map(opt).join(''), groups = {};
+  zones.forEach(v => { const g = v.includes('/') ? v.split('/')[0] : 'Other'; (groups[g] = groups[g] || []).push(v); });
+  return `<div class="card"><h2>Time zone</h2><p class="small mute">Your day, streak, greeting, schedule, news times and notifications all follow this time zone.</p>
+   <select data-chg="tzSet" aria-label="Time zone"><option value="auto" ${manual ? '' : 'selected'}>Automatic — this device: ${esc(tzCity(deviceTz()))} (${tzOffset(deviceTz())})</option><optgroup label="Quick picks">${picks}</optgroup>${Object.keys(groups).sort().map(g => `<optgroup label="All · ${esc(g)}">${groups[g].map(opt).join('')}</optgroup>`).join('')}</select>
+   <div class="small" style="margin-top:10px">Now in ${esc(tzCity(z))}: <b class="goldt" id="tznow">${tzNow()}</b></div>
+   <div class="tiny mute" style="margin-top:6px">${manual ? 'Fixed to this zone on all your devices until you change it.' : 'Changes by itself when you travel. Notifications follow the device you opened last.'}</div></div>`;
+}
+/* the server reads misc/clock to time notifications, so keep it up to date */
+function syncClock() {
+  if (typeof SB !== 'undefined' && !SESSION) return;
+  const c = clockCfg(), mode = c.mode === 'manual' && validTz(c.zone) ? 'manual' : 'auto', zone = mode === 'manual' ? c.zone : deviceTz();
+  if (c.mode !== mode || c.zone !== zone) put('misc', 'clock', { mode, zone });
+}
+ACT.tzSet = (d, el) => {
+  const v = el.value; el.blur();
+  put('misc', 'clock', v === 'auto' ? { mode: 'auto', zone: deviceTz() } : { mode: 'manual', zone: v });
+  render(true); toast('Time zone: ' + tzCity(appTz()));
+};
+setInterval(() => { const el = $('#tznow'); if (el) el.textContent = tzNow(); }, 5000);
 function restDayCard() {
   const r = restDays(), names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], order = [1, 2, 3, 4, 5, 6, 0];
   return `<div class="card"><h2>Rest day</h2><p class="small mute">On a rest day your streak is protected: missing it doesn't reset the streak, and completing a task still counts. Task fire streaks are protected too.</p>
@@ -1401,7 +1445,7 @@ ACT.importRun = async () => {
 };
 
 /* ========== TODAY (home) ========== */
-function greeting() { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening'; }
+function greeting() { const h = wall().getHours(); return h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening'; }
 function ringSVG(r, size = 84, label = '', sub = '') {
   const R = 36, C = 2 * Math.PI * R;
   return `<svg class="ring" viewBox="0 0 84 84" style="width:${size}px;height:${size}px"><circle cx="42" cy="42" r="${R}" fill="none" stroke="#1d1d1f" stroke-width="6"/>
@@ -1431,7 +1475,7 @@ VIEWS.home = () => {
     <div><div class="hdate">${fmtDate(t, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase()}</div>
     <div class="hgreet">${greeting()},</div><div class="hname">Emperor Blanco</div></div>
   </div>
-  ${(() => { const dd = S.days[t] || {}, h = new Date().getHours(); const am = !dd.ritualAM && h >= 4 && h < 14, pm = !dd.closed && h >= 17; return am || pm ? `<button class="card ritualcta" data-go="${am ? 'morning' : 'shutdown'}"><span style="font-size:22px">${am ? '⚔️' : '🔒'}</span><span style="flex:1;text-align:left"><b>${am ? 'Begin the day' : 'Close the day'}</b><span class="tiny mute" style="display:block">${am ? 'Morning briefing · 2 minutes' : 'Night shutdown · debrief and plan tomorrow'}</span></span><span class="goldt">→</span></button>` : ''; })()}
+  ${(() => { const dd = S.days[t] || {}, h = wall().getHours(); const am = !dd.ritualAM && h >= 4 && h < 14, pm = !dd.closed && h >= 17; return am || pm ? `<button class="card ritualcta" data-go="${am ? 'morning' : 'shutdown'}"><span style="font-size:22px">${am ? '⚔️' : '🔒'}</span><span style="flex:1;text-align:left"><b>${am ? 'Begin the day' : 'Close the day'}</b><span class="tiny mute" style="display:block">${am ? 'Morning briefing · 2 minutes' : 'Night shutdown · debrief and plan tomorrow'}</span></span><span class="goldt">→</span></button>` : ''; })()}
   ${(S.days[t] || {}).mission ? `<div class="card mission"><span class="tiny">🎯 TODAY'S MISSION</span><b>${esc(S.days[t].mission)}</b></div>` : ''}
   <div class="card rankcard" data-go="trophies">
     <div class="rp">${idx >= 0 ? pieceSVG(idx) : '<div style="opacity:.28;filter:grayscale(1)">' + pieceSVG(0) + '</div>'}</div>
@@ -1490,7 +1534,7 @@ VIEWS.warroom = () => {
     <div class="brief" data-act="wrTab" data-k="countdowns"><span class="mute tiny">NEXT D-DAY</span><b>${cds[0] ? diffDays(t, cds[0].date) + ' days' : '—'}</b><span class="tiny mute">${cds[0] ? esc(cds[0].title) : 'No countdowns'}</span></div>
    </div>
    ${HAS_LIVE() ? (refreshCalendar(), newsFiltered(t).filter(e => e.impact === 'High').length ? `<div class="small" style="margin-top:12px">📰 <b>Red folders today:</b> ${newsFiltered(t).filter(e => e.impact === 'High').map(e => evTime(e.d) + ' ' + esc(e.country) + ' ' + esc(e.title)).join(' · ')}</div>` : '') : ''}
-   ${!aarToday && new Date().getHours() >= 17 ? '<button class="btn sm" data-act="wrTab" data-k="aar" style="margin-top:12px">📝 File today\'s After Action Report</button>' : ''}</div>
+   ${!aarToday && wall().getHours() >= 17 ? '<button class="btn sm" data-act="wrTab" data-k="aar" style="margin-top:12px">📝 File today\'s After Action Report</button>' : ''}</div>
   <div class="tabs">${tabs.map(([k, l]) => `<button class="${UI.wrTab === k ? 'on' : ''}" data-act="wrTab" data-k="${k}">${l}</button>`).join('')}</div>${body}`;
 };
 ACT.wrTab = d => { UI.wrTab = d.k; render(); };
@@ -1641,7 +1685,7 @@ const liveQ = x => UI.quotes[dataSym(x)];
 const livePrice = x => { const q = liveQ(x); return q ? q.price : null; };
 function liveBar() {
   if (!HAS_LIVE()) return '<div class="tiny mute" style="margin-bottom:10px">Live prices work in the installed app.</div>';
-  return `<div class="row tiny mute" style="margin-bottom:10px"><span class="dot ${UI.quotesAt ? 'on' : ''}"></span>${UI.quotesBusy ? 'Loading live prices…' : UI.quotesAt ? 'Live prices · updated ' + new Date(UI.quotesAt).toTimeString().slice(0, 5) + ' · auto-refresh every minute' : 'Live prices'}<span class="sp"></span><button class="btn sm ghost" data-act="qRefresh">↻ Refresh</button></div>`;
+  return `<div class="row tiny mute" style="margin-bottom:10px"><span class="dot ${UI.quotesAt ? 'on' : ''}"></span>${UI.quotesBusy ? 'Loading live prices…' : UI.quotesAt ? 'Live prices · updated ' + hhmm(UI.quotesAt) + ' · auto-refresh every minute' : 'Live prices'}<span class="sp"></span><button class="btn sm ghost" data-act="qRefresh">↻ Refresh</button></div>`;
 }
 ACT.qRefresh = () => refreshQuotes(true);
 /* auto-refresh: every 60s while Portfolio or Watchlist is on screen, and right away when the app comes back */
@@ -1662,8 +1706,8 @@ async function refreshCalendar(force) {
 const newsPrefs = () => ({ impact: 'High', cur: ['USD'], ...(tSettings().news || {}) });
 function newsFiltered(dayOnly) {
   const p = newsPrefs(), lv = { High: 3, Medium: 2, Low: 1, Holiday: 0 }, min = p.impact === 'High' ? 3 : p.impact === 'Medium' ? 2 : 1;
-  return (UI.cal || []).filter(e => (lv[e.impact] || 0) >= min && (!p.cur.length || p.cur.includes(e.country))).map(e => ({ ...e, d: new Date(e.date) }))
-    .filter(e => !dayOnly || ymd(e.d) === dayOnly).sort((a, b) => a.d - b.d);
+  return (UI.cal || []).filter(e => (lv[e.impact] || 0) >= min && (!p.cur.length || p.cur.includes(e.country))).map(e => ({ ...e, d: new Date(e.date), w: wall(e.date) }))
+    .filter(e => !dayOnly || ymd(e.w) === dayOnly).sort((a, b) => a.d - b.d);
 }
 const evTime = d => pad(d.getHours()) + ':' + pad(d.getMinutes());
 const impactDot = i => `<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${i === 'High' ? '#e0565b' : i === 'Medium' ? '#e6a23c' : '#e6d36a'}"></span>`;
@@ -1672,19 +1716,19 @@ function redFoldersToday() {
   refreshCalendar();
   const ev = newsFiltered(today()).filter(e => e.impact === 'High');
   if (!ev.length) return '';
-  return `<div class="card" style="border-color:rgba(224,86,91,.45);padding:12px 16px"><div class="row wrap" style="gap:8px"><b class="small" style="color:#e98a8d">📰 Red folders today</b>${ev.map(e => `<span class="pill" style="border-color:rgba(224,86,91,.4)">${evTime(e.d)} · ${esc(e.country)} ${esc(e.title)}</span>`).join('')}</div></div>`;
+  return `<div class="card" style="border-color:rgba(224,86,91,.45);padding:12px 16px"><div class="row wrap" style="gap:8px"><b class="small" style="color:#e98a8d">📰 Red folders today</b>${ev.map(e => `<span class="pill" style="border-color:rgba(224,86,91,.4)">${evTime(e.w)} · ${esc(e.country)} ${esc(e.title)}</span>`).join('')}</div></div>`;
 }
 function tNews() {
   if (!HAS_LIVE()) return '<div class="card empty">The economic calendar works in the installed app.</div>';
   refreshCalendar();
   const p = newsPrefs(), ev = newsFiltered(), now = new Date();
-  const days = {}; ev.forEach(e => (days[ymd(e.d)] = days[ymd(e.d)] || []).push(e));
+  const days = {}; ev.forEach(e => (days[ymd(e.w)] = days[ymd(e.w)] || []).push(e));
   const curs = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD', 'CNY'];
   return `<div class="card" style="padding:12px 16px"><div class="row wrap" style="gap:10px"><div class="seg">${['High', 'Medium', 'All'].map(k => `<button class="${p.impact === k ? 'on' : ''}" data-act="newsImp" data-k="${k}">${k === 'High' ? 'High only' : k === 'Medium' ? 'High + Medium' : 'All'}</button>`).join('')}</div>
    <div class="row wrap" style="gap:4px">${curs.map(c => `<button class="btn sm ${p.cur.includes(c) ? 'pri' : 'ghost'}" style="padding:4px 8px" data-act="newsCur" data-c="${c}">${c}</button>`).join('')}</div></div>
-   <div class="tiny mute" style="margin-top:8px">This week · times in your timezone · source: ForexFactory${UI.calAt ? ' · updated ' + new Date(UI.calAt).toTimeString().slice(0, 5) : ''}</div></div>
+   <div class="tiny mute" style="margin-top:8px">This week · times in ${esc(tzCity(appTz()))} time · source: ForexFactory${UI.calAt ? ' · updated ' + hhmm(UI.calAt) : ''}</div></div>
   ${!UI.cal ? '<div class="card empty">Loading calendar…</div>' : !ev.length ? '<div class="card empty">No events match your filter this week.</div>' : Object.entries(days).map(([d, a]) => `<div class="card" style="padding:10px 14px"><div class="eyebrow" style="padding:4px 0 6px">${d === today() ? 'Today · ' : ''}${fmtDate(d, { weekday: 'long', day: 'numeric', month: 'short' })}</div>
-   <div class="list">${a.map(e => `<div class="row small" style="padding:8px 0;${e.d < now ? 'opacity:.45' : ''}"><span style="width:44px" class="mute">${evTime(e.d)}</span>${impactDot(e.impact)}<b style="width:34px">${esc(e.country)}</b><span style="flex:1;min-width:0">${esc(e.title)}</span><span class="tiny mute" style="text-align:right">${e.forecast ? 'F ' + esc(e.forecast) : ''}${e.previous ? '<br>P ' + esc(e.previous) : ''}</span></div>`).join('')}</div></div>`).join('')}`;
+   <div class="list">${a.map(e => `<div class="row small" style="padding:8px 0;${e.d < now ? 'opacity:.45' : ''}"><span style="width:44px" class="mute">${evTime(e.w)}</span>${impactDot(e.impact)}<b style="width:34px">${esc(e.country)}</b><span style="flex:1;min-width:0">${esc(e.title)}</span><span class="tiny mute" style="text-align:right">${e.forecast ? 'F ' + esc(e.forecast) : ''}${e.previous ? '<br>P ' + esc(e.previous) : ''}</span></div>`).join('')}</div></div>`).join('')}`;
 }
 ACT.newsImp = d => { const t = tSettings(); put('misc', 'trading', { ...t, news: { ...newsPrefs(), impact: d.k } }); };
 ACT.newsCur = d => { const t = tSettings(), p = newsPrefs(); const c = p.cur.includes(d.c) ? p.cur.filter(x => x !== d.c) : [...p.cur, d.c]; put('misc', 'trading', { ...t, news: { ...p, cur: c } }); };
@@ -1810,7 +1854,7 @@ VIEWS.morning = () => {
       ${cds[0] ? `<div class="card"><div class="tiny mute">NEXT D-DAY</div><b>${esc(cds[0].title)}</b> in <b class="goldt">${diffDays(t, cds[0].date)}</b> days</div>` : ''}
       ${!camp && !en.length && !cds[0] ? '<p class="mute">No campaign, enemies or countdowns set yet. Set them up in the War Room.</p>' : ''}`,
     () => `<div class="eyebrow">Today's orders</div><h1 style="margin:8px 0 12px">${items.length} order${items.length === 1 ? '' : 's'} today</h1>
-      ${HAS_LIVE() ? (refreshCalendar(), newsFiltered(t).filter(e => e.impact === 'High').length ? `<div class="card" style="border-color:rgba(224,86,91,.45)"><b class="small" style="color:#e98a8d">📰 Red folders</b>${newsFiltered(t).filter(e => e.impact === 'High').map(e => `<div class="small" style="margin-top:4px">${evTime(e.d)} · ${esc(e.country)} ${esc(e.title)}</div>`).join('')}</div>` : '') : ''}
+      ${HAS_LIVE() ? (refreshCalendar(), newsFiltered(t).filter(e => e.impact === 'High').length ? `<div class="card" style="border-color:rgba(224,86,91,.45)"><b class="small" style="color:#e98a8d">📰 Red folders</b>${newsFiltered(t).filter(e => e.impact === 'High').map(e => `<div class="small" style="margin-top:4px">${evTime(e.w)} · ${esc(e.country)} ${esc(e.title)}</div>`).join('')}</div>` : '') : ''}
       <div class="card"><div class="list">${items.map(x => `<div class="row small" style="padding:8px 0"><span style="width:46px" class="mute">${x.time || '—'}</span><span style="flex:1">${esc(x.title)}</span>${isDoneOn(x, t) ? '<span class="goldt">✓</span>' : ''}</div>`).join('') || '<div class="empty small">No orders set for today.</div>'}</div></div>`,
     () => `<div class="eyebrow">Focus</div><h1 style="margin:8px 0 6px">Today's #1 mission</h1><p class="small mute">If you only win one battle today, which one?</p>
       <input type="text" id="r-mission" data-d="${t}" data-chg="missionSave" value="${esc(dayDoc(t).mission || '')}" placeholder="Pass phase 1 of the eval" style="font-size:18px;padding:14px">`,
@@ -1853,13 +1897,13 @@ const tradingLocked = () => (tlock().until || 0) > Date.now();
 function lockLeft() { const ms = Math.max(0, (tlock().until || 0) - Date.now()); const h = Math.floor(ms / 36e5), m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1000) % 60; return h + ':' + pad(m) + ':' + pad(s); }
 function lockBanner() {
   if (!tradingLocked()) return '';
-  return `<div class="card lockban"><div class="row"><div style="font-size:26px">🔒</div><div style="flex:1"><b style="letter-spacing:.18em">TRADING LOCKED</b><div class="small mute">Until ${new Date(tlock().until).toTimeString().slice(0, 5)} · no new trades. Walk away, Emperor.</div></div><div class="serif" id="lockleft" style="font-size:26px;font-weight:600">${lockLeft()}</div></div>
+  return `<div class="card lockban"><div class="row"><div style="font-size:26px">🔒</div><div style="flex:1"><b style="letter-spacing:.18em">TRADING LOCKED</b><div class="small mute">Until ${hhmm(tlock().until)} · no new trades. Walk away, Emperor.</div></div><div class="serif" id="lockleft" style="font-size:26px;font-weight:600">${lockLeft()}</div></div>
    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="runLockShortcut">Run Opal block again</button><span class="sp"></span><button class="btn sm ghost" data-act="lockBreak" style="color:var(--mute)">Emergency unlock</button></div></div>`;
 }
 setInterval(() => { const el = $('#lockleft'); if (el) { if (!tradingLocked()) render(); else el.textContent = lockLeft(); } }, 1000);
 ACT.tradeLock = () => {
   const until = new Date(Date.now() + LOCK_HOURS * 36e5);
-  openModal(mh('Lock trading for ' + LOCK_HOURS + ' hours?') + `<p class="mute small">Until <b style="color:var(--text)">${until.toTimeString().slice(0, 5)}</b>. Logging new trades is locked in the app, and your <b style="color:var(--text)">“Trading Lock”</b> shortcut runs to block TradingView and Topstep with Opal.</p>
+  openModal(mh('Lock trading for ' + LOCK_HOURS + ' hours?') + `<p class="mute small">Until <b style="color:var(--text)">${hhmm(until)}</b>. Logging new trades is locked in the app, and your <b style="color:var(--text)">“Trading Lock”</b> shortcut runs to block TradingView and Topstep with Opal.</p>
     <p class="tiny mute">First time? Set up the shortcut once: Settings & Data → Trading Lock setup.</p>
     <div class="actions"><button class="btn" data-act="close">Cancel</button><button class="btn pri" id="tl-go">🔒 Lock now</button></div>`, m => m.querySelector('#tl-go').onclick = () => {
     const t = tlock(); put('misc', 'tlock', { ...t, until: until.getTime(), started: Date.now(), history: [...(t.history || []), { at: Date.now(), hours: LOCK_HOURS }].slice(-200) });
@@ -2059,7 +2103,7 @@ async function startSession(sess) {
   SESSION = sess; SYNC.loaded = new Set();
   if (loadCache(sess.user.id)) { applyQueue(); COLS.forEach(c => SYNC.loaded.add(c)); }
   SYNC.mode = 'connecting'; render(true);
-  try { await loadAll(); SYNC.mode = 'cloud'; SYNC.offline = false; } catch (e) { console.warn(e); SYNC.offline = true; if (!SYNC.loaded.size) COLS.forEach(c => SYNC.loaded.add(c)); }
+  try { await loadAll(); SYNC.mode = 'cloud'; SYNC.offline = false; syncClock(); } catch (e) { console.warn(e); SYNC.offline = true; if (!SYNC.loaded.size) COLS.forEach(c => SYNC.loaded.add(c)); }
   subscribe(); flush(); render(true);
 }
 async function initStore() {
@@ -2072,7 +2116,7 @@ async function initStore() {
   AUTH_READY = true;
   if (data.session) { if (!SESSION) startSession(data.session); } else render(true);
 }
-document.addEventListener('visibilitychange', () => { if (!document.hidden && SESSION) { loadAll().then(() => render()).catch(() => { }); flush(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && SESSION) { loadAll().then(() => { syncClock(); render(); }).catch(() => { }); flush(); } });
 
 /* sync label override */
 function syncLabel() { return SYNC.offline ? '<span class="dot warn"></span>Offline — will sync' : Object.keys(Q).length ? '<span class="dot warn"></span>Saving…' : SYNC.mode === 'cloud' ? '<span class="dot on"></span>Synced' : '<span class="dot"></span>Connecting…'; }
@@ -2129,7 +2173,7 @@ SB.auth.onAuthStateChange((ev) => {
 function accountCard() {
   setTimeout(pushRefresh, 0);
   return `<div class="card gold"><div class="row"><div><div class="eyebrow">Account</div><div style="margin-top:4px">${esc(SESSION ? SESSION.user.email : '')}</div><div class="tiny mute" style="margin-top:2px">${syncLabel()}</div></div><span class="sp"></span><button class="btn sm" data-act="signOut">Sign out</button></div></div>
-  <div class="card"><h2>Install on your devices</h2><div class="small mute"><b style="color:var(--text)">iPhone:</b> open this page in Safari → Share → <i>Add to Home Screen</i>.<br><b style="color:var(--text)">Mac:</b> Safari → File → <i>Add to Dock</i> (or Chrome → ⋮ → <i>Cast, save and share → Install page as app</i>).<br>Sign in once on each device — everything syncs automatically.</div></div>` + securityCard() + notifyCard();
+  <div class="card"><h2>Install on your devices</h2><div class="small mute"><b style="color:var(--text)">iPhone:</b> open this page in Safari → Share → <i>Add to Home Screen</i>.<br><b style="color:var(--text)">Mac:</b> Safari → File → <i>Add to Dock</i> (or Chrome → ⋮ → <i>Cast, save and share → Install page as app</i>).<br>Sign in once on each device — everything syncs automatically.</div></div>` + securityCard() + timeZoneCard() + notifyCard();
 }
 ACT.signOut = () => confirmBox('Sign out on this device?', async () => { await SB.auth.signOut(); }, 'Sign out');
 
@@ -2206,7 +2250,7 @@ function notifyCard() {
    <div class="list" style="margin-top:10px">${tm('morning', '☀️ Morning briefing')}${tm('streak', '🔥 Streak in danger (only if nothing done)')}${tm('aar', '📝 After Action Report (only if not filed)')}
     <div class="row" style="padding:7px 0"><span style="flex:1">📊 Weekly review — Sundays</span><input type="time" value="${esc(c.weekly ? c.weeklyTime : '')}" data-chg="notifyTime" data-k="weeklyTime" style="width:120px"><button class="sw ${c.weekly ? 'on' : ''}" data-act="notifyFlag" data-k="weekly"></button></div>
     <div class="row" style="padding:7px 0"><span style="flex:1">🗓 Monthly report — 1st of the month, 09:00</span><button class="sw ${c.monthly ? 'on' : ''}" data-act="notifyFlag" data-k="monthly"></button></div></div>
-   <div class="tiny mute" style="margin-top:6px">Times are Swiss time. Turn notifications on separately on each device.</div></div>`;
+   <div class="tiny mute" style="margin-top:6px">Times are ${esc(tzCity(appTz()))} time (change it under Time zone). Turn notifications on separately on each device.</div></div>`;
 }
 ACT.notifyTime = (d, el) => { const c = notifyCfg(); if (d.k === 'weeklyTime') c.weekly = !!el.value; put('misc', 'notify', { ...c, [d.k]: el.value }); };
 ACT.notifyClear = d => put('misc', 'notify', { ...notifyCfg(), [d.k]: '' });
